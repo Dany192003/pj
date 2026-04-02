@@ -1,4 +1,4 @@
-// js/whatsapp.js - Gestión de WhatsApp (usa URL ya guardada)
+// js/whatsapp.js - Gestión de WhatsApp y mensajes
 
 // Subir imagen a Cloudinary y enviar por WhatsApp
 async function subirYEnviar() {
@@ -9,7 +9,6 @@ async function subirYEnviar() {
         return;
     }
     
-    // Formatear número de teléfono para Guatemala
     if (tel.length === 8 && !tel.startsWith("502")) {
         tel = "502" + tel;
     }
@@ -19,9 +18,7 @@ async function subirYEnviar() {
         return;
     }
     
-    // Verificar si ya tenemos la URL de Cloudinary
     let imagenUrl = window.imagenCloudinaryUrl;
-    
     if (!imagenUrl) {
         showToast("⚠️ La imagen aún no se ha subido, intenta de nuevo", true);
         return;
@@ -48,17 +45,16 @@ async function subirYEnviar() {
         }
         
         showToast("✓ Abriendo WhatsApp...");
-        
     } catch (e) {
-        console.error("Error al enviar:", e);
-        showToast("❌ Error al enviar. Copia el mensaje manualmente.", true);
+        console.error(e);
+        showToast("❌ Error al enviar", true);
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
-// Construir mensaje con emojis UTF-8
+// Construir mensaje con emojis
 function construirMensajeConEmojis(registro) {
     if (!registro) return "";
     
