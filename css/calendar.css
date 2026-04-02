@@ -1,9 +1,24 @@
+/* css/calendar.css - Estilos del calendario */
+
 .calendar-container {
     background: white;
     border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 30px;
+    padding: 16px;
+    margin-bottom: 24px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+}
+
+@media (min-width: 768px) {
+    .calendar-container {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .calendar-container {
+        padding: 12px;
+    }
 }
 
 .calendar-header {
@@ -16,7 +31,7 @@
 }
 
 .calendar-header h2 {
-    font-size: 24px;
+    font-size: clamp(18px, 5vw, 24px);
     font-weight: 700;
     color: #0f172a;
     margin: 0;
@@ -27,14 +42,20 @@
     border: none;
     padding: 8px 16px;
     border-radius: 8px;
-    font-size: 18px;
+    font-size: clamp(14px, 4vw, 18px);
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 600;
 }
 
-.calendar-nav:hover {
-    background: #e2e8f0;
+@media (max-width: 480px) {
+    .calendar-nav {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+}
+
+.calendar-nav:active {
     transform: scale(0.95);
 }
 
@@ -45,7 +66,7 @@
     margin-bottom: 10px;
     font-weight: 700;
     color: #0891b2;
-    font-size: 14px;
+    font-size: clamp(11px, 3vw, 14px);
 }
 
 .calendar-days {
@@ -54,28 +75,38 @@
     gap: 5px;
 }
 
+@media (max-width: 480px) {
+    .calendar-days {
+        gap: 3px;
+    }
+}
+
 .calendar-day {
     background: #f8fafc;
     border-radius: 10px;
-    padding: 12px 8px;
+    padding: clamp(6px, 3vw, 12px) clamp(3px, 2vw, 8px);
     text-align: center;
     transition: all 0.2s ease;
     position: relative;
-    min-height: 80px;
+    min-height: clamp(55px, 15vw, 80px);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     font-weight: 500;
+    cursor: pointer;
 }
 
 .calendar-day:hover {
     background: #e2e8f0;
     transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .calendar-day.empty {
     background: transparent;
     cursor: default;
+    transform: none;
+    box-shadow: none;
 }
 
 .calendar-day.today {
@@ -85,20 +116,21 @@
 }
 
 .calendar-day.has-event {
-    background: #e0f2fe;
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
     border-left: 4px solid #0891b2;
 }
 
 .day-number {
-    font-size: 16px;
+    font-size: clamp(12px, 4vw, 16px);
     font-weight: 600;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
-.day-events {
-    font-size: 10px;
-    color: #64748b;
-    margin-top: 4px;
+@media (max-width: 480px) {
+    .day-number {
+        font-size: 12px;
+        margin-bottom: 2px;
+    }
 }
 
 .day-event {
@@ -107,10 +139,185 @@
     padding: 2px 4px;
     border-radius: 4px;
     margin-top: 2px;
-    font-size: 9px;
+    font-size: 8px;
     word-break: break-word;
+    line-height: 1.2;
+    cursor: pointer;
 }
 
+.day-event:hover {
+    background: #0e7490;
+}
+
+@media (max-width: 480px) {
+    .day-event {
+        font-size: 7px;
+        padding: 1px 2px;
+    }
+}
+
+/* Modal de actividades */
+.modal-actividad {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-actividad-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 25px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 450px;
+    animation: slideUp 0.3s ease;
+    position: relative;
+    box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.2);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+    .modal-actividad-content {
+        margin: 10% auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-actividad-content {
+        margin: 30% auto;
+        padding: 20px;
+        width: 95%;
+    }
+}
+
+.modal-actividad-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #0891b2;
+}
+
+.modal-actividad-header h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.close-actividad {
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.close-actividad:hover {
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+.modal-actividad-body {
+    margin-bottom: 20px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+/* Estilos para actividades en modal */
+.actividad-item {
+    margin-bottom: 15px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.actividad-titulo {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0891b2;
+    margin-bottom: 10px;
+}
+
+.actividad-fecha,
+.actividad-lugar,
+.actividad-descripcion {
+    font-size: 13px;
+    color: #334155;
+    margin-top: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.actividad-icono {
+    font-size: 14px;
+}
+
+.actividad-descripcion {
+    color: #64748b;
+    line-height: 1.5;
+    text-align: left;
+}
+
+/* Sin actividades */
+.sin-actividades {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.sin-actividades-icono {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.6;
+}
+
+.sin-actividades-texto {
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* Actividades lista */
+.actividades-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-actividad-footer {
+    text-align: center;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-cerrar-modal {
+    background: #0891b2;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.btn-cerrar-modal:hover {
+    background: #0e7490;
+    transform: scale(0.98);
+}
+
+/* Modal de login */
 .modal {
     display: none;
     position: fixed;
@@ -133,6 +340,19 @@
     text-align: center;
     animation: slideUp 0.3s ease;
     position: relative;
+}
+
+@media (min-width: 768px) {
+    .modal-content {
+        margin: 10% auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        margin: 30% auto;
+        padding: 20px;
+    }
 }
 
 .close {
@@ -164,6 +384,30 @@
     margin-top: 10px;
 }
 
+.btn-login {
+    background: #0891b2;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background: #0e7490;
+}
+
+.user-actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Animaciones */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -172,23 +416,10 @@
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px);
     }
     to {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-
-@media (max-width: 640px) {
-    .calendar-day {
-        min-height: 60px;
-        padding: 8px 4px;
-    }
-    .day-number {
-        font-size: 14px;
-    }
-    .calendar-weekdays {
-        font-size: 12px;
     }
 }

@@ -80,44 +80,30 @@ async function saveDatabase() {
     }
 }
 
-// NUEVA FUNCIÓN: Reiniciar sistema completo
 async function resetSistema() {
     return new Promise(async (resolve, reject) => {
         try {
             logMensaje("🔄 Reiniciando TODO el sistema...", false);
             
-            // 1. Eliminar TODOS los pagos
             const snapshotPagos = await coleccionPagos.get();
             const batchPagos = dbFirestore.batch();
-            snapshotPagos.forEach(doc => {
-                batchPagos.delete(doc.ref);
-            });
+            snapshotPagos.forEach(doc => { batchPagos.delete(doc.ref); });
             await batchPagos.commit();
             
-            // 2. Reiniciar correlativo de recibos (contador)
             ultimoNum = 0;
             await coleccionCorrelativo.set({ valor: 0 });
             
-            // 3. Eliminar TODAS las contraseñas de los grupos
             const snapshotPasswords = await coleccionPasswords.get();
             const batchPasswords = dbFirestore.batch();
-            snapshotPasswords.forEach(doc => {
-                batchPasswords.delete(doc.ref);
-            });
+            snapshotPasswords.forEach(doc => { batchPasswords.delete(doc.ref); });
             await batchPasswords.commit();
             
-            // 4. Eliminar TODAS las actividades del calendario
             const snapshotEventos = await coleccionEventos.get();
             const batchEventos = dbFirestore.batch();
-            snapshotEventos.forEach(doc => {
-                batchEventos.delete(doc.ref);
-            });
+            snapshotEventos.forEach(doc => { batchEventos.delete(doc.ref); });
             await batchEventos.commit();
             
-            // 5. Limpiar la variable local db
             db = {};
-            
-            // 6. Crear estructura limpia para el año actual (solo grupos, todo pendiente)
             const añoActual = new Date().getFullYear();
             db[añoActual] = [];
             for (const grupo of GRUPOS) {
@@ -128,15 +114,9 @@ async function resetSistema() {
                 }
             }
             
-            // 7. Guardar cambios en localStorage
             saveDatabaseLocal();
-            
-            logMensaje("✓ Sistema reiniciado completamente (pagos, contador, contraseñas y actividades)", false);
-            
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-            
+            logMensaje("✓ Sistema reiniciado completamente", false);
+            setTimeout(() => location.reload(), 1500);
             resolve(true);
         } catch (error) {
             console.error("Error al reiniciar sistema:", error);
@@ -153,8 +133,14 @@ async function cargarEventos() {
     return eventos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 }
 
-async function agregarEvento(fecha, titulo, lugar) {
-    const evento = { fecha, titulo, lugar: lugar || "", creado: new Date().toISOString() };
+async function agregarEvento(fecha, titulo, lugar, descripcion) {
+    const evento = { 
+        fecha, 
+        titulo, 
+        lugar: lugar || "", 
+        descripcion: descripcion || "",
+        creado: new Date().toISOString() 
+    };
     const docRef = await coleccionEventos.add(evento);
     return { id: docRef.id, ...evento };
 }
@@ -244,7 +230,7 @@ async function addCustomGroup(anio, grupo) {
     return false;
 }
 
-// ========== EXPORTAR FUNCIONES GLOBALES ==========
+// Exportar funciones globales
 window.cargarContraseñasGrupos = cargarContraseñasGrupos;
 window.verificarContraseñaGrupo = verificarContraseñaGrupo;
 window.guardarContraseñaGrupo = guardarContraseñaGrupo;
@@ -260,3 +246,6 @@ window.getNextNumero = getNextNumero;
 window.getCurrentNumero = getCurrentNumero;
 window.addCustomGroup = addCustomGroup;
 window.initDatabase = initDatabase;
+window.db = db;
+window.GRUPOS = GRUPOS;
+window.MESES = MESES;

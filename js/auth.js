@@ -1,6 +1,6 @@
 // js/auth.js - Autenticación
 
-const ADMIN_CREDENTIALS = { password: "123" };
+const ADMIN_CREDENTIALS = { password: "321" };
 
 function isAuthenticated() {
     return sessionStorage.getItem("admin_auth") === "true";

@@ -3,389 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0891b2">
     <title>Admin | Pastoral Juvenil</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .logout-btn, .reset-btn {
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-        }
-        .logout-btn {
-            background: #ef4444;
-            color: white;
-        }
-        .reset-btn {
-            background: #5a73ff;
-            color: white;
-        }
-        .user-badge {
-            background: #f1f5f9;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #0891b2;
-        }
-        .tabs-container {
-            background: white;
-            border-radius: 12px;
-            padding: 5px;
-            margin-bottom: 24px;
-            display: flex;
-            gap: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            flex-wrap: wrap;
-        }
-        .tab-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 12px 8px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-        .tab-btn.active {
-            background: var(--primary-gradient);
-            color: white;
-        }
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .evento-item, .grupo-pass-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .evento-fecha {
-            font-weight: 700;
-            color: #0891b2;
-            min-width: 100px;
-        }
-        .evento-titulo {
-            flex: 1;
-            margin: 0 15px;
-        }
-        .delete-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .grupo-pass-item input {
-            width: 150px;
-            padding: 6px;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-        }
-        .save-pass-btn {
-            background: #0891b2;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
-        .section-title {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            color: #0f172a;
-            border-left: 4px solid #0891b2;
-            padding-left: 10px;
-        }
-        .field {
-            margin-bottom: 15px;
-        }
-        .field label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #0891b2;
-            display: block;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-        .field input, .field select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #cbd5e1;
-            font-family: inherit;
-            font-size: 16px;
-        }
-        .row {
-            display: flex;
-            gap: 15px;
-        }
-        .row .field {
-            flex: 1;
-        }
-        .btn-main {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            font-size: 16px;
-            background: var(--primary-gradient);
-            color: white;
-        }
-        .btn-wa, .btn-copy {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .btn-wa {
-            background: #25D366;
-            color: white;
-        }
-        .btn-copy {
-            background: #3b82f6;
-            color: white;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .ticket {
-            border-radius: 20px;
-            overflow: hidden;
-            background: white;
-            max-width: 420px;
-            margin: 0 auto;
-            box-shadow: 0 20px 35px -15px rgba(0,0,0,0.2);
-        }
-        .ticket-header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            padding: 25px 20px;
-            text-align: center;
-        }
-        .logo-icon {
-            font-size: 42px;
-        }
-        .ticket-title {
-            font-size: 18px;
-            font-weight: 800;
-            color: white;
-        }
-        .ticket-subtitle {
-            font-size: 11px;
-            color: rgba(255,255,255,0.7);
-        }
-        .ticket-receipt-number {
-            background: #f8fafc;
-            padding: 15px 20px;
-            text-align: center;
-        }
-        .receipt-label {
-            font-size: 10px;
-            font-weight: 700;
-            color: #0891b2;
-        }
-        .receipt-number {
-            font-size: 24px;
-            font-weight: 800;
-            color: #0f172a;
-            font-family: monospace;
-        }
-        .ticket-info {
-            padding: 20px;
-        }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px dashed #e2e8f0;
-        }
-        .info-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #64748b;
-        }
-        .info-value {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .ticket-amount {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            margin: 0 20px 20px 20px;
-            padding: 20px;
-            text-align: center;
-            border-radius: 16px;
-        }
-        .amount-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #0369a1;
-        }
-        .amount-value {
-            font-size: 32px;
-            font-weight: 900;
-            color: #0f172a;
-        }
-        .amount-value::before {
-            content: "Q ";
-            font-size: 24px;
-        }
-        .ticket-footer {
-            background: #f1f5f9;
-            padding: 15px 20px;
-            text-align: center;
-        }
-        .excel-container {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            overflow-x: auto;
-        }
-        .excel-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .excel-table th {
-            background: #f8fafc;
-            padding: 10px;
-            color: #0891b2;
-        }
-        .excel-table td {
-            padding: 10px;
-            border-bottom: 1px solid #f1f5f9;
-            text-align: center;
-        }
-        .status-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        .status-pagado {
-            background: #dcfce7;
-            color: #15803d;
-        }
-        .status-pendiente {
-            background: #fef9c3;
-            color: #854d0e;
-        }
-        .toast {
-            visibility: hidden;
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #333;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            z-index: 1000;
-        }
-        .toast.show {
-            visibility: visible;
-            animation: fadeInOut 2s;
-        }
-        @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .modal-reset {
-            display: none;
-            position: fixed;
-            z-index: 1001;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-reset-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 25px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .btn-confirm-reset {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-        .btn-cancel-reset {
-            background: #cbd5e1;
-            color: #334155;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
 
@@ -393,11 +15,11 @@
     <div class="admin-header">
         <div>
             <h1>🏛️ Pastoral Juvenil</h1>
-            <p>Panel de Administración</p>
+            <p>Panel de Administración - Sumpango</p>
         </div>
-        <div style="display: flex; gap: 15px; align-items: center;">
+        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
             <span class="user-badge">👑 Administrador</span>
-            <button class="reset-btn" id="btnReset">🔄 Reiniciar Sistema</button>
+            <button class="reset-btn" id="btnReset">⚠️ Reiniciar Sistema</button>
             <button class="logout-btn" id="btnLogout">🚪 Cerrar Sesión</button>
         </div>
     </div>
@@ -415,49 +37,82 @@
             <div class="card">
                 <div class="section-title">📝 Datos del Pago</div>
                 <div class="row">
-                    <div class="field"><label>🔖 Número de Recibo</label><input id="numRecibo" type="text" readonly></div>
-                    <div class="field"><label>👤 Emite</label><input id="emisor" type="text" value="Pastoral Juvenil" readonly></div>
+                    <div class="field">
+                        <label>🔖 Número de Recibo</label>
+                        <input id="numRecibo" type="text" readonly>
+                    </div>
+                    <div class="field">
+                        <label>👤 Emite</label>
+                        <input id="emisor" type="text" value="Pastoral Juvenil" readonly>
+                    </div>
                 </div>
-                <!-- Reemplazar el select de grupo por este -->
-<div class="field">
-    <label>👥 Juvenil</label>
-    <select id="grupo">
-        <option value="" disabled selected>-- Seleccione un juvenil --</option>
-        <option>Confirmación</option>
-        <option>Jeshua</option>
-        <option>Jufra</option>
-        <option>Lectores</option>
-        <option>Mujeres y Hombres Nuevos</option>
-        <option>PCV</option>
-        <option>Pentecostés</option>
-        <option>Roca Fuerte</option>
-        <option>San Pablo</option>
-        <option>Senderos</option>
-        <option>Shadai</option>
-        <option>Ssael</option>
-        <option value="OTRO">➕ OTRO</option>
-    </select>
-</div>
-                <div class="field" id="campoOtro" style="display:none;"><label>📝 Nombre del Grupo</label><input id="nombreOtro" placeholder="Escriba el nombre"></div>
-                <div class="field"><label>📌 Concepto</label><input id="concepto" type="text" placeholder="Ej. Cuota Mensual"></div>
-                <div class="field"><label>💰 Monto (Q)</label><input id="monto" type="number" step="0.01"></div>
-                <div class="field"><label>📱 WhatsApp</label><input id="whatsapp" type="tel"></div>
+                <div class="field">
+                    <label>👥 Juvenil</label>
+                    <select id="grupo">
+                        <option value="" disabled selected>-- Seleccione un juvenil --</option>
+                        <option>Confirmación</option>
+                        <option>Jeshua</option>
+                        <option>Jufra</option>
+                        <option>Lectores</option>
+                        <option>Mujeres y Hombres Nuevos</option>
+                        <option>PCV</option>
+                        <option>Pentecostés</option>
+                        <option>Roca Fuerte</option>
+                        <option>San Pablo</option>
+                        <option>Senderos</option>
+                        <option>Shadai</option>
+                        <option>Ssael</option>
+                        <option value="OTRO">➕ OTRO</option>
+                    </select>
+                </div>
+                <div class="field" id="campoOtro" style="display:none;">
+                    <label>📝 Nombre del Grupo</label>
+                    <input id="nombreOtro" placeholder="Escriba el nombre">
+                </div>
+                <div class="field">
+                    <label>📌 Concepto</label>
+                    <input id="concepto" type="text" placeholder="Ej. Cuota Mensual">
+                </div>
+                <div class="field">
+                    <label>💰 Monto (Q)</label>
+                    <input id="monto" type="number" step="0.01" placeholder="0.00">
+                </div>
+                <div class="field">
+                    <label>📱 WhatsApp</label>
+                    <input id="whatsapp" type="tel" placeholder="Número de teléfono">
+                </div>
                 <button class="btn-main" id="btnGenerar">✨ Generar Comprobante ✨</button>
             </div>
             <div class="preview" id="preview" style="display:none;">
                 <div id="vistaPrevia" class="ticket">
-                    <div class="ticket-header"><div class="ticket-logo"><span class="logo-icon">⛪</span></div><div class="ticket-title">COMPROBANTE DE PAGO</div><div class="ticket-subtitle">Pastoral Juvenil - Sumpango</div></div>
-                    <div class="ticket-receipt-number"><span class="receipt-label">NÚMERO DE RECIBO</span><span class="receipt-number" id="vNumRecibo"></span></div>
+                    <div class="ticket-header">
+                        <div class="ticket-logo"><span class="logo-icon">⛪</span></div>
+                        <div class="ticket-title">COMPROBANTE DE PAGO</div>
+                        <div class="ticket-subtitle">Pastoral Juvenil - Sumpango</div>
+                    </div>
+                    <div class="ticket-receipt-number">
+                        <span class="receipt-label">NÚMERO DE RECIBO</span>
+                        <span class="receipt-number" id="vNumRecibo"></span>
+                    </div>
                     <div class="ticket-info">
                         <div class="info-row"><div class="info-label">👥 JUVENIL</div><div class="info-value" id="vGrupo">-</div></div>
                         <div class="info-row"><div class="info-label">📌 CONCEPTO</div><div class="info-value" id="vConcepto">-</div></div>
                         <div class="info-row"><div class="info-label">📆 FECHA</div><div class="info-value" id="vFecha">-</div></div>
                         <div class="info-row"><div class="info-label">⏰ HORA</div><div class="info-value" id="vHora">-</div></div>
                     </div>
-                    <div class="ticket-amount"><div class="amount-label">MONTO TOTAL</div><div class="amount-value" id="vMonto">0.00</div></div>
-                    <div class="ticket-footer"><div class="footer-text">¡Gracias por tu contribución!</div><div class="footer-note">Este comprobante es válido como constancia de pago</div></div>
+                    <div class="ticket-amount">
+                        <div class="amount-label">MONTO TOTAL</div>
+                        <div class="amount-value" id="vMonto">0.00</div>
+                    </div>
+                    <div class="ticket-footer">
+                        <div class="footer-text">¡Gracias por tu contribución!</div>
+                        <div class="footer-note">Este comprobante es válido como constancia de pago</div>
+                    </div>
                 </div>
-                <div class="btn-group"><button class="btn-wa" id="btnEnviarWA">📱 Abrir WhatsApp</button><button class="btn-copy" id="btnCopiarMsg">📋 Copiar Mensaje</button></div>
+                <div class="btn-group">
+                    <button class="btn-wa" id="btnEnviarWA">📱 Abrir WhatsApp</button>
+                    <button class="btn-copy" id="btnCopiarMsg">📋 Copiar Mensaje</button>
+                </div>
             </div>
         </div>
     </div>
@@ -478,14 +133,27 @@
         </div>
     </div>
 
-    <!-- Tab 3: Actividades -->
+    <!-- Tab 3: Actividades con descripción -->
     <div id="tab3" class="tab-content">
         <div class="card">
             <div class="section-title">📅 Agregar Actividad</div>
             <div class="row">
-                <div class="field"><label>📆 Fecha</label><input type="date" id="eventoFecha"></div>
-                <div class="field"><label>📌 Actividad</label><input type="text" id="eventoTitulo" placeholder="Ej: Reunión general"></div>
-                <div class="field"><label>📍 Lugar (opcional)</label><input type="text" id="eventoLugar" placeholder="Ej: Salón parroquial"></div>
+                <div class="field">
+                    <label>📆 Fecha</label>
+                    <input type="date" id="eventoFecha">
+                </div>
+                <div class="field">
+                    <label>📌 Título</label>
+                    <input type="text" id="eventoTitulo" placeholder="Ej: Reunión general">
+                </div>
+            </div>
+            <div class="field">
+                <label>📍 Lugar (opcional)</label>
+                <input type="text" id="eventoLugar" placeholder="Ej: Salón parroquial">
+            </div>
+            <div class="field">
+                <label>📝 Descripción</label>
+                <textarea id="eventoDescripcion" rows="3" placeholder="Escribe aquí la descripción detallada de la actividad..."></textarea>
             </div>
             <button class="btn-main" id="btnAgregarEvento">➕ Agregar Actividad</button>
         </div>
@@ -517,7 +185,7 @@
             <li>✓ El contador de recibos (volverá a REC-0001)</li>
         </ul>
         <p><strong style="color: #ef4444;">Esta acción NO se puede deshacer.</strong></p>
-        <div class="modal-reset-buttons">
+        <div style="margin-top: 20px;">
             <button class="btn-cancel-reset" id="btnCancelReset">Cancelar</button>
             <button class="btn-confirm-reset" id="btnConfirmReset">Sí, reiniciar todo</button>
         </div>

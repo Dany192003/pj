@@ -23,6 +23,7 @@ body {
 .app {
     max-width: 1200px;
     margin: 0 auto;
+    width: 100%;
 }
 
 /* Header */
@@ -33,14 +34,14 @@ body {
 
 .header h1 {
     margin: 0;
-    font-size: clamp(24px, 5vw, 32px);
+    font-size: clamp(22px, 6vw, 32px);
     font-weight: 800;
     color: #0e7490;
 }
 
 .header p {
     color: var(--text-muted);
-    font-size: clamp(12px, 3vw, 14px);
+    font-size: clamp(11px, 3.5vw, 14px);
     margin-top: 5px;
 }
 
@@ -48,7 +49,7 @@ body {
 .user-actions {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
     margin-top: 15px;
     flex-wrap: wrap;
 }
@@ -58,27 +59,23 @@ body {
     color: white;
     border: none;
     padding: 8px 20px;
-    border-radius: 20px;
+    border-radius: 30px;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.3s ease;
+    font-size: clamp(12px, 3vw, 14px);
 }
 
 .btn-consulta {
     background: #10b981;
 }
 
-.btn-login:hover {
-    background: #0e7490;
+.btn-login:hover, .btn-consulta:hover {
     transform: scale(0.98);
+    opacity: 0.9;
 }
 
-.btn-consulta:hover {
-    background: #059669;
-    transform: scale(0.98);
-}
-
-/* Tabs */
+/* Tabs - Responsive */
 .tabs-container {
     background: white;
     border-radius: 12px;
@@ -87,22 +84,24 @@ body {
     display: flex;
     gap: 5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .tab-btn {
     flex: 1;
+    min-width: fit-content;
     background: transparent;
     border: none;
-    padding: 12px 8px;
+    padding: 12px 16px;
     border-radius: 10px;
     font-weight: 700;
     cursor: pointer;
     color: var(--text-muted);
-    font-size: clamp(12px, 3.5vw, 14px);
+    font-size: clamp(11px, 3.5vw, 14px);
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
 .tab-btn:active {
@@ -123,11 +122,11 @@ body {
     display: block;
 }
 
-/* Grid y Cards */
+/* Grid - Responsive */
 .grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
 }
 
 @media (min-width: 768px) {
@@ -136,34 +135,49 @@ body {
         gap: 30px;
     }
     body {
-        padding: 20px;
+        padding: 24px;
     }
 }
 
+@media (max-width: 480px) {
+    .grid {
+        gap: 16px;
+    }
+}
+
+/* Cards */
 .card {
     background: white;
     border-radius: 20px;
     padding: 20px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    overflow: hidden;
 }
 
 @media (min-width: 768px) {
     .card {
-        padding: 30px;
+        padding: 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 16px;
     }
 }
 
 .section-title {
-    font-size: clamp(16px, 4vw, 18px);
+    font-size: clamp(16px, 4.5vw, 18px);
     font-weight: 800;
     margin-bottom: 20px;
     color: #0f172a;
     border-left: 4px solid var(--primary);
-    padding-left: 10px;
+    padding-left: 12px;
 }
 
-/* Formularios */
+/* Formularios - Responsive */
 .field {
     margin-bottom: 15px;
 }
@@ -187,6 +201,16 @@ body {
     background: #f8fafc;
     font-family: inherit;
     font-size: 16px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+@media (max-width: 480px) {
+    .field input,
+    .field select {
+        padding: 10px;
+        font-size: 14px;
+    }
 }
 
 .row {
@@ -206,7 +230,7 @@ body {
     flex: 1;
 }
 
-/* Botones principales */
+/* Botones */
 .btn-main,
 .btn-wa,
 .btn-copy {
@@ -219,6 +243,16 @@ body {
     font-size: 16px;
     transition: all 0.3s ease;
     margin-top: 10px;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .btn-main,
+    .btn-wa,
+    .btn-copy {
+        padding: 12px;
+        font-size: 14px;
+    }
 }
 
 .btn-main:active,
@@ -254,6 +288,7 @@ body {
     display: flex;
     gap: 10px;
     margin-top: 10px;
+    flex-wrap: wrap;
 }
 
 .btn-group .btn-wa,
@@ -262,46 +297,64 @@ body {
     margin-top: 0;
 }
 
-/* Diseño del Ticket */
+@media (max-width: 480px) {
+    .btn-group {
+        flex-direction: column;
+    }
+    .btn-group .btn-wa,
+    .btn-group .btn-copy {
+        width: 100%;
+    }
+}
+
+/* Ticket - Responsive */
 .ticket {
     border-radius: 20px;
     overflow: hidden;
     background: white;
-    max-width: 420px;
+    max-width: 100%;
     margin: 0 auto;
     box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s ease;
 }
 
-.ticket:hover {
-    transform: translateY(-2px);
+@media (min-width: 480px) {
+    .ticket {
+        max-width: 420px;
+    }
 }
 
 .ticket-header {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    padding: 25px 20px;
+    padding: 20px;
     text-align: center;
 }
 
+@media (max-width: 480px) {
+    .ticket-header {
+        padding: 16px;
+    }
+}
+
 .ticket-logo {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .logo-icon {
-    font-size: 42px;
+    font-size: clamp(36px, 10vw, 42px);
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 
 .ticket-title {
-    font-size: 18px;
+    font-size: clamp(14px, 4vw, 18px);
     font-weight: 800;
-    letter-spacing: 1.5px;
+    letter-spacing: 1px;
     color: white;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .ticket-subtitle {
-    font-size: 11px;
+    font-size: clamp(9px, 3vw, 11px);
     font-weight: 500;
     color: rgba(255,255,255,0.7);
     letter-spacing: 0.5px;
@@ -309,7 +362,7 @@ body {
 
 .ticket-receipt-number {
     background: #f8fafc;
-    padding: 15px 20px;
+    padding: 12px 16px;
     text-align: center;
     border-bottom: 1px solid #e2e8f0;
 }
@@ -325,24 +378,33 @@ body {
 }
 
 .receipt-number {
-    font-size: 24px;
+    font-size: clamp(18px, 6vw, 24px);
     font-weight: 800;
     color: #0f172a;
     font-family: 'Courier New', monospace;
     letter-spacing: 1px;
+    word-break: break-word;
 }
 
 .ticket-info {
-    padding: 20px;
+    padding: 16px;
     background: white;
+}
+
+@media (max-width: 480px) {
+    .ticket-info {
+        padding: 12px;
+    }
 }
 
 .info-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    padding: 12px 0;
+    padding: 10px 0;
     border-bottom: 1px dashed #e2e8f0;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .info-row:last-child {
@@ -350,15 +412,15 @@ body {
 }
 
 .info-label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     color: #64748b;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.5px;
 }
 
 .info-value {
-    font-size: 14px;
+    font-size: clamp(12px, 3.5vw, 14px);
     font-weight: 600;
     color: #1e293b;
     text-align: right;
@@ -366,57 +428,132 @@ body {
     max-width: 60%;
 }
 
+@media (max-width: 480px) {
+    .info-value {
+        max-width: 55%;
+        font-size: 12px;
+    }
+}
+
 .ticket-amount {
     background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    margin: 0 20px 20px 20px;
-    padding: 20px;
+    margin: 0 16px 16px 16px;
+    padding: 16px;
     text-align: center;
     border-radius: 16px;
     border: 1px solid #bae6fd;
 }
 
+@media (max-width: 480px) {
+    .ticket-amount {
+        margin: 0 12px 12px 12px;
+        padding: 12px;
+    }
+}
+
 .amount-label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     color: #0369a1;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 8px;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
 }
 
 .amount-value {
-    font-size: 32px;
+    font-size: clamp(24px, 7vw, 32px);
     font-weight: 900;
     color: #0f172a;
 }
 
 .amount-value::before {
     content: "Q ";
-    font-size: 24px;
+    font-size: clamp(18px, 5vw, 24px);
     font-weight: 700;
     color: #0891b2;
 }
 
 .ticket-footer {
     background: #f1f5f9;
-    padding: 15px 20px;
+    padding: 12px 16px;
     text-align: center;
     border-top: 1px solid #e2e8f0;
 }
 
 .footer-text {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: #334155;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .footer-note {
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 400;
     color: #94a3b8;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* Tabla de control - Responsive */
+.excel-container {
+    background: white;
+    border-radius: 20px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 768px) {
+    .excel-container {
+        padding: 20px;
+    }
+}
+
+.excel-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: clamp(10px, 3vw, 12px);
+    min-width: 500px;
+}
+
+.excel-table th {
+    background: #f8fafc;
+    padding: 10px 6px;
+    color: #0891b2;
+    text-align: center;
+    font-weight: 700;
+}
+
+.excel-table td {
+    padding: 8px 4px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: center;
+}
+
+.status-btn {
+    width: clamp(30px, 8vw, 36px);
+    height: clamp(30px, 8vw, 36px);
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: clamp(14px, 4vw, 18px);
+    transition: all 0.2s ease;
+}
+
+.status-btn:active {
+    transform: scale(0.95);
+}
+
+.status-pagado {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-pendiente {
+    background: #fef9c3;
+    color: #854d0e;
 }
 
 /* Animaciones */
@@ -471,71 +608,17 @@ body {
     animation: slideUp 0.4s ease-out;
 }
 
-/* Tabla de control */
-.excel-container {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    border: 1px solid #e2e8f0;
-    overflow-x: auto;
-}
-
-.excel-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: clamp(11px, 3vw, 12px);
-    min-width: 500px;
-}
-
-.excel-table th {
-    background: #f8fafc;
-    padding: 10px 8px;
-    color: #0891b2;
-    text-align: center;
-    font-weight: 700;
-}
-
-.excel-table td {
-    padding: 10px 8px;
-    border-bottom: 1px solid #f1f5f9;
-    text-align: center;
-}
-
-.status-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    transition: all 0.2s ease;
-}
-
-.status-btn:active {
-    transform: scale(0.95);
-}
-
-.status-pagado {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.status-pendiente {
-    background: #fef9c3;
-    color: #854d0e;
-}
-
-/* Toast */
+/* Toast - Responsive */
 .toast {
     visibility: hidden;
-    min-width: 250px;
+    min-width: 200px;
     background-color: #333;
     color: #fff;
     text-align: center;
     border-radius: 8px;
-    padding: 12px;
+    padding: 12px 16px;
     position: fixed;
-    bottom: 30px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
@@ -546,6 +629,16 @@ body {
 .toast.show {
     visibility: visible;
     animation: fadeInOut 2s ease-in-out;
+}
+
+@media (max-width: 640px) {
+    .toast {
+        white-space: normal;
+        width: 90%;
+        max-width: 300px;
+        font-size: 12px;
+        padding: 10px 14px;
+    }
 }
 
 /* Spinner */
@@ -559,50 +652,7 @@ body {
     animation: spin 0.8s linear infinite;
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-    .ticket {
-        max-width: 100%;
-    }
-    
-    .receipt-number {
-        font-size: 20px;
-    }
-    
-    .amount-value {
-        font-size: 28px;
-    }
-    
-    .info-value {
-        font-size: 13px;
-        max-width: 55%;
-    }
-}
-
-@media (max-width: 640px) {
-    .toast {
-        white-space: normal;
-        width: 90%;
-        max-width: 300px;
-    }
-}
-
-/* Print styles */
-@media print {
-    .ticket {
-        box-shadow: none;
-        border: 1px solid #e2e8f0;
-    }
-    
-    .btn-group,
-    .tabs-container,
-    .btn-main,
-    .user-actions {
-        display: none;
-    }
-}
-
-/* Modal de login */
+/* Modal - Responsive */
 .modal {
     display: none;
     position: fixed;
@@ -617,8 +667,8 @@ body {
 
 .modal-content {
     background-color: white;
-    margin: 15% auto;
-    padding: 25px;
+    margin: 20% auto;
+    padding: 20px;
     border-radius: 20px;
     width: 90%;
     max-width: 350px;
@@ -627,10 +677,23 @@ body {
     position: relative;
 }
 
+@media (min-width: 768px) {
+    .modal-content {
+        margin: 10% auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        margin: 30% auto;
+        padding: 16px;
+    }
+}
+
 .close {
     position: absolute;
-    right: 15px;
-    top: 10px;
+    right: 12px;
+    top: 8px;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
@@ -651,8 +714,35 @@ body {
     font-size: 16px;
 }
 
+@media (max-width: 480px) {
+    .modal-input {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
 .error-msg {
     color: #ef4444;
     font-size: 12px;
     margin-top: 10px;
+}
+
+/* Print styles */
+@media print {
+    .ticket {
+        box-shadow: none;
+        border: 1px solid #e2e8f0;
+        max-width: 100%;
+    }
+    .btn-group,
+    .tabs-container,
+    .btn-main,
+    .user-actions,
+    .admin-header {
+        display: none;
+    }
+    body {
+        background: white;
+        padding: 0;
+    }
 }
