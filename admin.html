@@ -29,6 +29,20 @@
             background: #dc2626;
             transform: scale(0.98);
         }
+        .reset-btn {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .reset-btn:hover {
+            background: #ea580c;
+            transform: scale(0.98);
+        }
         .user-badge {
             background: #f1f5f9;
             padding: 8px 16px;
@@ -37,17 +51,73 @@
             font-weight: 600;
             color: #0891b2;
         }
-        .admin-link {
-            background: #0891b2;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
+        .sync-status {
+            font-size: 12px;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        .admin-link:hover {
-            background: #0e7490;
+        .sync-status.syncing {
+            color: #f97316;
+        }
+        /* Modal de confirmación reset */
+        .modal-reset {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-reset-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+        .modal-reset-content h3 {
+            color: #f97316;
+            margin-bottom: 15px;
+        }
+        .modal-reset-content p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .modal-reset-content ul {
+            text-align: left;
+            margin-bottom: 20px;
+            color: #64748b;
+        }
+        .modal-reset-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .btn-confirm-reset {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-cancel-reset {
+            background: #cbd5e1;
+            color: #334155;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -60,7 +130,9 @@
             <p>Sistema de Comprobantes — Sumpango</p>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
+            <span class="sync-status" id="syncStatus">☁️ Sincronizado</span>
             <span class="user-badge" id="adminUser">👑 Administrador</span>
+            <button class="reset-btn" id="btnReset">🗑️ Resetear Todo</button>
             <button class="logout-btn" id="btnLogout">🚪 Cerrar Sesión</button>
         </div>
     </div>
@@ -191,16 +263,37 @@
                 <table class="excel-table">
                     <thead id="tableHeader"></thead>
                     <tbody id="tableBody"></tbody>
-                 </table>
+                </table>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para resetear -->
+<div id="modalReset" class="modal-reset">
+    <div class="modal-reset-content">
+        <h3>⚠️ ¡Advertencia!</h3>
+        <p>Esta acción eliminará TODOS los datos:</p>
+        <ul>
+            <li>✓ Todos los pagos registrados</li>
+            <li>✓ Todos los grupos</li>
+            <li>✓ Todos los recibos emitidos</li>
+        </ul>
+        <p><strong>Esta acción NO se puede deshacer.</strong></p>
+        <div class="modal-reset-buttons">
+            <button class="btn-cancel-reset" id="btnCancelReset">Cancelar</button>
+            <button class="btn-confirm-reset" id="btnConfirmReset">Sí, resetear todo</button>
         </div>
     </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="js/database.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/database-cloud.js"></script>
 <script src="js/receipt.js"></script>
 <script src="js/table.js"></script>
 <script src="js/whatsapp.js"></script>

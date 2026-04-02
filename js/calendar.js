@@ -4,7 +4,6 @@ let currentDate = new Date();
 let currentYear = currentDate.getFullYear();
 let currentMonth = currentDate.getMonth();
 
-// Inicializar calendario
 function initCalendar() {
     renderCalendar();
     loadUpcomingPayments();
@@ -33,7 +32,6 @@ function initCalendar() {
     });
 }
 
-// Renderizar calendario
 function renderCalendar() {
     const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const monthYearElement = document.getElementById("currentMonthYear");
@@ -82,7 +80,6 @@ function renderCalendar() {
     }
 }
 
-// Verificar pagos para un día específico
 function checkPaymentsForDay(day) {
     const mesActual = MESES[currentMonth];
     const anioActual = currentYear;
@@ -103,7 +100,6 @@ function checkPaymentsForDay(day) {
     return null;
 }
 
-// Cargar próximos pagos
 function loadUpcomingPayments() {
     const paymentsList = document.getElementById("paymentsList");
     if (!paymentsList) return;

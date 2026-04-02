@@ -1,11 +1,25 @@
-// js/receipt.js - Generación de recibos con imagen nativa
+// js/receipt.js - Generación de recibos
 
-// Variable global para el comprobante actual
+if (typeof window.showToast !== 'function') {
+    window.showToast = function(message, isError = false) {
+        const toast = document.getElementById("toast");
+        if (!toast) {
+            console.log(message);
+            return;
+        }
+        toast.textContent = message;
+        toast.style.backgroundColor = isError ? "#dc2626" : "#10b981";
+        toast.className = "toast show";
+        setTimeout(() => {
+            toast.className = "toast";
+        }, 2000);
+    };
+}
+
 window.compActual = null;
 window.comprobanteCanvas = null;
 window.imagenCloudinaryUrl = null;
 
-// Construir mensaje con emojis
 function construirMensajeConEmojis(registro) {
     const mensaje = `✅ *COMPROBANTE DE PAGO - Pastoral Juvenil* ✅\n\n` +
                    `👥 *Juvenil:* ${registro.g}\n` +
@@ -18,7 +32,6 @@ function construirMensajeConEmojis(registro) {
     return mensaje;
 }
 
-// Subir imagen a Cloudinary
 async function subirImagenCloudinary(canvas, reciboNum) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -43,7 +56,6 @@ async function subirImagenCloudinary(canvas, reciboNum) {
     });
 }
 
-// Generar imagen del comprobante como Canvas
 async function generarImagenComprobante(data) {
     return new Promise((resolve) => {
         const width = 450;
@@ -66,7 +78,6 @@ async function generarImagenComprobante(data) {
         ctx.fill();
         ctx.shadowColor = 'transparent';
         
-        // Encabezado
         const gradient = ctx.createLinearGradient(0, 0, 0, 100);
         gradient.addColorStop(0, '#0f172a');
         gradient.addColorStop(1, '#1e293b');
@@ -86,7 +97,6 @@ async function generarImagenComprobante(data) {
         ctx.fillStyle = 'rgba(255,255,255,0.7)';
         ctx.fillText('Pastoral Juvenil - Sumpango', width/2, 92);
         
-        // Número de recibo
         ctx.fillStyle = '#f8fafc';
         ctx.fillRect(0, 100, width, 70);
         ctx.font = '10px "Plus Jakarta Sans", sans-serif';
@@ -96,7 +106,6 @@ async function generarImagenComprobante(data) {
         ctx.fillStyle = '#0f172a';
         ctx.fillText(`REC-${data.num}`, width/2, 160);
         
-        // Información
         let yPos = 185;
         const infoItems = [
             { label: '👥 JUVENIL', value: data.g },
@@ -135,7 +144,6 @@ async function generarImagenComprobante(data) {
             yPos += 35;
         });
         
-        // Monto
         const montoY = yPos + 10;
         ctx.fillStyle = '#f0f9ff';
         ctx.beginPath();
@@ -153,7 +161,6 @@ async function generarImagenComprobante(data) {
         ctx.fillStyle = '#0f172a';
         ctx.fillText(`Q ${parseFloat(data.mon).toFixed(2)}`, width/2, montoY + 55);
         
-        // Pie
         const footerY = height - 65;
         ctx.fillStyle = '#f1f5f9';
         ctx.fillRect(0, footerY, width, 65);
@@ -168,7 +175,6 @@ async function generarImagenComprobante(data) {
     });
 }
 
-// Helper para roundRect
 if (!CanvasRenderingContext2D.prototype.roundRect) {
     CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
         if (w < 2 * r) r = w / 2;
@@ -186,7 +192,6 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
     };
 }
 
-// Mostrar el comprobante generado
 async function displayReceipt(data) {
     document.getElementById("vNumRecibo").textContent = `REC-${data.num}`;
     document.getElementById("vGrupo").textContent = data.g;
@@ -198,14 +203,14 @@ async function displayReceipt(data) {
     const canvas = await generarImagenComprobante(data);
     window.comprobanteCanvas = canvas;
     
-    showToast("📤 Subiendo imagen a la nube...", false);
+    window.showToast("📤 Subiendo imagen a la nube...", false);
     try {
         const imagenUrl = await subirImagenCloudinary(canvas, data.num);
         window.imagenCloudinaryUrl = imagenUrl;
-        showToast("✓ Imagen guardada en la nube", false);
+        window.showToast("✓ Imagen guardada en la nube", false);
     } catch (error) {
         console.error(error);
-        showToast("⚠️ Error al subir imagen", true);
+        window.showToast("⚠️ Error al subir imagen", true);
         window.imagenCloudinaryUrl = null;
     }
     
@@ -218,13 +223,12 @@ async function displayReceipt(data) {
     }, 100);
 }
 
-// Validar y obtener datos del formulario
 function getFormData() {
     let grupo = document.getElementById("grupo").value;
     if (grupo === "OTRO") {
         grupo = document.getElementById("nombreOtro").value.trim();
         if (!grupo) {
-            showToast("❌ Escribe el nombre del grupo personalizado", true);
+            window.showToast("❌ Escribe el nombre del grupo personalizado", true);
             return null;
         }
     }
@@ -234,15 +238,15 @@ function getFormData() {
     const whatsapp = document.getElementById("whatsapp").value.trim();
     
     if (!concepto) {
-        showToast("❌ Por favor ingresa un concepto", true);
+        window.showToast("❌ Por favor ingresa un concepto", true);
         return null;
     }
     if (!monto || parseFloat(monto) <= 0) {
-        showToast("❌ Por favor ingresa un monto válido mayor a 0", true);
+        window.showToast("❌ Por favor ingresa un monto válido mayor a 0", true);
         return null;
     }
     if (!whatsapp) {
-        showToast("❌ Por favor ingresa el número de WhatsApp", true);
+        window.showToast("❌ Por favor ingresa el número de WhatsApp", true);
         return null;
     }
     
@@ -252,7 +256,7 @@ function getFormData() {
     const horaActual = ahora.toLocaleTimeString("es-GT", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     
     if (!grupo) {
-        showToast("❌ Por favor selecciona un grupo", true);
+        window.showToast("❌ Por favor selecciona un grupo", true);
         return null;
     }
     
@@ -263,7 +267,6 @@ function getFormData() {
     };
 }
 
-// Generar nuevo comprobante
 async function generarComprobante() {
     const formData = getFormData();
     if (!formData) return;
@@ -271,7 +274,7 @@ async function generarComprobante() {
     const { grupo, concepto, monto, numero, fecha, hora } = formData;
     const anioActual = new Date().getFullYear();
     
-    asegurarDB(anioActual);
+    asegurarDBCloud(anioActual);
     if (!GRUPOS.includes(grupo)) {
         addCustomGroup(anioActual, grupo);
     }
@@ -291,7 +294,7 @@ async function generarComprobante() {
         hora: hora
     });
     
-    showToast("✓ Comprobante generado exitosamente");
+    window.showToast("✓ Comprobante generado exitosamente");
     
     if (anioActual === window.anioSeleccionado && typeof renderTabla === 'function') {
         renderTabla();

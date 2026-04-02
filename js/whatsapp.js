@@ -1,11 +1,10 @@
-// js/whatsapp.js - Gestión de WhatsApp y mensajes
+// js/whatsapp.js - Gestión de WhatsApp
 
-// Subir imagen a Cloudinary y enviar por WhatsApp
 async function subirYEnviar() {
     let tel = document.getElementById("whatsapp").value.replace(/\D/g, "");
     
     if (!tel) {
-        showToast("❌ Ingresa el número de WhatsApp", true);
+        window.showToast("❌ Ingresa el número de WhatsApp", true);
         return;
     }
     
@@ -14,13 +13,13 @@ async function subirYEnviar() {
     }
     
     if (!window.compActual) {
-        showToast("❌ Primero genera un comprobante", true);
+        window.showToast("❌ Primero genera un comprobante", true);
         return;
     }
     
     let imagenUrl = window.imagenCloudinaryUrl;
     if (!imagenUrl) {
-        showToast("⚠️ La imagen aún no se ha subido, intenta de nuevo", true);
+        window.showToast("⚠️ La imagen aún no se ha subido, intenta de nuevo", true);
         return;
     }
     
@@ -44,17 +43,16 @@ async function subirYEnviar() {
             window.open(waUrl, "_blank");
         }
         
-        showToast("✓ Abriendo WhatsApp...");
+        window.showToast("✓ Abriendo WhatsApp...");
     } catch (e) {
         console.error(e);
-        showToast("❌ Error al enviar", true);
+        window.showToast("❌ Error al enviar", true);
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
-// Construir mensaje con emojis
 function construirMensajeConEmojis(registro) {
     if (!registro) return "";
     
@@ -70,19 +68,18 @@ function construirMensajeConEmojis(registro) {
     return mensaje;
 }
 
-// Copiar mensaje al portapapeles
 function copiarMensaje() {
     if (!window.compActual) {
-        showToast("❌ Primero genera un comprobante", true);
+        window.showToast("❌ Primero genera un comprobante", true);
         return;
     }
     
     const mensajeParaCopiar = construirMensajeConEmojis(window.compActual);
     
     navigator.clipboard.writeText(mensajeParaCopiar).then(() => {
-        showToast("✓ Mensaje copiado al portapapeles", false);
-        showToast("📱 Pégalo en WhatsApp y adjunta la imagen manualmente", false);
+        window.showToast("✓ Mensaje copiado al portapapeles", false);
+        window.showToast("📱 Pégalo en WhatsApp y adjunta la imagen manualmente", false);
     }).catch(() => {
-        showToast("❌ Error al copiar", true);
+        window.showToast("❌ Error al copiar", true);
     });
 }

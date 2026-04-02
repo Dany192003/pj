@@ -1,11 +1,26 @@
 // js/table.js - Tabla de control
 
+if (typeof window.showToast !== 'function') {
+    window.showToast = function(message, isError = false) {
+        const toast = document.getElementById("toast");
+        if (!toast) {
+            console.log(message);
+            return;
+        }
+        toast.textContent = message;
+        toast.style.backgroundColor = isError ? "#dc2626" : "#10b981";
+        toast.className = "toast show";
+        setTimeout(() => {
+            toast.className = "toast";
+        }, 2000);
+    };
+}
+
 let anioSeleccionado = new Date().getFullYear();
 
-// Renderizar tabla de control
 function renderTabla() {
     if (!db[anioSeleccionado]) {
-        asegurarDB(anioSeleccionado);
+        asegurarDBCloud(anioSeleccionado);
     }
     
     const dataAnio = db[anioSeleccionado] || [];
@@ -29,9 +44,8 @@ function renderTabla() {
     }).join("");
 }
 
-// Alternar estado de pago
 function toggleStatus(grupo, mes) {
-    if (!db[anioSeleccionado]) asegurarDB(anioSeleccionado);
+    if (!db[anioSeleccionado]) asegurarDBCloud(anioSeleccionado);
     
     const record = db[anioSeleccionado].find(p => p.grupo === grupo && p.mes === mes);
     if (record) {
@@ -39,17 +53,15 @@ function toggleStatus(grupo, mes) {
         record.estado = nuevoEstado;
         saveDatabase();
         renderTabla();
-        showToast(`${nuevoEstado === "pagado" ? "✓ Pagado" : "✗ Pendiente"} - ${grupo} - ${mes}`);
+        window.showToast(`${nuevoEstado === "pagado" ? "✓ Pagado" : "✗ Pendiente"} - ${grupo} - ${mes}`);
     }
 }
 
-// Cambiar año en control
 function cambiarAnioControl() {
     anioSeleccionado = parseInt(document.getElementById("selectAnioControl").value);
     renderTabla();
 }
 
-// Inicializar select de años
 function initYearSelect() {
     const sel = document.getElementById("selectAnioControl");
     if (!sel) return;

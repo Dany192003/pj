@@ -1,13 +1,24 @@
 // js/app.js - Inicialización de la vista de usuario
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Cargar datos
-    loadDatabase();
+window.showToast = function(message, isError = false) {
+    const toast = document.getElementById("toast");
+    if (!toast) {
+        console.log(message);
+        return;
+    }
+    toast.textContent = message;
+    toast.style.backgroundColor = isError ? "#dc2626" : "#10b981";
+    toast.className = "toast show";
+    setTimeout(() => {
+        toast.className = "toast";
+    }, 2000);
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadDatabase();
     
-    // Inicializar calendario
-    initCalendar();
+    if (typeof initCalendar === 'function') initCalendar();
     
-    // Modal de login
     const modal = document.getElementById("loginModal");
     const btnAdminLogin = document.getElementById("btnAdminLogin");
     const closeBtn = document.querySelector(".close");
@@ -55,18 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Redirigir si ya está autenticado
-    redirectIfAuthenticated();
+    if (typeof redirectIfAuthenticated === 'function') {
+        redirectIfAuthenticated();
+    }
+    
+    window.showToast("✓ Datos cargados desde la nube", false);
 });
-
-// Función showToast global
-function showToast(message, isError = false) {
-    const toast = document.getElementById("toast");
-    if (!toast) return;
-    toast.textContent = message;
-    toast.style.backgroundColor = isError ? "#dc2626" : "#10b981";
-    toast.className = "toast show";
-    setTimeout(() => {
-        toast.className = "toast";
-    }, 2000);
-}
