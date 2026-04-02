@@ -1,4 +1,4 @@
-// js/receipt.js - Generación de recibos (con limpieza de formulario)
+// js/receipt.js - Generación de recibos con logo
 
 if (typeof window.showToast !== 'function') {
     window.showToast = function(message, isError = false) {
@@ -19,6 +19,7 @@ function construirMensajeConEmojis(registro) {
     return `✅ *COMPROBANTE DE PAGO - Pastoral Juvenil* ✅\n\n👥 *Juvenil:* ${registro.g}\n📌 *Concepto:* ${registro.concepto}\n💰 *Monto:* Q ${parseFloat(registro.mon).toFixed(2)}\n🔢 *No. Recibo:* REC-${registro.num}\n📆 *Fecha:* ${registro.fecha}\n⏰ *Hora:* ${registro.hora}\n\n_Gracias por tu contribución al movimiento juvenil._`;
 }
 
+// Función para subir imagen a Cloudinary
 async function subirImagenCloudinary(canvas, reciboNum) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -36,37 +37,75 @@ async function subirImagenCloudinary(canvas, reciboNum) {
     });
 }
 
-async function generarImagenComprobante(data) {
+// Función para cargar y dibujar el logo en el canvas
+function cargarLogoEnCanvas(ctx, x, y, width, height) {
     return new Promise((resolve) => {
+        const logoImg = new Image();
+        logoImg.crossOrigin = "Anonymous";
+        logoImg.src = 'img/logo.jpg'; // Asegúrate de que esta ruta sea correcta y la imagen exista
+        logoImg.onload = () => {
+            ctx.drawImage(logoImg, x, y, width, height);
+            resolve(true);
+        };
+        logoImg.onerror = () => {
+            // Si no se puede cargar el logo, dibujar un icono de iglesia como fallback
+            ctx.font = `${height}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('⛪', x + width/2 - height/2, y + height - 5);
+            resolve(false);
+        };
+    });
+}
+
+// Generar imagen del comprobante como Canvas con logo
+async function generarImagenComprobante(data) {
+    return new Promise(async (resolve) => {
         const width = 450, height = 550;
         const canvas = document.createElement('canvas');
         canvas.width = width; canvas.height = height;
         const ctx = canvas.getContext('2d');
         
+        // Fondo blanco
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
         ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 10; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 4;
         ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.roundRect(0, 0, width, height, 20); ctx.fill();
         ctx.shadowColor = 'transparent';
         
-        const gradient = ctx.createLinearGradient(0, 0, 0, 100);
+        // Encabezado con gradiente
+        const gradient = ctx.createLinearGradient(0, 0, 0, 110);
         gradient.addColorStop(0, '#0f172a'); gradient.addColorStop(1, '#1e293b');
-        ctx.fillStyle = gradient; ctx.beginPath(); ctx.roundRect(0, 0, width, 100, 20); ctx.fill();
+        ctx.fillStyle = gradient; ctx.beginPath(); ctx.roundRect(0, 0, width, 110, 20); ctx.fill();
         
-        ctx.font = '42px "Segoe UI Emoji"'; ctx.fillStyle = '#ffffff'; ctx.fillText('⛪', width/2 - 20, 55);
-        ctx.font = 'bold 18px "Plus Jakarta Sans"'; ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.fillText('COMPROBANTE DE PAGO', width/2, 75);
-        ctx.font = '11px "Plus Jakarta Sans"'; ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fillText('Pastoral Juvenil - Sumpango', width/2, 92);
+        // Logo de la parroquia (cargar imagen)
+        await cargarLogoEnCanvas(ctx, width/2 - 25, 12, 50, 50);
         
-        ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 100, width, 70);
-        ctx.font = '10px "Plus Jakarta Sans"'; ctx.fillStyle = '#0891b2'; ctx.fillText('NÚMERO DE RECIBO', width/2, 128);
-        ctx.font = 'bold 26px "Courier New"'; ctx.fillStyle = '#0f172a'; ctx.fillText(`REC-${data.num}`, width/2, 160);
+        // Título
+        ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText('COMPROBANTE DE PAGO', width/2, 80);
         
-        let yPos = 185;
+        // Subtítulo
+        ctx.font = '9px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.fillText('Parroquia San Agustín - Sumpango', width/2, 98);
+        
+        // Número de recibo
+        ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 110, width, 65);
+        ctx.font = '10px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#0891b2'; ctx.fillText('NÚMERO DE RECIBO', width/2, 138);
+        ctx.font = 'bold 24px "Courier New", monospace';
+        ctx.fillStyle = '#0f172a'; ctx.fillText(`REC-${data.num}`, width/2, 168);
+        
+        // Información
+        let yPos = 195;
         const infoItems = [
             { label: '👥 JUVENIL', value: data.g },
             { label: '📌 CONCEPTO', value: data.concepto },
             { label: '📆 FECHA', value: data.fecha },
             { label: '⏰ HORA', value: data.hora }
         ];
+        
         infoItems.forEach((item) => {
             ctx.beginPath(); ctx.strokeStyle = '#e2e8f0'; ctx.setLineDash([5,5]); ctx.moveTo(20, yPos - 5); ctx.lineTo(width - 20, yPos - 5); ctx.stroke(); ctx.setLineDash([]);
             ctx.font = 'bold 11px "Plus Jakarta Sans"'; ctx.fillStyle = '#64748b'; ctx.textAlign = 'left'; ctx.fillText(item.label, 20, yPos + 8);
@@ -77,16 +116,18 @@ async function generarImagenComprobante(data) {
             ctx.fillText(valueText, width - 20, yPos + 8); yPos += 35;
         });
         
+        // Monto total
         const montoY = yPos + 10;
         ctx.fillStyle = '#f0f9ff'; ctx.beginPath(); ctx.roundRect(20, montoY - 15, width - 40, 85, 16); ctx.fill();
         ctx.strokeStyle = '#bae6fd'; ctx.lineWidth = 1; ctx.beginPath(); ctx.roundRect(20, montoY - 15, width - 40, 85, 16); ctx.stroke();
         ctx.font = 'bold 11px "Plus Jakarta Sans"'; ctx.fillStyle = '#0369a1'; ctx.fillText('MONTO TOTAL', width/2, montoY + 8);
         ctx.font = 'bold 36px "Plus Jakarta Sans"'; ctx.fillStyle = '#0f172a'; ctx.fillText(`Q ${parseFloat(data.mon).toFixed(2)}`, width/2, montoY + 55);
         
+        // Pie de página
         const footerY = height - 65;
         ctx.fillStyle = '#f1f5f9'; ctx.fillRect(0, footerY, width, 65);
-        ctx.font = 'bold 12px "Plus Jakarta Sans"'; ctx.fillStyle = '#334155'; ctx.fillText('¡Gracias por tu contribución!', width/2, footerY + 28);
-        ctx.font = '9px "Plus Jakarta Sans"'; ctx.fillStyle = '#94a3b8'; ctx.fillText('Este comprobante es válido como constancia de pago', width/2, footerY + 48);
+        ctx.font = 'bold 11px "Plus Jakarta Sans"'; ctx.fillStyle = '#334155'; ctx.fillText('¡Gracias por tu contribución!', width/2, footerY + 28);
+        ctx.font = '8px "Plus Jakarta Sans"'; ctx.fillStyle = '#94a3b8'; ctx.fillText('Pastoral Juvenil - Parroquia San Agustín Sumpango', width/2, footerY + 48);
         
         resolve(canvas);
     });
@@ -103,6 +144,7 @@ if (!CanvasRenderingContext2D.prototype.roundRect) {
     };
 }
 
+// Mostrar el comprobante generado (solo vista previa)
 async function displayReceipt(data) {
     document.getElementById("vNumRecibo").textContent = `REC-${data.num}`;
     document.getElementById("vGrupo").textContent = data.g;
@@ -111,38 +153,42 @@ async function displayReceipt(data) {
     document.getElementById("vHora").textContent = data.hora;
     document.getElementById("vMonto").textContent = parseFloat(data.mon).toFixed(2);
     
+    // Generar canvas con logo
     const canvas = await generarImagenComprobante(data);
     window.comprobanteCanvas = canvas;
     
-    window.showToast("📤 Subiendo imagen...", false);
-    try {
-        const imagenUrl = await subirImagenCloudinary(canvas, data.num);
-        window.imagenCloudinaryUrl = imagenUrl;
-        window.showToast("✓ Imagen guardada", false);
-    } catch (error) { window.showToast("⚠️ Error al subir imagen", true); window.imagenCloudinaryUrl = null; }
+    // Mostrar vista previa como imagen
+    const ticketDiv = document.getElementById("vistaPrevia");
+    const img = document.createElement('img');
+    img.src = canvas.toDataURL('image/png');
+    img.style.width = '100%';
+    img.style.maxWidth = '400px';
+    img.style.borderRadius = '16px';
+    img.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+    img.style.margin = '0 auto';
+    img.style.display = 'block';
+    
+    // Limpiar y agregar la imagen
+    ticketDiv.innerHTML = '';
+    ticketDiv.appendChild(img);
     
     document.getElementById("preview").style.display = "block";
     window.compActual = data;
-    setTimeout(() => { document.getElementById("preview").scrollIntoView({ behavior: 'smooth' }); }, 100);
+    
+    setTimeout(() => { 
+        document.getElementById("preview").scrollIntoView({ behavior: 'smooth' }); 
+    }, 100);
 }
 
-// Función para limpiar el formulario
 function limpiarFormulario() {
-    // Limpiar concepto
     document.getElementById("concepto").value = "";
-    // Limpiar monto
     document.getElementById("monto").value = "";
-    // Limpiar WhatsApp
     document.getElementById("whatsapp").value = "";
-    // Resetear selector de grupo a la opción por defecto
     const grupoSelect = document.getElementById("grupo");
     grupoSelect.value = "";
-    // Ocultar campo de "OTRO"
     document.getElementById("campoOtro").style.display = "none";
     document.getElementById("nombreOtro").value = "";
-    // Limpiar preview
     document.getElementById("preview").style.display = "none";
-    // Limpiar variables globales
     window.compActual = null;
     window.comprobanteCanvas = null;
     window.imagenCloudinaryUrl = null;
@@ -150,37 +196,20 @@ function limpiarFormulario() {
 
 function getFormData() {
     let grupo = document.getElementById("grupo").value;
-    
-    // Validar que se haya seleccionado un grupo
     if (!grupo || grupo === "") {
         window.showToast("❌ Por favor selecciona un juvenil", true);
         return null;
     }
-    
     if (grupo === "OTRO") {
         grupo = document.getElementById("nombreOtro").value.trim();
-        if (!grupo) {
-            window.showToast("❌ Escribe el nombre del grupo", true);
-            return null;
-        }
+        if (!grupo) { window.showToast("❌ Escribe el nombre del grupo", true); return null; }
     }
-    
     const concepto = document.getElementById("concepto").value.trim();
     const monto = document.getElementById("monto").value;
     const whatsapp = document.getElementById("whatsapp").value.trim();
-    
-    if (!concepto) {
-        window.showToast("❌ Ingresa un concepto", true);
-        return null;
-    }
-    if (!monto || parseFloat(monto) <= 0) {
-        window.showToast("❌ Ingresa un monto válido", true);
-        return null;
-    }
-    if (!whatsapp) {
-        window.showToast("❌ Ingresa el número de WhatsApp", true);
-        return null;
-    }
+    if (!concepto) { window.showToast("❌ Ingresa un concepto", true); return null; }
+    if (!monto || parseFloat(monto) <= 0) { window.showToast("❌ Ingresa un monto válido", true); return null; }
+    if (!whatsapp) { window.showToast("❌ Ingresa el número de WhatsApp", true); return null; }
     
     const numero = document.getElementById("numRecibo").value.replace("REC-", "");
     const ahora = new Date();
@@ -203,12 +232,17 @@ async function generarComprobante() {
     await updatePaymentStatus(anioActual, grupo, mesActual, "pagado");
     const newNumero = getNextNumero();
     document.getElementById("numRecibo").value = `REC-${getCurrentNumero()}`;
-    await displayReceipt({ g: grupo, concepto: concepto, mon: monto, num: newNumero, fecha: fecha, hora: hora });
+    
+    await displayReceipt({ 
+        g: grupo, 
+        concepto: concepto, 
+        mon: monto, 
+        num: newNumero, 
+        fecha: fecha, 
+        hora: hora 
+    });
     
     window.showToast("✓ Comprobante generado exitosamente", false);
-    
-    // Limpiar el formulario para el siguiente comprobante
-    limpiarFormulario();
     
     if (anioActual === window.anioSeleccionado) renderTabla();
 }

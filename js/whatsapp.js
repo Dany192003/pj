@@ -1,37 +1,47 @@
-// js/whatsapp.js - Gestión de WhatsApp (con limpieza después de enviar)
+// js/whatsapp.js - Gestión de WhatsApp
 
 async function subirYEnviar() {
     let tel = document.getElementById("whatsapp").value.replace(/\D/g, "");
     if (!tel) { window.showToast("❌ Ingresa el número", true); return; }
     if (tel.length === 8 && !tel.startsWith("502")) tel = "502" + tel;
     if (!window.compActual) { window.showToast("❌ Genera un comprobante primero", true); return; }
-    let imagenUrl = window.imagenCloudinaryUrl;
-    if (!imagenUrl) { window.showToast("⚠️ La imagen aún no se ha subido", true); return; }
     
     const btn = document.getElementById("btnEnviarWA");
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner"></span> Abriendo...';
+    btn.innerHTML = '<span class="spinner"></span> Subiendo imagen...';
     btn.disabled = true;
     
     try {
+        window.showToast("📤 Subiendo imagen a la nube...", false);
+        
+        const canvas = window.comprobanteCanvas;
+        if (!canvas) throw new Error("No hay imagen generada");
+        
+        const imagenUrl = await subirImagenCloudinary(canvas, window.compActual.num);
+        window.imagenCloudinaryUrl = imagenUrl;
+        
+        window.showToast("✓ Imagen subida, abriendo WhatsApp...", false);
+        
         const mensajeTexto = construirMensajeConEmojis(window.compActual);
         const mensajeCompleto = mensajeTexto + "\n\n📎 *Comprobante en línea:*\n" + imagenUrl;
         const mensajeCodificado = encodeURIComponent(mensajeCompleto);
         const waUrl = `https://api.whatsapp.com/send/?phone=${tel}&text=${mensajeCodificado}&type=phone_number&app_absent=0`;
+        
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         if (isMobile) window.location.href = waUrl;
         else window.open(waUrl, "_blank");
-        window.showToast("✓ Abriendo WhatsApp...");
         
-        // Limpiar el formulario después de enviar
-        if (typeof limpiarFormulario === 'function') {
-            setTimeout(() => {
-                limpiarFormulario();
-            }, 1000);
-        }
+        setTimeout(() => {
+            if (typeof limpiarFormulario === 'function') limpiarFormulario();
+        }, 2000);
         
-    } catch (e) { window.showToast("❌ Error al enviar", true); }
-    finally { btn.innerHTML = originalText; btn.disabled = false; }
+    } catch (e) { 
+        console.error(e); 
+        window.showToast("❌ Error al subir la imagen", true); 
+    } finally { 
+        btn.innerHTML = originalText; 
+        btn.disabled = false; 
+    }
 }
 
 function construirMensajeConEmojis(registro) {
@@ -44,11 +54,5 @@ function copiarMensaje() {
     const mensaje = construirMensajeConEmojis(window.compActual);
     navigator.clipboard.writeText(mensaje).then(() => {
         window.showToast("✓ Mensaje copiado", false);
-        // Limpiar el formulario después de copiar
-        if (typeof limpiarFormulario === 'function') {
-            setTimeout(() => {
-                limpiarFormulario();
-            }, 1000);
-        }
     }).catch(() => window.showToast("❌ Error al copiar", true));
 }

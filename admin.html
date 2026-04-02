@@ -13,9 +13,12 @@
 
 <div class="app">
     <div class="admin-header">
-        <div>
-            <h1>🏛️ Pastoral Juvenil</h1>
-            <p>Panel de Administración - Sumpango</p>
+        <div class="admin-header-logo">
+            <img src="img/logo.jpg" alt="Logo" class="admin-logo-img">
+            <div>
+                <h1>Pastoral Juvenil</h1>
+                <p>Panel de Administración - Parroquia San Agustín Sumpango</p>
+            </div>
         </div>
         <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
             <span class="user-badge">👑 Administrador</span>
@@ -37,50 +40,24 @@
             <div class="card">
                 <div class="section-title">📝 Datos del Pago</div>
                 <div class="row">
-                    <div class="field">
-                        <label>🔖 Número de Recibo</label>
-                        <input id="numRecibo" type="text" readonly>
-                    </div>
-                    <div class="field">
-                        <label>👤 Emite</label>
-                        <input id="emisor" type="text" value="Pastoral Juvenil" readonly>
-                    </div>
+                    <div class="field"><label>🔖 Número de Recibo</label><input id="numRecibo" type="text" readonly></div>
+                    <div class="field"><label>👤 Emite</label><input id="emisor" type="text" value="Pastoral Juvenil" readonly></div>
                 </div>
                 <div class="field">
                     <label>👥 Juvenil</label>
                     <select id="grupo">
                         <option value="" disabled selected>-- Seleccione un juvenil --</option>
-                        <option>Confirmación</option>
-                        <option>Jeshua</option>
-                        <option>Jufra</option>
-                        <option>Lectores</option>
-                        <option>Mujeres y Hombres Nuevos</option>
-                        <option>PCV</option>
-                        <option>Pentecostés</option>
-                        <option>Roca Fuerte</option>
-                        <option>San Pablo</option>
-                        <option>Senderos</option>
-                        <option>Shadai</option>
-                        <option>Ssael</option>
+                        <option>Confirmación</option><option>Jeshua</option><option>Jufra</option>
+                        <option>Lectores</option><option>Mujeres y Hombres Nuevos</option><option>PCV</option>
+                        <option>Pentecostés</option><option>Roca Fuerte</option><option>San Pablo</option>
+                        <option>Senderos</option><option>Shadai</option><option>Ssael</option>
                         <option value="OTRO">➕ OTRO</option>
                     </select>
                 </div>
-                <div class="field" id="campoOtro" style="display:none;">
-                    <label>📝 Nombre del Grupo</label>
-                    <input id="nombreOtro" placeholder="Escriba el nombre">
-                </div>
-                <div class="field">
-                    <label>📌 Concepto</label>
-                    <input id="concepto" type="text" placeholder="Ej. Cuota Mensual">
-                </div>
-                <div class="field">
-                    <label>💰 Monto (Q)</label>
-                    <input id="monto" type="number" step="0.01" placeholder="0.00">
-                </div>
-                <div class="field">
-                    <label>📱 WhatsApp</label>
-                    <input id="whatsapp" type="tel" placeholder="Número de teléfono">
-                </div>
+                <div class="field" id="campoOtro" style="display:none;"><label>📝 Nombre del Grupo</label><input id="nombreOtro" placeholder="Escriba el nombre"></div>
+                <div class="field"><label>📌 Concepto</label><input id="concepto" type="text" placeholder="Ej. Cuota Mensual"></div>
+                <div class="field"><label>💰 Monto (Q)</label><input id="monto" type="number" step="0.01" placeholder="0.00"></div>
+                <div class="field"><label>📱 WhatsApp</label><input id="whatsapp" type="tel" placeholder="Número de teléfono"></div>
                 <button class="btn-main" id="btnGenerar">✨ Generar Comprobante ✨</button>
             </div>
             <div class="preview" id="preview" style="display:none;">
@@ -88,31 +65,19 @@
                     <div class="ticket-header">
                         <div class="ticket-logo"><span class="logo-icon">⛪</span></div>
                         <div class="ticket-title">COMPROBANTE DE PAGO</div>
-                        <div class="ticket-subtitle">Pastoral Juvenil - Sumpango</div>
+                        <div class="ticket-subtitle">Parroquia San Agustín - Sumpango</div>
                     </div>
-                    <div class="ticket-receipt-number">
-                        <span class="receipt-label">NÚMERO DE RECIBO</span>
-                        <span class="receipt-number" id="vNumRecibo"></span>
-                    </div>
+                    <div class="ticket-receipt-number"><span class="receipt-label">NÚMERO DE RECIBO</span><span class="receipt-number" id="vNumRecibo"></span></div>
                     <div class="ticket-info">
                         <div class="info-row"><div class="info-label">👥 JUVENIL</div><div class="info-value" id="vGrupo">-</div></div>
                         <div class="info-row"><div class="info-label">📌 CONCEPTO</div><div class="info-value" id="vConcepto">-</div></div>
                         <div class="info-row"><div class="info-label">📆 FECHA</div><div class="info-value" id="vFecha">-</div></div>
                         <div class="info-row"><div class="info-label">⏰ HORA</div><div class="info-value" id="vHora">-</div></div>
                     </div>
-                    <div class="ticket-amount">
-                        <div class="amount-label">MONTO TOTAL</div>
-                        <div class="amount-value" id="vMonto">0.00</div>
-                    </div>
-                    <div class="ticket-footer">
-                        <div class="footer-text">¡Gracias por tu contribución!</div>
-                        <div class="footer-note">Este comprobante es válido como constancia de pago</div>
-                    </div>
+                    <div class="ticket-amount"><div class="amount-label">MONTO TOTAL</div><div class="amount-value" id="vMonto">0.00</div></div>
+                    <div class="ticket-footer"><div class="footer-text">¡Gracias por tu contribución!</div><div class="footer-note">Este comprobante es válido como constancia de pago</div></div>
                 </div>
-                <div class="btn-group">
-                    <button class="btn-wa" id="btnEnviarWA">📱 Abrir WhatsApp</button>
-                    <button class="btn-copy" id="btnCopiarMsg">📋 Copiar Mensaje</button>
-                </div>
+                <div class="btn-group"><button class="btn-wa" id="btnEnviarWA">📱 Abrir WhatsApp</button><button class="btn-copy" id="btnCopiarMsg">📋 Copiar Mensaje</button></div>
             </div>
         </div>
     </div>
@@ -121,74 +86,51 @@
     <div id="tab2" class="tab-content">
         <div class="excel-container">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
-                <h3 style="margin:0;">📋 Historial de Cuotas</h3>
+                <h3>📋 Historial de Cuotas</h3>
                 <select id="selectAnioControl" style="padding:8px; border-radius:8px;"></select>
             </div>
             <div style="overflow-x: auto;">
-                <table class="excel-table">
-                    <thead id="tableHeader"></thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
+                <table class="excel-table"><thead id="tableHeader"></thead><tbody id="tableBody"></tbody></table>
             </div>
         </div>
     </div>
 
-    <!-- Tab 3: Actividades con descripción -->
+    <!-- Tab 3: Actividades -->
     <div id="tab3" class="tab-content">
         <div class="card">
             <div class="section-title">📅 Agregar Actividad</div>
             <div class="row">
-                <div class="field">
-                    <label>📆 Fecha</label>
-                    <input type="date" id="eventoFecha">
-                </div>
-                <div class="field">
-                    <label>📌 Título</label>
-                    <input type="text" id="eventoTitulo" placeholder="Ej: Reunión general">
-                </div>
+                <div class="field"><label>📆 Fecha</label><input type="date" id="eventoFecha"></div>
+                <div class="field"><label>📌 Título</label><input type="text" id="eventoTitulo" placeholder="Ej: Reunión general"></div>
             </div>
-            <div class="field">
-                <label>📍 Lugar (opcional)</label>
-                <input type="text" id="eventoLugar" placeholder="Ej: Salón parroquial">
-            </div>
-            <div class="field">
-                <label>📝 Descripción</label>
-                <textarea id="eventoDescripcion" rows="3" placeholder="Escribe aquí la descripción detallada de la actividad..."></textarea>
-            </div>
+            <div class="field"><label>📍 Lugar</label><input type="text" id="eventoLugar" placeholder="Ej: Salón parroquial"></div>
+            <div class="field"><label>📝 Descripción</label><textarea id="eventoDescripcion" rows="3" placeholder="Descripción detallada..."></textarea></div>
             <button class="btn-main" id="btnAgregarEvento">➕ Agregar Actividad</button>
         </div>
-        <div class="card" style="margin-top: 20px;">
+        <div class="card" style="margin-top:20px">
             <div class="section-title">📋 Lista de Actividades</div>
             <div id="eventosList"></div>
         </div>
     </div>
 
-    <!-- Tab 4: Contraseñas de Grupos -->
+    <!-- Tab 4: Contraseñas -->
     <div id="tab4" class="tab-content">
         <div class="card">
             <div class="section-title">🔑 Contraseñas por Grupo</div>
             <div id="gruposPassList"></div>
-            <p style="font-size: 12px; color: #64748b; margin-top: 15px;">Cada coordinador usará esta contraseña para consultar los pagos de su grupo.</p>
+            <p style="font-size:12px; color:#64748b; margin-top:15px;">Cada coordinador usará esta contraseña para consultar los pagos de su grupo.</p>
         </div>
     </div>
 </div>
 
-<!-- Modal de confirmación para reset -->
+<!-- Modal Reset -->
 <div id="modalReset" class="modal-reset">
     <div class="modal-reset-content">
         <h3>⚠️ ¡ADVERTENCIA!</h3>
         <p>Esta acción eliminará <strong>TODOS</strong> los datos del sistema:</p>
-        <ul>
-            <li>✓ Todos los pagos registrados</li>
-            <li>✓ Todas las actividades del calendario</li>
-            <li>✓ Todas las contraseñas de grupos</li>
-            <li>✓ El contador de recibos (volverá a REC-0001)</li>
-        </ul>
-        <p><strong style="color: #ef4444;">Esta acción NO se puede deshacer.</strong></p>
-        <div style="margin-top: 20px;">
-            <button class="btn-cancel-reset" id="btnCancelReset">Cancelar</button>
-            <button class="btn-confirm-reset" id="btnConfirmReset">Sí, reiniciar todo</button>
-        </div>
+        <ul><li>✓ Todos los pagos</li><li>✓ Actividades</li><li>✓ Contraseñas</li><li>✓ Contador de recibos</li></ul>
+        <p><strong style="color:#ef4444;">Esta acción NO se puede deshacer.</strong></p>
+        <div><button class="btn-cancel-reset" id="btnCancelReset">Cancelar</button><button class="btn-confirm-reset" id="btnConfirmReset">Sí, reiniciar todo</button></div>
     </div>
 </div>
 
