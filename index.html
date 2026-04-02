@@ -8,17 +8,220 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/calendar.css">
+    <style>
+        /* Estilos adicionales para el rediseño */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        .hero-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .hero-title {
+            font-size: clamp(28px, 6vw, 42px);
+            font-weight: 800;
+            background: linear-gradient(135deg, #0f172a 0%, #0891b2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+        
+        .hero-subtitle {
+            color: #64748b;
+            font-size: clamp(14px, 3.5vw, 16px);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        /* Botones de acción principales */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .action-btn-primary {
+            background: linear-gradient(135deg, #0891b2 0%, #3b82f6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+        }
+        
+        .action-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(8, 145, 178, 0.4);
+        }
+        
+        .action-btn-secondary {
+            background: white;
+            color: #0891b2;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .action-btn-secondary:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            border-color: #0891b2;
+        }
+        
+        .action-btn-icon {
+            font-size: 18px;
+        }
+        
+        /* Tarjeta del calendario con sombra mejorada */
+        .calendar-container {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 0;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .calendar-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 40px -15px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Mejora en navegación del calendario */
+        .calendar-nav {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .calendar-nav:hover {
+            background: #e2e8f0;
+            transform: scale(1.02);
+        }
+        
+        .calendar-header h2 {
+            font-size: clamp(20px, 5vw, 26px);
+            font-weight: 700;
+            background: linear-gradient(135deg, #0f172a, #0891b2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Pie de página elegante */
+        .footer-note {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #94a3b8;
+            font-size: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer-note a {
+            color: #0891b2;
+            text-decoration: none;
+        }
+        
+        /* Modal rediseñado */
+        .modal-content {
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-content h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #0f172a, #0891b2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .btn-main {
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
+            .action-buttons {
+                gap: 12px;
+            }
+            
+            .action-btn {
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+            
+            .calendar-container {
+                padding: 14px;
+            }
+            
+            .hero-section {
+                margin-bottom: 20px;
+                padding: 10px 0;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <div class="app">
-    <div class="header">
-        <h1>🏛️ Pastoral Juvenil</h1>
-        <p>Calendario de Actividades - Sumpango</p>
-        <div class="user-actions">
-            <button class="btn-login" id="btnAdminLogin">🔐 Administrador</button>
-            <button class="btn-consulta" id="btnConsultaPagos">📋 Consultar Pagos</button>
-        </div>
+    <!-- Hero Section - Rediseñada -->
+    <div class="hero-section">
+        <div class="hero-icon">⛪</div>
+        <h1 class="hero-title">Pastoral Juvenil</h1>
+        <p class="hero-subtitle">Calendario de Actividades y Eventos</p>
+    </div>
+
+    <!-- Botones de acción - Rediseñados y mejor ordenados -->
+    <div class="action-buttons">
+        <button class="action-btn action-btn-primary" id="btnAdminLogin">
+            <span class="action-btn-icon">🔐</span>
+            <span>Panel Administrativo</span>
+        </button>
+        <button class="action-btn action-btn-secondary" id="btnConsultaPagos">
+            <span class="action-btn-icon">📋</span>
+            <span>Consultar Pagos</span>
+        </button>
     </div>
 
     <!-- Calendario de actividades -->
@@ -38,13 +241,23 @@
         </div>
     </div>
 
-    <!-- Modal de login admin -->
+    <!-- Pie de página elegante -->
+    <div class="footer-note">
+        <p>📅 Actividades programadas por la Pastoral Juvenil - Sumpango</p>
+        <p>¿Dudas? Contacta al <a href="#">administrador</a></p>
+    </div>
+
+    <!-- Modal de login - Rediseñado -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h3>🔐 Acceso Administrador</h3>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 48px;">🔐</div>
+                <h3>Acceso Administrador</h3>
+                <p style="color: #64748b; font-size: 13px;">Ingresa tu contraseña para continuar</p>
+            </div>
             <input type="password" id="adminPassword" placeholder="Contraseña" class="modal-input">
-            <button id="btnLogin" class="btn-main">Ingresar</button>
+            <button id="btnLogin" class="btn-main">Ingresar al Panel</button>
             <p class="error-msg" id="loginError"></p>
         </div>
     </div>
