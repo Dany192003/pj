@@ -1,102 +1,131 @@
-// js/admin.js - Inicialización del panel administrativo
+// js/admin.js - Panel administrativo
 
 window.showToast = function(message, isError = false) {
     const toast = document.getElementById("toast");
-    if (!toast) {
-        console.log(message);
-        return;
-    }
+    if (!toast) { console.log(message); return; }
     toast.textContent = message;
     toast.style.backgroundColor = isError ? "#dc2626" : "#10b981";
     toast.className = "toast show";
-    setTimeout(() => {
-        toast.className = "toast";
-    }, 2000);
+    setTimeout(() => { toast.className = "toast"; }, 2000);
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!requireAuth()) return;
     
-    const syncStatus = document.getElementById("syncStatus");
-    if (syncStatus) {
-        syncStatus.textContent = "🔄 Sincronizando...";
-        syncStatus.classList.add("syncing");
-    }
-    
     await loadDatabase();
     
     const anioActual = new Date().getFullYear();
     window.anioSeleccionado = anioActual;
+    await asegurarDBCloud(anioActual);
     
-    if (typeof asegurarDBCloud === 'function') {
-        await asegurarDBCloud(anioActual);
-    }
+    initYearSelect();
+    renderTabla();
+    actNumeroRecibo();
     
-    if (typeof initYearSelect === 'function') initYearSelect();
-    if (typeof renderTabla === 'function') renderTabla();
-    if (typeof actNumeroRecibo === 'function') actNumeroRecibo();
+    // Botones principales
+    document.getElementById("btnGenerar").onclick = generarComprobante;
+    document.getElementById("btnEnviarWA").onclick = subirYEnviar;
+    document.getElementById("btnCopiarMsg").onclick = copiarMensaje;
+    document.getElementById("btnLogout").onclick = logout;
+    document.getElementById("grupo").onchange = checkOtroGrupo;
+    document.getElementById("selectAnioControl").onchange = cambiarAnioControl;
     
-    if (syncStatus) {
-        syncStatus.textContent = "☁️ Sincronizado";
-        syncStatus.classList.remove("syncing");
-    }
-    
-    const btnGenerar = document.getElementById("btnGenerar");
-    const btnEnviarWA = document.getElementById("btnEnviarWA");
-    const btnCopiarMsg = document.getElementById("btnCopiarMsg");
-    const btnLogout = document.getElementById("btnLogout");
-    const grupoSelect = document.getElementById("grupo");
-    const selectAnioControl = document.getElementById("selectAnioControl");
-    
-    if (btnGenerar) btnGenerar.onclick = generarComprobante;
-    if (btnEnviarWA) btnEnviarWA.onclick = subirYEnviar;
-    if (btnCopiarMsg) btnCopiarMsg.onclick = copiarMensaje;
-    if (btnLogout) btnLogout.onclick = logout;
-    if (grupoSelect) grupoSelect.onchange = checkOtroGrupo;
-    if (selectAnioControl) selectAnioControl.onchange = cambiarAnioControl;
-    
-    // Botón reset
-    const btnReset = document.getElementById("btnReset");
-    const modalReset = document.getElementById("modalReset");
-    const btnCancelReset = document.getElementById("btnCancelReset");
-    const btnConfirmReset = document.getElementById("btnConfirmReset");
-    
-    if (btnReset) {
-        btnReset.onclick = () => {
-            if (modalReset) modalReset.style.display = "block";
-        };
-    }
-    
-    if (btnCancelReset) {
-        btnCancelReset.onclick = () => {
-            if (modalReset) modalReset.style.display = "none";
-        };
-    }
-    
-    if (btnConfirmReset) {
-        btnConfirmReset.onclick = async () => {
-            if (modalReset) modalReset.style.display = "none";
-            if (typeof resetDatabase === 'function') {
-                await resetDatabase();
-            }
-        };
-    }
-    
-    window.onclick = (event) => {
-        if (event.target === modalReset) {
-            if (modalReset) modalReset.style.display = "none";
-        }
-    };
-    
+    // Tabs
     document.querySelectorAll('.tab-btn').forEach(b => {
         b.addEventListener('click', (e) => {
-            e.preventDefault();
             document.querySelectorAll('.tab-btn, .tab-content').forEach(x => x.classList.remove('active'));
             b.classList.add('active');
-            const tabId = b.dataset.tab;
-            if (tabId) document.getElementById(tabId).classList.add('active');
+            document.getElementById(b.dataset.tab).classList.add('active');
         });
     });
     
-    window.showToast("✓ Datos sincronizados desde la nube", false);
+    // ========== RESET PAGOS ==========
+const btnReset = document.getElementById("btnReset");
+const modalReset = document.getElementById("modalReset");
+const btnCancelReset = document.getElementById("btnCancelReset");
+const btnConfirmReset = document.getElementById("btnConfirmReset");
+    
+
+if (btnReset) {
+    btnReset.onclick = () => {
+        if (modalReset) modalReset.style.display = "block";
+    };
+}
+
+if (btnCancelReset) {
+    btnCancelReset.onclick = () => {
+        if (modalReset) modalReset.style.display = "none";
+    };
+}
+
+if (btnConfirmReset) {
+    btnConfirmReset.onclick = async () => {
+        if (modalReset) modalReset.style.display = "none";
+        if (typeof resetSistema === 'function') {
+            await resetSistema();
+        } else {
+            window.showToast("❌ Error: función no disponible", true);
+        }
+    };
+}
+    window.onclick = (event) => { if (event.target === modalReset) modalReset.style.display = "none"; };
+    
+    // ========== TAB 3: ACTIVIDADES ==========
+    await cargarEventosAdmin();
+    document.getElementById("btnAgregarEvento").onclick = async () => {
+        const fecha = document.getElementById("eventoFecha").value;
+        const titulo = document.getElementById("eventoTitulo").value.trim();
+        const lugar = document.getElementById("eventoLugar").value.trim();
+        if (!fecha || !titulo) { window.showToast("❌ Completa fecha y título", true); return; }
+        await agregarEvento(fecha, titulo, lugar);
+        document.getElementById("eventoFecha").value = "";
+        document.getElementById("eventoTitulo").value = "";
+        document.getElementById("eventoLugar").value = "";
+        await cargarEventosAdmin();
+        window.showToast("✓ Actividad agregada", false);
+    };
+    
+    // ========== TAB 4: CONTRASEÑAS ==========
+    await cargarContraseñasAdmin();
 });
+
+async function cargarEventosAdmin() {
+    const eventos = await cargarEventos();
+    const eventosList = document.getElementById("eventosList");
+    if (!eventosList) return;
+    if (eventos.length === 0) { eventosList.innerHTML = '<p style="color: #64748b;">No hay actividades registradas</p>'; return; }
+    eventosList.innerHTML = eventos.map(evento => `
+        <div class="evento-item">
+            <span class="evento-fecha">📅 ${evento.fecha}</span>
+            <span class="evento-titulo"><strong>${evento.titulo}</strong> ${evento.lugar ? `📍 ${evento.lugar}` : ''}</span>
+            <button class="delete-btn" data-id="${evento.id}">🗑️</button>
+        </div>
+    `).join("");
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.onclick = async () => { await eliminarEvento(btn.dataset.id); await cargarEventosAdmin(); window.showToast("✓ Actividad eliminada", false); };
+    });
+}
+
+async function cargarContraseñasAdmin() {
+    const passwords = await cargarContraseñasGrupos();
+    const gruposPassList = document.getElementById("gruposPassList");
+    if (!gruposPassList) return;
+    gruposPassList.innerHTML = GRUPOS.map(grupo => `
+        <div class="grupo-pass-item">
+            <span><strong>👥 ${grupo}</strong></span>
+            <div>
+                <input type="text" id="pass-${grupo}" placeholder="Contraseña" value="${passwords[grupo] || ''}" style="padding:6px; border-radius:8px; border:1px solid #cbd5e1;">
+                <button class="save-pass-btn" data-grupo="${grupo}" style="background:#0891b2; color:white; border:none; padding:6px 12px; border-radius:8px; cursor:pointer; margin-left:10px;">💾 Guardar</button>
+            </div>
+        </div>
+    `).join("");
+    document.querySelectorAll('.save-pass-btn').forEach(btn => {
+        btn.onclick = async () => {
+            const grupo = btn.dataset.grupo;
+            const password = document.getElementById(`pass-${grupo}`).value.trim();
+            if (!password) { window.showToast("❌ Ingresa una contraseña", true); return; }
+            await guardarContraseñaGrupo(grupo, password);
+            window.showToast(`✓ Contraseña guardada para ${grupo}`, false);
+        };
+    });
+}

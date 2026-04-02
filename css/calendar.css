@@ -1,4 +1,3 @@
-/* Estilos del Calendario */
 .calendar-container {
     background: white;
     border-radius: 20px;
@@ -60,10 +59,9 @@
     border-radius: 10px;
     padding: 12px 8px;
     text-align: center;
-    cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
-    min-height: 70px;
+    min-height: 80px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -86,14 +84,9 @@
     font-weight: 700;
 }
 
-.calendar-day.paid {
-    background: #dcfce7;
-    border-left: 4px solid #15803d;
-}
-
-.calendar-day.pending {
-    background: #fff3e3;
-    border-left: 4px solid #f97316;
+.calendar-day.has-event {
+    background: #e0f2fe;
+    border-left: 4px solid #0891b2;
 }
 
 .day-number {
@@ -108,86 +101,16 @@
     margin-top: 4px;
 }
 
-.day-payment {
-    font-size: 11px;
-    font-weight: 700;
-    margin-top: 4px;
+.day-event {
+    background: #0891b2;
+    color: white;
+    padding: 2px 4px;
+    border-radius: 4px;
+    margin-top: 2px;
+    font-size: 9px;
+    word-break: break-word;
 }
 
-.day-payment.paid {
-    color: #15803d;
-}
-
-.day-payment.pending {
-    color: #f97316;
-}
-
-/* Próximos pagos */
-.upcoming-payments {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-.upcoming-payments h3 {
-    margin: 0 0 15px 0;
-    font-size: 18px;
-    color: #0f172a;
-}
-
-.payments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.payment-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    background: #f8fafc;
-    border-radius: 12px;
-    transition: all 0.2s ease;
-}
-
-.payment-item:hover {
-    background: #f1f5f9;
-}
-
-.payment-info {
-    flex: 1;
-}
-
-.payment-group {
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.payment-date {
-    font-size: 12px;
-    color: #64748b;
-}
-
-.payment-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.payment-status.paid {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.payment-status.pending {
-    background: #fef9c3;
-    color: #854d0e;
-}
-
-/* Modal de login */
 .modal {
     display: none;
     position: fixed;
@@ -209,11 +132,21 @@
     max-width: 350px;
     text-align: center;
     animation: slideUp 0.3s ease;
+    position: relative;
 }
 
-.modal-content h3 {
-    margin: 0 0 20px 0;
-    color: #0f172a;
+.close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+.close:hover {
+    color: #ef4444;
 }
 
 .modal-input {
@@ -225,53 +158,36 @@
     font-size: 16px;
 }
 
-.close {
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #94a3b8;
-}
-
-.close:hover {
-    color: #ef4444;
-}
-
 .error-msg {
     color: #ef4444;
     font-size: 12px;
     margin-top: 10px;
 }
 
-.btn-login {
-    background: #0891b2;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: 600;
-    margin-top: 10px;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-.btn-login:hover {
-    background: #0e7490;
-}
-
-.user-actions {
-    margin-top: 10px;
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 640px) {
     .calendar-day {
-        min-height: 55px;
+        min-height: 60px;
         padding: 8px 4px;
     }
-    
     .day-number {
         font-size: 14px;
     }
-    
     .calendar-weekdays {
         font-size: 12px;
     }

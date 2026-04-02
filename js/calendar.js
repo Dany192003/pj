@@ -1,35 +1,38 @@
-// js/calendar.js - Generador de calendario
+// js/calendar.js - Calendario de actividades
 
 let currentDate = new Date();
 let currentYear = currentDate.getFullYear();
 let currentMonth = currentDate.getMonth();
+let eventosGlobal = [];
 
-function initCalendar() {
+async function initCalendar() {
+    eventosGlobal = await cargarEventos();
     renderCalendar();
-    loadUpcomingPayments();
     
     const prevBtn = document.getElementById("prevMonth");
     const nextBtn = document.getElementById("nextMonth");
     
-    if (prevBtn) prevBtn.addEventListener("click", () => {
-        currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        }
-        renderCalendar();
-        loadUpcomingPayments();
-    });
+    if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+    }
     
-    if (nextBtn) nextBtn.addEventListener("click", () => {
-        currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
-        renderCalendar();
-        loadUpcomingPayments();
-    });
+    if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+    }
 }
 
 function renderCalendar() {
@@ -65,67 +68,18 @@ function renderCalendar() {
             dayElement.classList.add("today");
         }
         
-        const hasPayments = checkPaymentsForDay(day);
-        if (hasPayments) {
-            dayElement.classList.add(hasPayments.status);
-            dayElement.innerHTML = `
-                <div class="day-number">${day}</div>
-                <div class="day-payment ${hasPayments.status}">${hasPayments.text}</div>
-            `;
-        } else {
-            dayElement.innerHTML = `<div class="day-number">${day}</div>`;
+        const fechaStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const eventosDia = eventosGlobal.filter(e => e.fecha === fechaStr);
+        
+        let eventosHtml = "";
+        if (eventosDia.length > 0) {
+            dayElement.classList.add("has-event");
+            eventosDia.forEach(evento => {
+                eventosHtml += `<div class="day-event" title="${evento.lugar || ''}">📌 ${evento.titulo.substring(0, 20)}${evento.titulo.length > 20 ? '...' : ''}</div>`;
+            });
         }
         
+        dayElement.innerHTML = `<div class="day-number">${day}</div><div class="day-events">${eventosHtml}</div>`;
         calendarDays.appendChild(dayElement);
     }
-}
-
-function checkPaymentsForDay(day) {
-    const mesActual = MESES[currentMonth];
-    const anioActual = currentYear;
-    
-    if (!db[anioActual]) return null;
-    
-    const paymentsForMonth = db[anioActual].filter(p => p.mes === mesActual);
-    if (paymentsForMonth.length === 0) return null;
-    
-    const paidCount = paymentsForMonth.filter(p => p.estado === "pagado").length;
-    const pendingCount = paymentsForMonth.filter(p => p.estado === "pendiente").length;
-    
-    if (paidCount > 0 && pendingCount === 0) {
-        return { status: "paid", text: "✓ Todos pagados" };
-    } else if (pendingCount > 0) {
-        return { status: "pending", text: `${pendingCount} pendiente${pendingCount > 1 ? 's' : ''}` };
-    }
-    return null;
-}
-
-function loadUpcomingPayments() {
-    const paymentsList = document.getElementById("paymentsList");
-    if (!paymentsList) return;
-    
-    const anioActual = new Date().getFullYear();
-    const mesActual = MESES[new Date().getMonth()];
-    
-    if (!db[anioActual]) {
-        paymentsList.innerHTML = '<div class="payment-item">No hay pagos registrados</div>';
-        return;
-    }
-    
-    const pendingPayments = db[anioActual].filter(p => p.estado === "pendiente" && p.mes === mesActual);
-    
-    if (pendingPayments.length === 0) {
-        paymentsList.innerHTML = '<div class="payment-item">✨ No hay pagos pendientes este mes</div>';
-        return;
-    }
-    
-    paymentsList.innerHTML = pendingPayments.map(p => `
-        <div class="payment-item">
-            <div class="payment-info">
-                <div class="payment-group">👥 ${p.grupo}</div>
-                <div class="payment-date">📅 ${p.mes} ${anioActual}</div>
-            </div>
-            <div class="payment-status pending">Pendiente</div>
-        </div>
-    `).join("");
 }

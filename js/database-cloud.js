@@ -1,15 +1,11 @@
 // js/database-cloud.js - Gestión de datos en Firebase
 
-// Constantes globales
 const GRUPOS = ["Confirmación", "Jeshua", "Jufra", "Lectores", "Mujeres y Hombres Nuevos", "PCV", "Pentecostés", "Roca Fuerte", "San Pablo", "Senderos", "Shadai", "Ssael"];
 const MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-// Estado global
 let db = {};
 let ultimoNum = 0;
-let datosCargados = false;
 
-// Función interna para mostrar mensajes
 function logMensaje(mensaje, isError = false) {
     console.log(mensaje);
     if (typeof window.showToast === 'function') {
@@ -17,12 +13,10 @@ function logMensaje(mensaje, isError = false) {
     }
 }
 
-// Cargar datos desde Firebase
 async function loadDatabase() {
     return new Promise(async (resolve) => {
         try {
             console.log("🔄 Cargando datos desde Firebase...");
-            
             const docCorr = await coleccionCorrelativo.get();
             if (docCorr.exists) {
                 ultimoNum = docCorr.data().valor || 0;
@@ -33,22 +27,15 @@ async function loadDatabase() {
             
             const snapshot = await coleccionPagos.get();
             db = {};
-            
             snapshot.forEach(doc => {
                 const data = doc.data();
                 const anio = data.anio;
                 if (!db[anio]) db[anio] = [];
-                db[anio].push({
-                    grupo: data.grupo,
-                    mes: data.mes,
-                    estado: data.estado
-                });
+                db[anio].push({ grupo: data.grupo, mes: data.mes, estado: data.estado });
             });
             
             const añoActual = new Date().getFullYear();
             await asegurarDBCloud(añoActual);
-            
-            datosCargados = true;
             console.log("✓ Datos cargados exitosamente");
             resolve(true);
         } catch (error) {
@@ -59,7 +46,6 @@ async function loadDatabase() {
     });
 }
 
-// Asegurar estructura para un año
 async function asegurarDBCloud(anio) {
     if (!db[anio]) {
         db[anio] = [];
@@ -69,73 +55,83 @@ async function asegurarDBCloud(anio) {
                 if (!existe) {
                     db[anio].push({ grupo, mes, estado: "pendiente" });
                     const docId = `${anio}_${grupo}_${mes}`;
-                    await coleccionPagos.doc(docId).set({
-                        anio: anio,
-                        grupo: grupo,
-                        mes: mes,
-                        estado: "pendiente"
-                    });
+                    await coleccionPagos.doc(docId).set({ anio: anio, grupo: grupo, mes: mes, estado: "pendiente" });
                 }
             }
         }
     }
 }
 
-// Guardar datos en Firebase
 async function saveDatabase() {
     try {
         await coleccionCorrelativo.set({ valor: ultimoNum });
-        
         for (const anio in db) {
             for (const pago of db[anio]) {
                 const docId = `${anio}_${pago.grupo}_${pago.mes}`;
-                await coleccionPagos.doc(docId).set({
-                    anio: parseInt(anio),
-                    grupo: pago.grupo,
-                    mes: pago.mes,
-                    estado: pago.estado
-                });
+                await coleccionPagos.doc(docId).set({ anio: parseInt(anio), grupo: pago.grupo, mes: pago.mes, estado: pago.estado });
             }
         }
         saveDatabaseLocal();
         return true;
     } catch (error) {
-        console.error("Error guardando en cloud:", error);
+        console.error("Error guardando:", error);
         saveDatabaseLocal();
         return false;
     }
 }
 
-// Resetear toda la base de datos
-async function resetDatabase() {
+// NUEVA FUNCIÓN: Reiniciar sistema completo
+async function resetSistema() {
     return new Promise(async (resolve, reject) => {
         try {
-            if (typeof window.showToast === 'function') {
-                window.showToast("🔄 Eliminando todos los datos...", false);
-            }
+            logMensaje("🔄 Reiniciando TODO el sistema...", false);
             
-            const snapshot = await coleccionPagos.get();
-            const batch = dbFirestore.batch();
-            snapshot.forEach(doc => {
-                batch.delete(doc.ref);
+            // 1. Eliminar TODOS los pagos
+            const snapshotPagos = await coleccionPagos.get();
+            const batchPagos = dbFirestore.batch();
+            snapshotPagos.forEach(doc => {
+                batchPagos.delete(doc.ref);
             });
-            await batch.commit();
+            await batchPagos.commit();
             
+            // 2. Reiniciar correlativo de recibos (contador)
+            ultimoNum = 0;
             await coleccionCorrelativo.set({ valor: 0 });
             
-            localStorage.removeItem("pj_db_v8");
-            localStorage.removeItem("pj_corr_v8");
+            // 3. Eliminar TODAS las contraseñas de los grupos
+            const snapshotPasswords = await coleccionPasswords.get();
+            const batchPasswords = dbFirestore.batch();
+            snapshotPasswords.forEach(doc => {
+                batchPasswords.delete(doc.ref);
+            });
+            await batchPasswords.commit();
             
+            // 4. Eliminar TODAS las actividades del calendario
+            const snapshotEventos = await coleccionEventos.get();
+            const batchEventos = dbFirestore.batch();
+            snapshotEventos.forEach(doc => {
+                batchEventos.delete(doc.ref);
+            });
+            await batchEventos.commit();
+            
+            // 5. Limpiar la variable local db
             db = {};
-            ultimoNum = 0;
             
+            // 6. Crear estructura limpia para el año actual (solo grupos, todo pendiente)
             const añoActual = new Date().getFullYear();
-            await asegurarDBCloud(añoActual);
-            await saveDatabase();
-            
-            if (typeof window.showToast === 'function') {
-                window.showToast("✓ Todos los datos han sido eliminados", false);
+            db[añoActual] = [];
+            for (const grupo of GRUPOS) {
+                for (const mes of MESES) {
+                    db[añoActual].push({ grupo: grupo, mes: mes, estado: "pendiente" });
+                    const docId = `${añoActual}_${grupo}_${mes}`;
+                    await coleccionPagos.doc(docId).set({ anio: añoActual, grupo: grupo, mes: mes, estado: "pendiente" });
+                }
             }
+            
+            // 7. Guardar cambios en localStorage
+            saveDatabaseLocal();
+            
+            logMensaje("✓ Sistema reiniciado completamente (pagos, contador, contraseñas y actividades)", false);
             
             setTimeout(() => {
                 location.reload();
@@ -143,31 +139,54 @@ async function resetDatabase() {
             
             resolve(true);
         } catch (error) {
-            console.error("Error al resetear:", error);
-            if (typeof window.showToast === 'function') {
-                window.showToast("❌ Error al resetear los datos", true);
-            }
+            console.error("Error al reiniciar sistema:", error);
+            logMensaje("❌ Error al reiniciar el sistema", true);
             reject(error);
         }
     });
 }
 
-// Fallback a localStorage
+async function cargarEventos() {
+    const snapshot = await coleccionEventos.get();
+    const eventos = [];
+    snapshot.forEach(doc => { eventos.push({ id: doc.id, ...doc.data() }); });
+    return eventos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+}
+
+async function agregarEvento(fecha, titulo, lugar) {
+    const evento = { fecha, titulo, lugar: lugar || "", creado: new Date().toISOString() };
+    const docRef = await coleccionEventos.add(evento);
+    return { id: docRef.id, ...evento };
+}
+
+async function eliminarEvento(eventoId) {
+    await coleccionEventos.doc(eventoId).delete();
+}
+
+async function cargarContraseñasGrupos() {
+    const snapshot = await coleccionPasswords.get();
+    const passwords = {};
+    snapshot.forEach(doc => { passwords[doc.id] = doc.data().password; });
+    return passwords;
+}
+
+async function guardarContraseñaGrupo(grupo, password) {
+    await coleccionPasswords.doc(grupo).set({ password: password });
+}
+
+async function verificarContraseñaGrupo(grupo, password) {
+    const doc = await coleccionPasswords.doc(grupo).get();
+    if (doc.exists) return doc.data().password === password;
+    return password === "admin123";
+}
+
 function loadDatabaseLocal() {
     const storedDb = localStorage.getItem("pj_db_v8");
     const storedCorr = localStorage.getItem("pj_corr_v8");
-    
-    if (storedDb) {
-        db = JSON.parse(storedDb);
-    } else {
-        db = {};
-    }
-    
-    if (storedCorr) {
-        ultimoNum = parseInt(storedCorr);
-    } else {
-        ultimoNum = 0;
-    }
+    if (storedDb) db = JSON.parse(storedDb);
+    else db = {};
+    if (storedCorr) ultimoNum = parseInt(storedCorr);
+    else ultimoNum = 0;
 }
 
 function saveDatabaseLocal() {
@@ -178,25 +197,19 @@ function saveDatabaseLocal() {
 async function initDatabase() {
     const snapshot = await coleccionPagos.get();
     const batch = dbFirestore.batch();
-    snapshot.forEach(doc => {
-        batch.delete(doc.ref);
-    });
+    snapshot.forEach(doc => batch.delete(doc.ref));
     await batch.commit();
     await coleccionCorrelativo.set({ valor: 0 });
-    
     localStorage.removeItem("pj_db_v8");
     localStorage.removeItem("pj_corr_v8");
-    
     db = {};
     ultimoNum = 0;
-    
     const añoActual = new Date().getFullYear();
     await asegurarDBCloud(añoActual);
 }
 
 async function updatePaymentStatus(anio, grupo, mes, estado) {
     if (!db[anio]) await asegurarDBCloud(anio);
-    
     const record = db[anio].find(p => p.grupo === grupo && p.mes === mes);
     if (record) {
         record.estado = estado;
@@ -218,21 +231,32 @@ function getCurrentNumero() {
 
 async function addCustomGroup(anio, grupo) {
     if (!db[anio]) await asegurarDBCloud(anio);
-    
     const existeGrupo = db[anio].some(item => item.grupo === grupo);
     if (!existeGrupo) {
         for (const mesItem of MESES) {
             db[anio].push({ grupo: grupo, mes: mesItem, estado: "pendiente" });
             const docId = `${anio}_${grupo}_${mesItem}`;
-            await coleccionPagos.doc(docId).set({
-                anio: anio,
-                grupo: grupo,
-                mes: mesItem,
-                estado: "pendiente"
-            });
+            await coleccionPagos.doc(docId).set({ anio: anio, grupo: grupo, mes: mesItem, estado: "pendiente" });
         }
         await saveDatabase();
         return true;
     }
     return false;
 }
+
+// ========== EXPORTAR FUNCIONES GLOBALES ==========
+window.cargarContraseñasGrupos = cargarContraseñasGrupos;
+window.verificarContraseñaGrupo = verificarContraseñaGrupo;
+window.guardarContraseñaGrupo = guardarContraseñaGrupo;
+window.cargarEventos = cargarEventos;
+window.agregarEvento = agregarEvento;
+window.eliminarEvento = eliminarEvento;
+window.resetSistema = resetSistema;
+window.loadDatabase = loadDatabase;
+window.saveDatabase = saveDatabase;
+window.asegurarDBCloud = asegurarDBCloud;
+window.updatePaymentStatus = updatePaymentStatus;
+window.getNextNumero = getNextNumero;
+window.getCurrentNumero = getCurrentNumero;
+window.addCustomGroup = addCustomGroup;
+window.initDatabase = initDatabase;

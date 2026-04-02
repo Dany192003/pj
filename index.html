@@ -13,13 +13,14 @@
 <div class="app">
     <div class="header">
         <h1>🏛️ Pastoral Juvenil</h1>
-        <p>Calendario de Actividades y Pagos - Sumpango</p>
+        <p>Calendario de Actividades - Sumpango</p>
         <div class="user-actions">
-            <button class="btn-login" id="btnAdminLogin">🔐 Acceso Administrador</button>
+            <button class="btn-login" id="btnAdminLogin">🔐 Administrador</button>
+            <button class="btn-consulta" id="btnConsultaPagos">📋 Consultar Pagos</button>
         </div>
     </div>
 
-    <!-- Calendario -->
+    <!-- Calendario de actividades -->
     <div class="calendar-container">
         <div class="calendar-header">
             <button class="calendar-nav" id="prevMonth">◀</button>
@@ -36,15 +37,7 @@
         </div>
     </div>
 
-    <!-- Lista de próximos pagos -->
-    <div class="upcoming-payments">
-        <h3>📅 Próximos Pagos Pendientes</h3>
-        <div class="payments-list" id="paymentsList">
-            <!-- Lista de pagos pendientes -->
-        </div>
-    </div>
-
-    <!-- Modal de login -->
+    <!-- Modal de login admin -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
