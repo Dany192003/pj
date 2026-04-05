@@ -7,7 +7,7 @@ function mostrarLoaderWhatsApp(mostrar) {
             <div id="loaderWhatsApp" class="loader-overlay">
                 <div class="loader-content">
                     <div class="loader-spinner"></div>
-                    <p>Procesando imagen...</p>
+                    <p>Abriendo WhatsApp...</p>
                 </div>
             </div>
         `;
@@ -26,7 +26,6 @@ async function subirYEnviar() {
     if (tel.length === 8 && !tel.startsWith("502")) tel = "502" + tel;
     
     console.log("📞 Número de teléfono:", tel);
-    
     const telefonoParaEnviar = tel;
     
     if (window.compPendiente && !window.compActual) {
@@ -40,51 +39,41 @@ async function subirYEnviar() {
         return; 
     }
     
+    if (!window.imagenCloudinaryUrl) {
+        window.showToast("❌ La imagen aún no se ha generado", true);
+        return;
+    }
+    
     const btn = document.getElementById("btnConfirmarEnviar");
     const originalText = btn ? btn.innerHTML : "Enviar";
     if (btn) {
-        btn.innerHTML = '<span class="spinner"></span> Procesando...';
+        btn.innerHTML = '<span class="spinner"></span> Abriendo WhatsApp...';
         btn.disabled = true;
     }
     
     mostrarLoaderWhatsApp(true);
     
     try {
-        console.log("📸 Capturando el comprobante HTML...");
-        
-        const elemento = document.getElementById("vistaPrevia");
-        if (!elemento) {
-            throw new Error("No se encontró el elemento del comprobante");
-        }
-        
-        const imagenUrl = await capturarYSubirCloudinary(elemento, window.compActual.num);
-        window.imagenCloudinaryUrl = imagenUrl;
-        
-        console.log("📤 Imagen subida, URL:", imagenUrl);
-        window.showToast("✓ Imagen lista, abriendo WhatsApp...", false);
-        
         const mensajeTexto = construirMensajeConEmojis(window.compActual);
-        const mensajeCompleto = mensajeTexto + "\n\n📎 *Comprobante en línea:*\n" + imagenUrl;
+        const mensajeCompleto = mensajeTexto + "\n\n📎 *Comprobante en línea:*\n" + window.imagenCloudinaryUrl;
         const mensajeCodificado = encodeURIComponent(mensajeCompleto);
         
         const waUrl = `https://api.whatsapp.com/send/?phone=${telefonoParaEnviar}&text=${mensajeCodificado}&type=phone_number&app_absent=0`;
         
         console.log("🔗 Abriendo WhatsApp con URL:", waUrl);
         
+        window.open(waUrl, "_blank");
+        
         setTimeout(() => {
-            window.open(waUrl, "_blank");
-            
-            setTimeout(() => {
-                if (typeof window.limpiarFormulario === 'function') {
-                    window.limpiarFormulario();
-                    console.log("🧹 Formulario limpiado después de envío");
-                }
-            }, 1000);
-        }, 500);
+            if (typeof window.limpiarFormulario === 'function') {
+                window.limpiarFormulario();
+                console.log("🧹 Formulario limpiado después de envío");
+            }
+        }, 1000);
         
     } catch (error) { 
         console.error("❌ Error detallado:", error);
-        window.showToast("❌ Error al procesar la imagen: " + (error.message || "Error desconocido"), true); 
+        window.showToast("❌ Error al enviar", true); 
     } finally { 
         setTimeout(() => {
             mostrarLoaderWhatsApp(false);

@@ -1,4 +1,4 @@
-// js/receipt.js - Generación de recibos (vista previa con PENDIENTE)
+// js/receipt.js - Generación de recibos con imagen nativa (sin html2canvas)
 
 if (typeof window.showToast !== 'function') {
     window.showToast = function(message, isError = false) {
@@ -15,62 +15,245 @@ window.compActual = null;
 window.compPendiente = null;
 window.imagenCloudinaryUrl = null;
 
+// Mostrar barra de progreso
+function mostrarBarraProgreso(porcentaje, mensaje) {
+    let barraContainer = document.getElementById("barraProgresoContainer");
+    
+    if (!barraContainer && porcentaje < 100) {
+        const barraHTML = `
+            <div id="barraProgresoContainer" class="barra-progreso-container">
+                <div class="barra-progreso-content">
+                    <div class="barra-progreso-header">
+                        <span class="barra-progreso-icon">📤</span>
+                        <span id="barraProgresoMensaje">Generando imagen...</span>
+                    </div>
+                    <div class="barra-progreso-barra">
+                        <div id="barraProgresoFill" class="barra-progreso-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="barra-progreso-footer">
+                        <span id="barraProgresoPorcentaje">0%</span>
+                        <span id="barraProgresoEstado">Iniciando...</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML("beforeend", barraHTML);
+        barraContainer = document.getElementById("barraProgresoContainer");
+    }
+    
+    if (barraContainer) {
+        if (porcentaje >= 100) {
+            setTimeout(() => {
+                barraContainer.style.opacity = "0";
+                setTimeout(() => {
+                    if (barraContainer) barraContainer.remove();
+                }, 500);
+            }, 500);
+        } else {
+            barraContainer.style.display = "flex";
+            const fill = document.getElementById("barraProgresoFill");
+            const porcentajeSpan = document.getElementById("barraProgresoPorcentaje");
+            const mensajeSpan = document.getElementById("barraProgresoMensaje");
+            const estadoSpan = document.getElementById("barraProgresoEstado");
+            
+            if (fill) fill.style.width = `${porcentaje}%`;
+            if (porcentajeSpan) porcentajeSpan.textContent = `${porcentaje}%`;
+            if (mensajeSpan) mensajeSpan.textContent = mensaje || "Generando imagen...";
+            if (estadoSpan) {
+                if (porcentaje < 30) estadoSpan.textContent = "🎨 Creando diseño...";
+                else if (porcentaje < 70) estadoSpan.textContent = "📤 Subiendo a la nube...";
+                else if (porcentaje < 100) estadoSpan.textContent = "⚙️ Finalizando...";
+                else estadoSpan.textContent = "✅ Completado!";
+            }
+        }
+    }
+}
+
+function ocultarBarraProgreso() {
+    const barra = document.getElementById("barraProgresoContainer");
+    if (barra) {
+        barra.style.opacity = "0";
+        setTimeout(() => {
+            if (barra) barra.remove();
+        }, 500);
+    }
+}
+
 function construirMensajeConEmojis(registro) {
     const estadoTexto = registro.estado || "PAGADO";
     return `✅ *COMPROBANTE DE PAGO - Pastoral Juvenil* ✅\n\n👥 *Juvenil:* ${registro.g}\n📌 *Concepto:* ${registro.concepto}\n💰 *Monto:* Q ${parseFloat(registro.mon).toFixed(2)}\n🔢 *No. Recibo:* REC-${registro.num}\n📆 *Fecha:* ${registro.fecha}\n⏰ *Hora:* ${registro.hora}\n✅ *Estado:* ${estadoTexto}\n\n_Gracias por tu contribución al movimiento juvenil._`;
 }
 
-// Función para capturar el HTML y subir a Cloudinary
-async function capturarYSubirCloudinary(elemento, reciboNum) {
-    console.log("📸 Iniciando captura del comprobante...");
-    
-    if (!elemento) {
-        throw new Error("No se encontró el elemento del comprobante");
-    }
-    
-    try {
-        // Configuración de captura
-        const canvas = await html2canvas(elemento, {
-            scale: 2.5,
-            backgroundColor: '#ffffff',
-            logging: false,
-            useCORS: true,
-            allowTaint: false
+// Función para generar imagen nativa del comprobante (sin html2canvas)
+function generarImagenComprobante(data, estado) {
+    return new Promise((resolve) => {
+        // Dimensiones fijas para la imagen
+        const width = 500;
+        const height = 620;
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        
+        // Fondo blanco sólido
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        
+        // === ENCABEZADO ===
+        const gradiente = ctx.createLinearGradient(0, 0, 0, 100);
+        gradiente.addColorStop(0, '#0f172a');
+        gradiente.addColorStop(1, '#1e293b');
+        ctx.fillStyle = gradiente;
+        ctx.fillRect(0, 0, width, 100);
+        
+        // Icono iglesia
+        ctx.font = '48px "Segoe UI Emoji", "Apple Color Emoji"';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText('⛪', width / 2, 55);
+        
+        // Título
+        ctx.font = 'bold 18px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('COMPROBANTE DE PAGO', width / 2, 85);
+        
+        // === NÚMERO DE RECIBO ===
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(0, 100, width, 65);
+        ctx.font = '10px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#0891b2';
+        ctx.fillText('NÚMERO DE RECIBO', width / 2, 128);
+        ctx.font = 'bold 26px "Courier New", monospace';
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText(`REC-${data.num}`, width / 2, 158);
+        
+        // === INFORMACIÓN ===
+        let yPos = 185;
+        const infoItems = [
+            { icon: '👥', label: 'JUVENIL', value: data.g },
+            { icon: '📌', label: 'CONCEPTO', value: data.concepto },
+            { icon: '📆', label: 'FECHA', value: data.fecha },
+            { icon: '⏰', label: 'HORA', value: data.hora }
+        ];
+        
+        infoItems.forEach((item) => {
+            // Línea separadora
+            ctx.beginPath();
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.setLineDash([5, 5]);
+            ctx.moveTo(20, yPos - 5);
+            ctx.lineTo(width - 20, yPos - 5);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Label
+            ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#64748b';
+            ctx.textAlign = 'left';
+            ctx.fillText(`${item.icon} ${item.label}`, 20, yPos + 10);
+            
+            // Value
+            ctx.font = '600 13px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#1e293b';
+            ctx.textAlign = 'right';
+            let valueText = item.value;
+            const maxWidth = width - 140;
+            if (ctx.measureText(valueText).width > maxWidth) {
+                while (ctx.measureText(valueText + '...').width > maxWidth && valueText.length > 3) {
+                    valueText = valueText.slice(0, -1);
+                }
+                valueText = valueText + '...';
+            }
+            ctx.fillText(valueText, width - 20, yPos + 10);
+            
+            yPos += 40;
         });
         
-        console.log("✓ Captura completada, tamaño:", canvas.width, "x", canvas.height);
+        // === ESTADO ===
+        ctx.fillStyle = estado === "PAGADO" ? "#dcfce7" : "#fef9c3";
+        ctx.fillRect(20, yPos, width - 40, 45);
+        ctx.strokeStyle = estado === "PAGADO" ? "#15803d" : "#f97316";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(20, yPos, width - 40, 45);
         
-        // Convertir a blob
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png", 0.95));
+        ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = estado === "PAGADO" ? "#15803d" : "#f97316";
+        ctx.textAlign = 'center';
+        ctx.fillText('ESTADO', width / 2, yPos + 18);
         
-        // Crear FormData
-        const formData = new FormData();
-        formData.append("file", blob);
-        formData.append("upload_preset", "comprobantes");
-        formData.append("folder", "comprobantes");
-        formData.append("public_id", `REC-${reciboNum}_${Date.now()}`);
+        ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = estado === "PAGADO" ? "#15803d" : "#f97316";
+        ctx.fillText(estado, width / 2, yPos + 38);
         
-        console.log("📤 Subiendo a Cloudinary...");
+        yPos += 60;
         
-        const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/image/upload", { 
-            method: "POST", 
-            body: formData 
-        });
+        // === MONTO TOTAL ===
+        ctx.fillStyle = '#f0f9ff';
+        ctx.fillRect(20, yPos, width - 40, 75);
+        ctx.strokeStyle = '#bae6fd';
+        ctx.strokeRect(20, yPos, width - 40, 75);
         
-        if (!res.ok) {
-            const errorText = await res.text();
-            console.error("❌ Error Cloudinary:", errorText);
-            throw new Error(`Error en Cloudinary: ${res.status}`);
-        }
+        ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#0369a1';
+        ctx.fillText('MONTO TOTAL', width / 2, yPos + 22);
         
-        const data = await res.json();
-        console.log("✓ Imagen subida exitosamente:", data.secure_url);
-        return data.secure_url;
+        ctx.font = 'bold 32px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText(`Q ${parseFloat(data.mon).toFixed(2)}`, width / 2, yPos + 62);
         
-    } catch (error) {
-        console.error("❌ Error en captura/subida:", error);
-        throw error;
+        yPos += 90;
+        
+        // === PIE DE PÁGINA ===
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fillRect(0, height - 55, width, 55);
+        
+        ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#334155';
+        ctx.fillText('¡Gracias por tu contribución!', width / 2, height - 32);
+        
+        ctx.font = '9px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText('Parroquia San Agustín - Sumpango', width / 2, height - 15);
+        
+        resolve(canvas);
+    });
+}
+
+// Función para subir imagen a Cloudinary
+async function subirImagenCloudinary(canvas, reciboNum) {
+    mostrarBarraProgreso(50, "Generando imagen...");
+    
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png", 1.0));
+    mostrarBarraProgreso(60, "Preparando subida...");
+    
+    const formData = new FormData();
+    formData.append("file", blob);
+    formData.append("upload_preset", "comprobantes");
+    formData.append("folder", "comprobantes");
+    formData.append("public_id", `REC-${reciboNum}_${Date.now()}`);
+    
+    console.log("📤 Subiendo a Cloudinary...");
+    mostrarBarraProgreso(70, "Subiendo a la nube...");
+    
+    const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/image/upload", { 
+        method: "POST", 
+        body: formData 
+    });
+    
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error("❌ Error Cloudinary:", errorText);
+        throw new Error(`Error en Cloudinary: ${res.status}`);
     }
+    
+    const data = await res.json();
+    console.log("✓ Imagen subida exitosamente:", data.secure_url);
+    mostrarBarraProgreso(100, "¡Completado!");
+    
+    setTimeout(() => ocultarBarraProgreso(), 1000);
+    
+    return data.secure_url;
 }
 
 function mostrarLoader(mostrar) {
@@ -90,7 +273,7 @@ function mostrarLoader(mostrar) {
     }
 }
 
-// Mostrar vista previa con estado PENDIENTE
+// Mostrar vista previa con estado PENDIENTE (usando HTML)
 function mostrarVistaPrevia(data) {
     console.log("📄 Mostrando vista previa del comprobante (ESTADO: PENDIENTE)");
     
@@ -103,7 +286,6 @@ function mostrarVistaPrevia(data) {
     document.getElementById("vHora").textContent = data.hora;
     document.getElementById("vMonto").textContent = parseFloat(data.mon).toFixed(2);
     
-    // Estado: PENDIENTE (color naranja)
     const estadoElement = document.getElementById("vEstado");
     if (estadoElement) {
         estadoElement.textContent = "PENDIENTE";
@@ -111,7 +293,6 @@ function mostrarVistaPrevia(data) {
         estadoElement.style.fontWeight = "800";
     }
     
-    // Cambiar fondo de la fila de estado
     const estadoRow = document.getElementById("estadoRow");
     if (estadoRow) {
         estadoRow.style.background = "#fef9c3";
@@ -135,7 +316,7 @@ function mostrarVistaPrevia(data) {
     }, 100);
 }
 
-// Confirmar y guardar el comprobante (cambiar estado a PAGADO)
+// Confirmar y guardar el comprobante (cambiar estado a PAGADO y generar imagen)
 async function confirmarYGuardarComprobante() {
     if (!window.compPendiente) {
         window.showToast("❌ Primero genera una vista previa", true);
@@ -161,10 +342,8 @@ async function confirmarYGuardarComprobante() {
         datos.num = nuevoNumero;
         document.getElementById("numReciboPreview").value = `REC-${getCurrentNumero()}`;
         
-        // Cambiar vista previa a PAGADO
         document.getElementById("vNumRecibo").textContent = `REC-${nuevoNumero}`;
         
-        // Estado: PAGADO (color verde)
         const estadoElement = document.getElementById("vEstado");
         if (estadoElement) {
             estadoElement.textContent = "PAGADO";
@@ -172,11 +351,25 @@ async function confirmarYGuardarComprobante() {
             estadoElement.style.fontWeight = "800";
         }
         
-        // Cambiar fondo de la fila de estado a verde claro
         const estadoRow = document.getElementById("estadoRow");
         if (estadoRow) {
             estadoRow.style.background = "#dcfce7";
         }
+        
+        // Generar imagen nativa del comprobante
+        mostrarBarraProgreso(10, "Creando imagen...");
+        const canvas = await generarImagenComprobante({
+            g: datos.g,
+            concepto: datos.concepto,
+            mon: datos.mon,
+            num: nuevoNumero,
+            fecha: datos.fecha,
+            hora: datos.hora
+        }, "PAGADO");
+        
+        // Subir a Cloudinary
+        const imagenUrl = await subirImagenCloudinary(canvas, nuevoNumero);
+        window.imagenCloudinaryUrl = imagenUrl;
         
         window.compActual = {
             g: datos.g,
@@ -200,6 +393,7 @@ async function confirmarYGuardarComprobante() {
         
     } catch (error) {
         mostrarLoader(false);
+        ocultarBarraProgreso();
         console.error("❌ Error al guardar comprobante:", error);
         window.showToast("❌ Error al guardar el comprobante", true);
         return false;
@@ -279,4 +473,3 @@ window.confirmarYGuardarComprobante = confirmarYGuardarComprobante;
 window.limpiarFormulario = limpiarFormulario;
 window.actNumeroReciboPreview = actNumeroReciboPreview;
 window.checkOtroGrupo = checkOtroGrupo;
-window.capturarYSubirCloudinary = capturarYSubirCloudinary;
