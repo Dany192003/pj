@@ -179,3 +179,305 @@ textarea:focus { outline: none; border-color: #0891b2; }
     .grupo-pass-item input { width: 100%; margin-bottom: 8px; }
     .save-pass-btn { margin-left: 0; width: 100%; }
 }
+/* Agregar al final de css/admin.css */
+
+/* Spinner pequeño para botones de estado */
+.spinner-small {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 0.6s linear infinite;
+}
+
+/* Deshabilitar botones mientras se procesa */
+.status-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Modal de confirmación personalizado */
+.modal-confirmacion {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-confirmacion-content {
+    background-color: white;
+    margin: 20% auto;
+    padding: 0;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 400px;
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-confirmacion-header {
+    padding: 24px 24px 16px 24px;
+    text-align: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.modal-confirmacion-icon {
+    font-size: 48px;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+.modal-confirmacion-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.modal-confirmacion-body {
+    padding: 20px 24px;
+    text-align: center;
+}
+
+.modal-confirmacion-body p {
+    margin: 0;
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.modal-confirmacion-footer {
+    padding: 16px 24px 24px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.btn-confirmar-cancelar, .btn-confirmar-aceptar {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-confirmar-cancelar {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-confirmar-cancelar:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+.btn-confirmar-aceptar {
+    background: linear-gradient(135deg, #0891b2 0%, #3b82f6 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
+}
+
+.btn-confirmar-aceptar:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+.btn-confirmar-cancelar:active, .btn-confirmar-aceptar:active {
+    transform: translateY(1px);
+}
+
+@media (max-width: 640px) {
+    .modal-confirmacion-content {
+        margin: 30% auto;
+        width: 92%;
+    }
+    .modal-confirmacion-header {
+        padding: 20px 20px 12px 20px;
+    }
+    .modal-confirmacion-body {
+        padding: 16px 20px;
+    }
+    .modal-confirmacion-footer {
+        padding: 14px 20px 20px 20px;
+    }
+}
+
+
+/* ========== SPINNER PEQUEÑO ========== */
+.spinner-small {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 0.6s linear infinite;
+}
+
+.status-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ========== MODAL DE CONFIRMACIÓN PERSONALIZADO ========== */
+.modal-confirmacion {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-confirmacion-content {
+    background-color: white;
+    margin: 20% auto;
+    padding: 0;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 400px;
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-confirmacion-header {
+    padding: 24px 24px 16px 24px;
+    text-align: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.modal-confirmacion-icon {
+    font-size: 48px;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+.modal-confirmacion-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.modal-confirmacion-body {
+    padding: 20px 24px;
+    text-align: center;
+}
+
+.modal-confirmacion-body p {
+    margin: 0;
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.modal-confirmacion-body p strong {
+    color: #0891b2;
+    font-weight: 700;
+}
+
+.modal-confirmacion-footer {
+    padding: 16px 24px 24px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.btn-confirmar-cancelar,
+.btn-confirmar-aceptar {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-confirmar-cancelar {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-confirmar-cancelar:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+.btn-confirmar-aceptar {
+    background: linear-gradient(135deg, #0891b2 0%, #3b82f6 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
+}
+
+.btn-confirmar-aceptar:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+.btn-confirmar-cancelar:active,
+.btn-confirmar-aceptar:active {
+    transform: translateY(1px);
+}
+
+/* ========== RESPONSIVE MODAL ========== */
+@media (max-width: 640px) {
+    .modal-confirmacion-content {
+        margin: 30% auto;
+        width: 92%;
+    }
+    .modal-confirmacion-header {
+        padding: 20px 20px 12px 20px;
+    }
+    .modal-confirmacion-body {
+        padding: 16px 20px;
+    }
+    .modal-confirmacion-footer {
+        padding: 14px 20px 20px 20px;
+    }
+}
+
+/* ========== ANIMACIONES ========== */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
