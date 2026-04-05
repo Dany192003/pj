@@ -40,8 +40,14 @@
             <div class="card">
                 <div class="section-title">📝 Datos del Pago</div>
                 <div class="row">
-                    <div class="field"><label>🔖 Número de Recibo</label><input id="numRecibo" type="text" readonly></div>
-                    <div class="field"><label>👤 Emite</label><input id="emisor" type="text" value="Pastoral Juvenil" readonly></div>
+                    <div class="field">
+                        <label>🔖 Número de Recibo</label>
+                        <input id="numReciboPreview" type="text" readonly>
+                    </div>
+                    <div class="field">
+                        <label>👤 Emite</label>
+                        <input id="emisor" type="text" value="Pastoral Juvenil" readonly>
+                    </div>
                 </div>
                 <div class="field">
                     <label>👥 Juvenil</label>
@@ -54,11 +60,23 @@
                         <option value="OTRO">➕ OTRO</option>
                     </select>
                 </div>
-                <div class="field" id="campoOtro" style="display:none;"><label>📝 Nombre del Grupo</label><input id="nombreOtro" placeholder="Escriba el nombre"></div>
-                <div class="field"><label>📌 Concepto</label><input id="concepto" type="text" placeholder="Ej. Cuota Mensual"></div>
-                <div class="field"><label>💰 Monto (Q)</label><input id="monto" type="number" step="0.01" placeholder="0.00"></div>
-                <div class="field"><label>📱 WhatsApp</label><input id="whatsapp" type="tel" placeholder="Número de teléfono"></div>
-                <button class="btn-main" id="btnGenerar">✨ Generar Comprobante ✨</button>
+                <div class="field" id="campoOtro" style="display:none;">
+                    <label>📝 Nombre del Grupo</label>
+                    <input id="nombreOtro" placeholder="Escriba el nombre">
+                </div>
+                <div class="field">
+                    <label>📌 Concepto</label>
+                    <input id="concepto" type="text" placeholder="Ej. Cuota Mensual">
+                </div>
+                <div class="field">
+                    <label>💰 Monto (Q)</label>
+                    <input id="monto" type="number" step="0.01" placeholder="0.00">
+                </div>
+                <div class="field">
+                    <label>📱 WhatsApp</label>
+                    <input id="whatsapp" type="tel" placeholder="Número de teléfono">
+                </div>
+                <button class="btn-main" id="btnVistaPrevia">👁️ Vista Previa</button>
             </div>
             <div class="preview" id="preview" style="display:none;">
                 <div id="vistaPrevia" class="ticket">
@@ -67,17 +85,26 @@
                         <div class="ticket-title">COMPROBANTE DE PAGO</div>
                         <div class="ticket-subtitle">Parroquia San Agustín - Sumpango</div>
                     </div>
-                    <div class="ticket-receipt-number"><span class="receipt-label">NÚMERO DE RECIBO</span><span class="receipt-number" id="vNumRecibo"></span></div>
+                    <div class="ticket-receipt-number">
+                        <span class="receipt-label">NÚMERO DE RECIBO</span>
+                        <span class="receipt-number" id="vNumRecibo"></span>
+                    </div>
                     <div class="ticket-info">
                         <div class="info-row"><div class="info-label">👥 JUVENIL</div><div class="info-value" id="vGrupo">-</div></div>
                         <div class="info-row"><div class="info-label">📌 CONCEPTO</div><div class="info-value" id="vConcepto">-</div></div>
                         <div class="info-row"><div class="info-label">📆 FECHA</div><div class="info-value" id="vFecha">-</div></div>
                         <div class="info-row"><div class="info-label">⏰ HORA</div><div class="info-value" id="vHora">-</div></div>
                     </div>
-                    <div class="ticket-amount"><div class="amount-label">MONTO TOTAL</div><div class="amount-value" id="vMonto">0.00</div></div>
-                    <div class="ticket-footer"><div class="footer-text">¡Gracias por tu contribución!</div><div class="footer-note">Este comprobante es válido como constancia de pago</div></div>
+                    <div class="ticket-amount">
+                        <div class="amount-label">MONTO TOTAL</div>
+                        <div class="amount-value" id="vMonto">0.00</div>
+                    </div>
+                    <div class="ticket-footer">
+                        <div class="footer-text">¡Gracias por tu contribución!</div>
+                        <div class="footer-note">Este comprobante es válido como constancia de pago</div>
+                    </div>
                 </div>
-                <div class="btn-group"><button class="btn-wa" id="btnEnviarWA">📱 Abrir WhatsApp</button><button class="btn-copy" id="btnCopiarMsg">📋 Copiar Mensaje</button></div>
+                <button class="btn-wa" id="btnConfirmarEnviar">✅ Confirmar y Enviar WhatsApp</button>
             </div>
         </div>
     </div>

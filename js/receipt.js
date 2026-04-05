@@ -1,4 +1,4 @@
-// js/receipt.js - Generación de recibos con logo
+// js/receipt.js - Generación de recibos (vista previa sin guardar)
 
 if (typeof window.showToast !== 'function') {
     window.showToast = function(message, isError = false) {
@@ -12,189 +12,160 @@ if (typeof window.showToast !== 'function') {
 }
 
 window.compActual = null;
-window.comprobanteCanvas = null;
+window.compPendiente = null;
 window.imagenCloudinaryUrl = null;
 
 function construirMensajeConEmojis(registro) {
     return `✅ *COMPROBANTE DE PAGO - Pastoral Juvenil* ✅\n\n👥 *Juvenil:* ${registro.g}\n📌 *Concepto:* ${registro.concepto}\n💰 *Monto:* Q ${parseFloat(registro.mon).toFixed(2)}\n🔢 *No. Recibo:* REC-${registro.num}\n📆 *Fecha:* ${registro.fecha}\n⏰ *Hora:* ${registro.hora}\n\n_Gracias por tu contribución al movimiento juvenil._`;
 }
 
-// Función para subir imagen a Cloudinary
-async function subirImagenCloudinary(canvas, reciboNum) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const blob = await new Promise(r => canvas.toBlob(r, "image/png", 1.0));
-            const formData = new FormData();
-            formData.append("file", blob);
-            formData.append("upload_preset", "comprobantes");
-            formData.append("folder", "comprobantes");
-            formData.append("public_id", `REC-${reciboNum}_${Date.now()}`);
-            const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/image/upload", { method: "POST", body: formData });
-            if (!res.ok) throw new Error("Error en Cloudinary");
-            const data = await res.json();
-            resolve(data.secure_url);
-        } catch (error) { reject(error); }
-    });
-}
-
-// Función para cargar y dibujar el logo en el canvas
-function cargarLogoEnCanvas(ctx, x, y, width, height) {
-    return new Promise((resolve) => {
-        const logoImg = new Image();
-        logoImg.crossOrigin = "Anonymous";
-        logoImg.src = 'img/logo.jpg'; // Asegúrate de que esta ruta sea correcta y la imagen exista
-        logoImg.onload = () => {
-            ctx.drawImage(logoImg, x, y, width, height);
-            resolve(true);
-        };
-        logoImg.onerror = () => {
-            // Si no se puede cargar el logo, dibujar un icono de iglesia como fallback
-            ctx.font = `${height}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
-            ctx.fillStyle = '#ffffff';
-            ctx.fillText('⛪', x + width/2 - height/2, y + height - 5);
-            resolve(false);
-        };
-    });
-}
-
-// Generar imagen del comprobante como Canvas con logo
-async function generarImagenComprobante(data) {
-    return new Promise(async (resolve) => {
-        const width = 450, height = 550;
-        const canvas = document.createElement('canvas');
-        canvas.width = width; canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        
-        // Fondo blanco
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
-        ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 10; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 4;
-        ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.roundRect(0, 0, width, height, 20); ctx.fill();
-        ctx.shadowColor = 'transparent';
-        
-        // Encabezado con gradiente
-        const gradient = ctx.createLinearGradient(0, 0, 0, 110);
-        gradient.addColorStop(0, '#0f172a'); gradient.addColorStop(1, '#1e293b');
-        ctx.fillStyle = gradient; ctx.beginPath(); ctx.roundRect(0, 0, width, 110, 20); ctx.fill();
-        
-        // Logo de la parroquia (cargar imagen)
-        await cargarLogoEnCanvas(ctx, width/2 - 25, 12, 50, 50);
-        
-        // Título
-        ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.fillText('COMPROBANTE DE PAGO', width/2, 80);
-        
-        // Subtítulo
-        ctx.font = '9px "Plus Jakarta Sans", sans-serif';
-        ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        ctx.fillText('Parroquia San Agustín - Sumpango', width/2, 98);
-        
-        // Número de recibo
-        ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 110, width, 65);
-        ctx.font = '10px "Plus Jakarta Sans", sans-serif';
-        ctx.fillStyle = '#0891b2'; ctx.fillText('NÚMERO DE RECIBO', width/2, 138);
-        ctx.font = 'bold 24px "Courier New", monospace';
-        ctx.fillStyle = '#0f172a'; ctx.fillText(`REC-${data.num}`, width/2, 168);
-        
-        // Información
-        let yPos = 195;
-        const infoItems = [
-            { label: '👥 JUVENIL', value: data.g },
-            { label: '📌 CONCEPTO', value: data.concepto },
-            { label: '📆 FECHA', value: data.fecha },
-            { label: '⏰ HORA', value: data.hora }
-        ];
-        
-        infoItems.forEach((item) => {
-            ctx.beginPath(); ctx.strokeStyle = '#e2e8f0'; ctx.setLineDash([5,5]); ctx.moveTo(20, yPos - 5); ctx.lineTo(width - 20, yPos - 5); ctx.stroke(); ctx.setLineDash([]);
-            ctx.font = 'bold 11px "Plus Jakarta Sans"'; ctx.fillStyle = '#64748b'; ctx.textAlign = 'left'; ctx.fillText(item.label, 20, yPos + 8);
-            ctx.font = '600 13px "Plus Jakarta Sans"'; ctx.fillStyle = '#1e293b'; ctx.textAlign = 'right';
-            let valueText = item.value; const maxWidth = width - 140;
-            let textWidth = ctx.measureText(valueText).width;
-            if (textWidth > maxWidth) { while (textWidth > maxWidth && valueText.length > 3) { valueText = valueText.slice(0, -1); textWidth = ctx.measureText(valueText + '...').width; } valueText = valueText + '...'; }
-            ctx.fillText(valueText, width - 20, yPos + 8); yPos += 35;
+// Función para capturar el HTML y subir a Cloudinary
+async function capturarYSubirCloudinary(elemento, reciboNum) {
+    console.log("📸 Iniciando captura del comprobante...");
+    try {
+        const canvas = await html2canvas(elemento, {
+            scale: 2,
+            backgroundColor: '#ffffff',
+            logging: false,
+            useCORS: true,
+            allowTaint: false
         });
         
-        // Monto total
-        const montoY = yPos + 10;
-        ctx.fillStyle = '#f0f9ff'; ctx.beginPath(); ctx.roundRect(20, montoY - 15, width - 40, 85, 16); ctx.fill();
-        ctx.strokeStyle = '#bae6fd'; ctx.lineWidth = 1; ctx.beginPath(); ctx.roundRect(20, montoY - 15, width - 40, 85, 16); ctx.stroke();
-        ctx.font = 'bold 11px "Plus Jakarta Sans"'; ctx.fillStyle = '#0369a1'; ctx.fillText('MONTO TOTAL', width/2, montoY + 8);
-        ctx.font = 'bold 36px "Plus Jakarta Sans"'; ctx.fillStyle = '#0f172a'; ctx.fillText(`Q ${parseFloat(data.mon).toFixed(2)}`, width/2, montoY + 55);
+        console.log("✓ Captura completada, tamaño:", canvas.width, "x", canvas.height);
         
-        // Pie de página
-        const footerY = height - 65;
-        ctx.fillStyle = '#f1f5f9'; ctx.fillRect(0, footerY, width, 65);
-        ctx.font = 'bold 11px "Plus Jakarta Sans"'; ctx.fillStyle = '#334155'; ctx.fillText('¡Gracias por tu contribución!', width/2, footerY + 28);
-        ctx.font = '8px "Plus Jakarta Sans"'; ctx.fillStyle = '#94a3b8'; ctx.fillText('Pastoral Juvenil - Parroquia San Agustín Sumpango', width/2, footerY + 48);
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png", 0.9));
+        const formData = new FormData();
+        formData.append("file", blob);
+        formData.append("upload_preset", "comprobantes");
+        formData.append("folder", "comprobantes");
+        formData.append("public_id", `REC-${reciboNum}_${Date.now()}`);
         
-        resolve(canvas);
-    });
+        console.log("📤 Subiendo a Cloudinary...");
+        const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/image/upload", { 
+            method: "POST", 
+            body: formData 
+        });
+        
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error("❌ Error Cloudinary:", errorText);
+            throw new Error(`Error en Cloudinary: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        console.log("✓ Imagen subida exitosamente:", data.secure_url);
+        return data.secure_url;
+        
+    } catch (error) {
+        console.error("❌ Error en captura/subida:", error);
+        throw error;
+    }
 }
 
-if (!CanvasRenderingContext2D.prototype.roundRect) {
-    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-        if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2;
-        this.moveTo(x+r, y); this.lineTo(x+w-r, y); this.quadraticCurveTo(x+w, y, x+w, y+r);
-        this.lineTo(x+w, y+h-r); this.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-        this.lineTo(x+r, y+h); this.quadraticCurveTo(x, y+h, x, y+h-r);
-        this.lineTo(x, y+r); this.quadraticCurveTo(x, y, x+r, y);
-        return this;
-    };
+function mostrarLoader(mostrar) {
+    let loader = document.getElementById("loaderGenerando");
+    if (!loader && mostrar) {
+        const loaderHTML = `
+            <div id="loaderGenerando" class="loader-overlay">
+                <div class="loader-content">
+                    <div class="loader-spinner"></div>
+                    <p>Procesando...</p>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML("beforeend", loaderHTML);
+    } else if (loader && !mostrar) {
+        loader.remove();
+    }
 }
 
-// Mostrar el comprobante generado (solo vista previa)
-async function displayReceipt(data) {
-    document.getElementById("vNumRecibo").textContent = `REC-${data.num}`;
+// Mostrar vista previa SIN guardar en BD
+function mostrarVistaPrevia(data) {
+    console.log("📄 Mostrando vista previa del comprobante (sin guardar)");
+    
+    const tempNum = getCurrentNumero();
+    
+    document.getElementById("vNumRecibo").textContent = `REC-${tempNum}`;
     document.getElementById("vGrupo").textContent = data.g;
     document.getElementById("vConcepto").textContent = data.concepto;
     document.getElementById("vFecha").textContent = data.fecha;
     document.getElementById("vHora").textContent = data.hora;
     document.getElementById("vMonto").textContent = parseFloat(data.mon).toFixed(2);
     
-    // Generar canvas con logo
-    const canvas = await generarImagenComprobante(data);
-    window.comprobanteCanvas = canvas;
-    
-    // Mostrar vista previa como imagen
-    const ticketDiv = document.getElementById("vistaPrevia");
-    const img = document.createElement('img');
-    img.src = canvas.toDataURL('image/png');
-    img.style.width = '100%';
-    img.style.maxWidth = '400px';
-    img.style.borderRadius = '16px';
-    img.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-    img.style.margin = '0 auto';
-    img.style.display = 'block';
-    
-    // Limpiar y agregar la imagen
-    ticketDiv.innerHTML = '';
-    ticketDiv.appendChild(img);
+    window.compPendiente = {
+        g: data.g,
+        concepto: data.concepto,
+        mon: data.mon,
+        num: tempNum,
+        fecha: data.fecha,
+        hora: data.hora,
+        whatsapp: data.whatsapp
+    };
     
     document.getElementById("preview").style.display = "block";
-    window.compActual = data;
+    console.log("✓ Vista previa HTML mostrada - pendiente de confirmar");
     
     setTimeout(() => { 
         document.getElementById("preview").scrollIntoView({ behavior: 'smooth' }); 
     }, 100);
 }
 
-function limpiarFormulario() {
-    document.getElementById("concepto").value = "";
-    document.getElementById("monto").value = "";
-    document.getElementById("whatsapp").value = "";
-    const grupoSelect = document.getElementById("grupo");
-    grupoSelect.value = "";
-    document.getElementById("campoOtro").style.display = "none";
-    document.getElementById("nombreOtro").value = "";
-    document.getElementById("preview").style.display = "none";
-    window.compActual = null;
-    window.comprobanteCanvas = null;
-    window.imagenCloudinaryUrl = null;
+// Confirmar y guardar el comprobante
+async function confirmarYGuardarComprobante() {
+    if (!window.compPendiente) {
+        window.showToast("❌ Primero genera una vista previa", true);
+        return false;
+    }
+    
+    const datos = window.compPendiente;
+    const anioActual = new Date().getFullYear();
+    
+    mostrarLoader(true);
+    
+    try {
+        console.log("💾 Confirmando y guardando comprobante en BD...");
+        
+        await asegurarDBCloud(anioActual);
+        if (!GRUPOS.includes(datos.g)) {
+            await addCustomGroup(anioActual, datos.g);
+        }
+        const mesActual = MESES[new Date().getMonth()];
+        await updatePaymentStatus(anioActual, datos.g, mesActual, "pagado");
+        
+        const nuevoNumero = getNextNumero();
+        datos.num = nuevoNumero;
+        document.getElementById("numReciboPreview").value = `REC-${getCurrentNumero()}`;
+        document.getElementById("vNumRecibo").textContent = `REC-${nuevoNumero}`;
+        
+        window.compActual = {
+            g: datos.g,
+            concepto: datos.concepto,
+            mon: datos.mon,
+            num: nuevoNumero,
+            fecha: datos.fecha,
+            hora: datos.hora
+        };
+        
+        mostrarLoader(false);
+        window.showToast("✓ Comprobante guardado exitosamente", false);
+        console.log("✅ Comprobante guardado con éxito. Folio:", nuevoNumero);
+        
+        if (anioActual === window.anioSeleccionado && typeof renderTabla === 'function') {
+            renderTabla();
+        }
+        
+        return true;
+        
+    } catch (error) {
+        mostrarLoader(false);
+        console.error("❌ Error al guardar comprobante:", error);
+        window.showToast("❌ Error al guardar el comprobante", true);
+        return false;
+    }
 }
 
-function getFormData() {
+// Obtener datos del formulario para vista previa
+function getFormDataParaVistaPrevia() {
     let grupo = document.getElementById("grupo").value;
     if (!grupo || grupo === "") {
         window.showToast("❌ Por favor selecciona un juvenil", true);
@@ -207,44 +178,46 @@ function getFormData() {
     const concepto = document.getElementById("concepto").value.trim();
     const monto = document.getElementById("monto").value;
     const whatsapp = document.getElementById("whatsapp").value.trim();
+    
     if (!concepto) { window.showToast("❌ Ingresa un concepto", true); return null; }
     if (!monto || parseFloat(monto) <= 0) { window.showToast("❌ Ingresa un monto válido", true); return null; }
     if (!whatsapp) { window.showToast("❌ Ingresa el número de WhatsApp", true); return null; }
     
-    const numero = document.getElementById("numRecibo").value.replace("REC-", "");
     const ahora = new Date();
     const fechaActual = ahora.toLocaleDateString("es-GT", { day: 'numeric', month: 'long', year: 'numeric' });
     const horaActual = ahora.toLocaleTimeString("es-GT", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     
-    return { grupo, concepto, monto, numero, whatsapp, fecha: fechaActual, hora: horaActual };
-}
-
-async function generarComprobante() {
-    const formData = getFormData();
-    if (!formData) return;
-    
-    const { grupo, concepto, monto, numero, fecha, hora } = formData;
-    const anioActual = new Date().getFullYear();
-    
-    await asegurarDBCloud(anioActual);
-    if (!GRUPOS.includes(grupo)) await addCustomGroup(anioActual, grupo);
-    const mesActual = MESES[new Date().getMonth()];
-    await updatePaymentStatus(anioActual, grupo, mesActual, "pagado");
-    const newNumero = getNextNumero();
-    document.getElementById("numRecibo").value = `REC-${getCurrentNumero()}`;
-    
-    await displayReceipt({ 
+    return { 
         g: grupo, 
         concepto: concepto, 
         mon: monto, 
-        num: newNumero, 
-        fecha: fecha, 
-        hora: hora 
-    });
-    
-    window.showToast("✓ Comprobante generado exitosamente", false);
-    
-    if (anioActual === window.anioSeleccionado) renderTabla();
+        whatsapp: whatsapp,
+        fecha: fechaActual, 
+        hora: horaActual 
+    };
+}
+
+// Evento: Vista Previa
+async function generarVistaPrevia() {
+    console.log("👁️ Generando vista previa...");
+    const formData = getFormDataParaVistaPrevia();
+    if (!formData) return;
+    mostrarVistaPrevia(formData);
+}
+
+function limpiarFormulario() {
+    document.getElementById("concepto").value = "";
+    document.getElementById("monto").value = "";
+    document.getElementById("whatsapp").value = "";
+    const grupoSelect = document.getElementById("grupo");
+    grupoSelect.value = "";
+    document.getElementById("campoOtro").style.display = "none";
+    document.getElementById("nombreOtro").value = "";
+    document.getElementById("preview").style.display = "none";
+    window.compActual = null;
+    window.compPendiente = null;
+    window.imagenCloudinaryUrl = null;
+    console.log("🧹 Formulario limpiado");
 }
 
 function checkOtroGrupo() {
@@ -253,7 +226,14 @@ function checkOtroGrupo() {
     if (campoOtro) campoOtro.style.display = grupoSelect.value === "OTRO" ? "block" : "none";
 }
 
-function actNumeroRecibo() {
-    const numRecibo = document.getElementById("numRecibo");
+function actNumeroReciboPreview() {
+    const numRecibo = document.getElementById("numReciboPreview");
     if (numRecibo) numRecibo.value = `REC-${getCurrentNumero()}`;
 }
+
+// Exportar funciones necesarias para admin.js
+window.generarVistaPrevia = generarVistaPrevia;
+window.confirmarYGuardarComprobante = confirmarYGuardarComprobante;
+window.limpiarFormulario = limpiarFormulario;
+window.actNumeroReciboPreview = actNumeroReciboPreview;
+window.checkOtroGrupo = checkOtroGrupo;

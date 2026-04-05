@@ -1,4 +1,4 @@
-// js/table.js - Tabla de control
+// js/table.js - Tabla de control (versión corregida)
 
 if (typeof window.showToast !== 'function') {
     window.showToast = function(message, isError = false) {
@@ -14,34 +14,69 @@ if (typeof window.showToast !== 'function') {
 let anioSeleccionado = new Date().getFullYear();
 
 function renderTabla() {
-    if (!db[anioSeleccionado]) asegurarDBCloud(anioSeleccionado);
+    if (!db[anioSeleccionado]) {
+        asegurarDBCloud(anioSeleccionado);
+    }
+    
     const dataAnio = db[anioSeleccionado] || [];
     const thead = document.getElementById("tableHeader");
     const tbody = document.getElementById("tableBody");
+    
     if (!thead || !tbody) return;
+    
     thead.innerHTML = `<th>👥 Juvenil</th>${MESES.map(m => `<th>${m.substring(0, 3)}</th>`).join("")}`;
-    const gruposUnicos = [...new Set(dataAnio.map(p => p.grupo))].sort();
-    tbody.innerHTML = gruposUnicos.map(g => {
-        let fila = `<td style="text-align:left; font-weight:700;">${g}<\/td>`;
-        MESES.forEach(m => {
-            const r = dataAnio.find(p => p.grupo === g && p.mes === m);
-            const isP = r?.estado === "pagado";
-            fila += `<td><button class="status-btn ${isP ? 'status-pagado' : 'status-pendiente'}" onclick="window.toggleStatus('${g}', '${m}')">${isP ? '✓' : '✗'}</button><\/td>`;
+    
+    // Usar GRUPOS para asegurar que TODOS aparezcan
+    const gruposOrdenados = [...GRUPOS].sort();
+    
+    tbody.innerHTML = gruposOrdenados.map(grupo => {
+        let fila = `<td style="text-align:left; font-weight:700; background:#f8fafc;">${grupo}<\/td>`;
+        
+        MESES.forEach(mes => {
+            const registro = dataAnio.find(p => p.grupo === grupo && p.mes === mes);
+            const estaPagado = registro?.estado === "pagado";
+            
+            fila += `<td style="text-align:center;">
+                        <button class="status-btn ${estaPagado ? 'status-pagado' : 'status-pendiente'}" 
+                                onclick="window.toggleStatus('${grupo}', '${mes}')">
+                            ${estaPagado ? '✓' : '✗'}
+                        </button>
+                     <\/td>`;
         });
+        
         return `<tr>${fila}<\/tr>`;
     }).join("");
 }
 
 function toggleStatus(grupo, mes) {
-    if (!db[anioSeleccionado]) asegurarDBCloud(anioSeleccionado);
-    const record = db[anioSeleccionado].find(p => p.grupo === grupo && p.mes === mes);
-    if (record) {
-        const nuevoEstado = record.estado === "pagado" ? "pendiente" : "pagado";
-        record.estado = nuevoEstado;
-        saveDatabase();
-        renderTabla();
-        window.showToast(`${nuevoEstado === "pagado" ? "✓ Pagado" : "✗ Pendiente"} - ${grupo} - ${mes}`);
+    if (!db[anioSeleccionado]) {
+        asegurarDBCloud(anioSeleccionado);
     }
+    
+    let record = db[anioSeleccionado].find(p => p.grupo === grupo && p.mes === mes);
+    
+    if (!record) {
+        db[anioSeleccionado].push({ grupo: grupo, mes: mes, estado: "pendiente" });
+        record = db[anioSeleccionado].find(p => p.grupo === grupo && p.mes === mes);
+    }
+    
+    const nuevoEstado = record.estado === "pagado" ? "pendiente" : "pagado";
+    record.estado = nuevoEstado;
+    
+    const docId = `${anioSeleccionado}_${grupo}_${mes}`;
+    coleccionPagos.doc(docId).set({ 
+        anio: anioSeleccionado, 
+        grupo: grupo, 
+        mes: mes, 
+        estado: nuevoEstado 
+    }).then(() => {
+        saveDatabaseLocal();
+        renderTabla();
+        window.showToast(`${nuevoEstado === "pagado" ? "✓ Pagado" : "✗ Pendiente"} - ${grupo} - ${mes}`, false);
+    }).catch(error => {
+        console.error("Error:", error);
+        window.showToast("❌ Error al guardar", true);
+    });
 }
 
 function cambiarAnioControl() {
@@ -55,7 +90,8 @@ function initYearSelect() {
     sel.innerHTML = "";
     for (let i = 2024; i <= 2030; i++) {
         const o = document.createElement("option");
-        o.value = i; o.textContent = i;
+        o.value = i;
+        o.textContent = i;
         sel.appendChild(o);
     }
     sel.value = anioSeleccionado;

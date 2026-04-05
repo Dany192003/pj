@@ -20,12 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     initYearSelect();
     renderTabla();
-    actNumeroRecibo();
+    actNumeroReciboPreview();
     
     // Botones principales
-    document.getElementById("btnGenerar").onclick = generarComprobante;
-    document.getElementById("btnEnviarWA").onclick = subirYEnviar;
-    document.getElementById("btnCopiarMsg").onclick = copiarMensaje;
+    document.getElementById("btnVistaPrevia").onclick = generarVistaPrevia;
+    document.getElementById("btnConfirmarEnviar").onclick = subirYEnviar;
     document.getElementById("btnLogout").onclick = logout;
     document.getElementById("grupo").onchange = checkOtroGrupo;
     document.getElementById("selectAnioControl").onchange = cambiarAnioControl;
@@ -39,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
     
-    // ========== RESET SISTEMA ==========
+    // Reset Sistema
     const btnReset = document.getElementById("btnReset");
     const modalReset = document.getElementById("modalReset");
     const btnCancelReset = document.getElementById("btnCancelReset");
@@ -55,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     window.onclick = (event) => { if (event.target === modalReset) modalReset.style.display = "none"; };
     
-    // ========== TAB 3: ACTIVIDADES ==========
+    // Tab 3: Actividades
     await cargarEventosAdmin();
     
     document.getElementById("btnAgregarEvento").onclick = async () => {
@@ -78,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.showToast("✓ Actividad agregada", false);
     };
     
-    // ========== TAB 4: CONTRASEÑAS ==========
+    // Tab 4: Contraseñas
     await cargarContraseñasAdmin();
 });
 

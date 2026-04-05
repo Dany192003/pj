@@ -46,17 +46,25 @@ async function loadDatabase() {
     });
 }
 
+// Asegurar que existe la estructura para un año (con TODOS los grupos)
 async function asegurarDBCloud(anio) {
     if (!db[anio]) {
         db[anio] = [];
-        for (const grupo of GRUPOS) {
-            for (const mes of MESES) {
-                const existe = db[anio].some(p => p.grupo === grupo && p.mes === mes);
-                if (!existe) {
-                    db[anio].push({ grupo, mes, estado: "pendiente" });
-                    const docId = `${anio}_${grupo}_${mes}`;
-                    await coleccionPagos.doc(docId).set({ anio: anio, grupo: grupo, mes: mes, estado: "pendiente" });
-                }
+    }
+    
+    // Asegurar que todos los grupos tengan registros para todos los meses
+    for (const grupo of GRUPOS) {
+        for (const mes of MESES) {
+            const existe = db[anio].some(p => p.grupo === grupo && p.mes === mes);
+            if (!existe) {
+                db[anio].push({ grupo, mes, estado: "pendiente" });
+                const docId = `${anio}_${grupo}_${mes}`;
+                await coleccionPagos.doc(docId).set({ 
+                    anio: anio, 
+                    grupo: grupo, 
+                    mes: mes, 
+                    estado: "pendiente" 
+                });
             }
         }
     }
