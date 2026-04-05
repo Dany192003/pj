@@ -46,13 +46,11 @@ async function loadDatabase() {
     });
 }
 
-// Asegurar que existe la estructura para un año (con TODOS los grupos)
 async function asegurarDBCloud(anio) {
     if (!db[anio]) {
         db[anio] = [];
     }
     
-    // Asegurar que todos los grupos tengan registros para todos los meses
     for (const grupo of GRUPOS) {
         for (const mes of MESES) {
             const existe = db[anio].some(p => p.grupo === grupo && p.mes === mes);
@@ -76,7 +74,12 @@ async function saveDatabase() {
         for (const anio in db) {
             for (const pago of db[anio]) {
                 const docId = `${anio}_${pago.grupo}_${pago.mes}`;
-                await coleccionPagos.doc(docId).set({ anio: parseInt(anio), grupo: pago.grupo, mes: pago.mes, estado: pago.estado });
+                await coleccionPagos.doc(docId).set({ 
+                    anio: parseInt(anio), 
+                    grupo: pago.grupo, 
+                    mes: pago.mes, 
+                    estado: pago.estado 
+                });
             }
         }
         saveDatabaseLocal();
@@ -88,47 +91,78 @@ async function saveDatabase() {
     }
 }
 
+// Función RESET SISTEMA - Reinicia pagos, actividades, contraseñas y contador
 async function resetSistema() {
     return new Promise(async (resolve, reject) => {
         try {
             logMensaje("🔄 Reiniciando TODO el sistema...", false);
             
+            // 1. Eliminar TODOS los pagos
             const snapshotPagos = await coleccionPagos.get();
             const batchPagos = dbFirestore.batch();
-            snapshotPagos.forEach(doc => { batchPagos.delete(doc.ref); });
+            snapshotPagos.forEach(doc => {
+                batchPagos.delete(doc.ref);
+            });
             await batchPagos.commit();
+            console.log("✓ Pagos eliminados");
             
+            // 2. Reiniciar correlativo de recibos (contador)
             ultimoNum = 0;
             await coleccionCorrelativo.set({ valor: 0 });
+            console.log("✓ Correlativo reiniciado");
             
+            // 3. Eliminar TODAS las contraseñas de los grupos
             const snapshotPasswords = await coleccionPasswords.get();
             const batchPasswords = dbFirestore.batch();
-            snapshotPasswords.forEach(doc => { batchPasswords.delete(doc.ref); });
+            snapshotPasswords.forEach(doc => {
+                batchPasswords.delete(doc.ref);
+            });
             await batchPasswords.commit();
+            console.log("✓ Contraseñas eliminadas");
             
+            // 4. Eliminar TODAS las actividades del calendario
             const snapshotEventos = await coleccionEventos.get();
             const batchEventos = dbFirestore.batch();
-            snapshotEventos.forEach(doc => { batchEventos.delete(doc.ref); });
+            snapshotEventos.forEach(doc => {
+                batchEventos.delete(doc.ref);
+            });
             await batchEventos.commit();
+            console.log("✓ Actividades eliminadas");
             
+            // 5. Limpiar la variable local db
             db = {};
+            
+            // 6. Crear estructura limpia para el año actual (solo grupos, todo pendiente)
             const añoActual = new Date().getFullYear();
             db[añoActual] = [];
             for (const grupo of GRUPOS) {
                 for (const mes of MESES) {
                     db[añoActual].push({ grupo: grupo, mes: mes, estado: "pendiente" });
                     const docId = `${añoActual}_${grupo}_${mes}`;
-                    await coleccionPagos.doc(docId).set({ anio: añoActual, grupo: grupo, mes: mes, estado: "pendiente" });
+                    await coleccionPagos.doc(docId).set({ 
+                        anio: añoActual, 
+                        grupo: grupo, 
+                        mes: mes, 
+                        estado: "pendiente" 
+                    });
                 }
             }
+            console.log("✓ Estructura limpia creada para el año", añoActual);
             
+            // 7. Guardar cambios en localStorage
             saveDatabaseLocal();
-            logMensaje("✓ Sistema reiniciado completamente", false);
-            setTimeout(() => location.reload(), 1500);
+            
+            logMensaje("✓ Sistema reiniciado completamente (pagos, contador, contraseñas y actividades)", false);
+            
+            // Recargar la página después de 1.5 segundos
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+            
             resolve(true);
         } catch (error) {
             console.error("Error al reiniciar sistema:", error);
-            logMensaje("❌ Error al reiniciar el sistema", true);
+            logMensaje("❌ Error al reiniciar el sistema: " + error.message, true);
             reject(error);
         }
     });

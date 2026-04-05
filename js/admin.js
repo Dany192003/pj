@@ -9,7 +9,93 @@ window.showToast = function(message, isError = false) {
     setTimeout(() => { toast.className = "toast"; }, 2000);
 };
 
+// Función para escapar HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ========== FUNCIÓN: CARGAR EVENTOS ==========
+async function cargarEventosAdmin() {
+    console.log("📅 Cargando eventos...");
+    const eventos = await cargarEventos();
+    const eventosList = document.getElementById("eventosList");
+    if (!eventosList) {
+        console.log("❌ eventosList no encontrado");
+        return;
+    }
+    
+    if (eventos.length === 0) {
+        eventosList.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px;">No hay actividades registradas</p>';
+        return;
+    }
+    
+    eventosList.innerHTML = eventos.map(evento => `
+        <div class="evento-item">
+            <div style="flex: 1;">
+                <div class="evento-fecha">📅 ${evento.fecha}</div>
+                <div class="evento-titulo"><strong>${escapeHtml(evento.titulo)}</strong></div>
+                ${evento.lugar ? `<div class="evento-lugar">📍 ${escapeHtml(evento.lugar)}</div>` : ''}
+                ${evento.descripcion ? `<div class="evento-descripcion">📝 ${escapeHtml(evento.descripcion.substring(0, 100))}${evento.descripcion.length > 100 ? '...' : ''}</div>` : ''}
+            </div>
+            <button class="delete-btn" data-id="${evento.id}">🗑️</button>
+        </div>
+    `).join("");
+    
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.onclick = async () => {
+            const id = btn.dataset.id;
+            await eliminarEvento(id);
+            await cargarEventosAdmin();
+            window.showToast("✓ Actividad eliminada", false);
+        };
+    });
+    console.log("✅ Eventos cargados:", eventos.length);
+}
+
+// ========== FUNCIÓN: CARGAR CONTRASEÑAS ==========
+async function cargarContraseñasAdmin() {
+    console.log("🔑 Cargando contraseñas...");
+    const passwords = await cargarContraseñasGrupos();
+    const gruposPassList = document.getElementById("gruposPassList");
+    if (!gruposPassList) {
+        console.log("❌ gruposPassList no encontrado");
+        return;
+    }
+    
+    gruposPassList.innerHTML = GRUPOS.map(grupo => `
+        <div class="grupo-pass-item">
+            <span><strong>👥 ${escapeHtml(grupo)}</strong></span>
+            <div>
+                <input type="text" id="pass-${escapeHtml(grupo)}" placeholder="Contraseña" value="${passwords[grupo] || ''}" class="pass-input">
+                <button class="save-pass-btn" data-grupo="${escapeHtml(grupo)}">💾 Guardar</button>
+            </div>
+        </div>
+    `).join("");
+    
+    document.querySelectorAll('.save-pass-btn').forEach(btn => {
+        btn.onclick = async () => {
+            const grupo = btn.dataset.grupo;
+            const passwordInput = document.getElementById(`pass-${grupo}`);
+            const password = passwordInput.value.trim();
+            
+            if (!password) {
+                window.showToast("❌ Ingresa una contraseña", true);
+                return;
+            }
+            
+            await guardarContraseñaGrupo(grupo, password);
+            window.showToast(`✓ Contraseña guardada para ${grupo}`, false);
+        };
+    });
+    console.log("✅ Contraseñas cargadas");
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("🚀 Iniciando panel administrativo...");
+    
     if (!requireAuth()) return;
     
     await loadDatabase();
@@ -29,111 +115,119 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("grupo").onchange = checkOtroGrupo;
     document.getElementById("selectAnioControl").onchange = cambiarAnioControl;
     
-    // Tabs
-    document.querySelectorAll('.tab-btn').forEach(b => {
-        b.addEventListener('click', (e) => {
-            document.querySelectorAll('.tab-btn, .tab-content').forEach(x => x.classList.remove('active'));
-            b.classList.add('active');
-            document.getElementById(b.dataset.tab).classList.add('active');
+    // ========== TABS - Versión mejorada ==========
+    const tabs = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    // Función para activar una pestaña
+    async function activateTab(tabId) {
+        console.log("📑 Activando pestaña:", tabId);
+        
+        // Desactivar todas las pestañas
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        // Activar la pestaña seleccionada
+        const selectedTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+        if (selectedTab) selectedTab.classList.add('active');
+        const selectedContent = document.getElementById(tabId);
+        if (selectedContent) selectedContent.classList.add('active');
+        
+        // Cargar contenido según la pestaña
+        if (tabId === 'tab3') {
+            await cargarEventosAdmin();
+        }
+        if (tabId === 'tab4') {
+            await cargarContraseñasAdmin();
+        }
+        if (tabId === 'tab2') {
+            renderTabla();
+        }
+    }
+    
+    // Agregar event listeners a las pestañas
+    tabs.forEach(tab => {
+        tab.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const tabId = tab.dataset.tab;
+            if (tabId) {
+                await activateTab(tabId);
+            }
         });
     });
     
-    // Reset Sistema
+    // Activar la pestaña inicial (tab1)
+    await activateTab('tab1');
+    
+    // ========== BOTÓN AGREGAR EVENTO ==========
+    const btnAgregarEvento = document.getElementById("btnAgregarEvento");
+    if (btnAgregarEvento) {
+        btnAgregarEvento.onclick = async () => {
+            const fecha = document.getElementById("eventoFecha").value;
+            const titulo = document.getElementById("eventoTitulo").value.trim();
+            const lugar = document.getElementById("eventoLugar").value.trim();
+            const descripcion = document.getElementById("eventoDescripcion").value.trim();
+            
+            if (!fecha) { window.showToast("❌ Selecciona una fecha", true); return; }
+            if (!titulo) { window.showToast("❌ Escribe un título", true); return; }
+            
+            await agregarEvento(fecha, titulo, lugar, descripcion);
+            
+            document.getElementById("eventoFecha").value = "";
+            document.getElementById("eventoTitulo").value = "";
+            document.getElementById("eventoLugar").value = "";
+            document.getElementById("eventoDescripcion").value = "";
+            
+            await cargarEventosAdmin();
+            window.showToast("✓ Actividad agregada", false);
+        };
+    } else {
+        console.log("❌ btnAgregarEvento no encontrado");
+    }
+    
+    // ========== RESET SISTEMA ==========
     const btnReset = document.getElementById("btnReset");
     const modalReset = document.getElementById("modalReset");
     const btnCancelReset = document.getElementById("btnCancelReset");
     const btnConfirmReset = document.getElementById("btnConfirmReset");
     
-    if (btnReset) btnReset.onclick = () => modalReset.style.display = "block";
-    if (btnCancelReset) btnCancelReset.onclick = () => modalReset.style.display = "none";
+    if (btnReset) {
+        btnReset.onclick = () => {
+            console.log("🔄 Botón Reset clickeado - Mostrando modal");
+            if (modalReset) modalReset.style.display = "block";
+        };
+    } else {
+        console.log("❌ btnReset no encontrado");
+    }
+    
+    if (btnCancelReset) {
+        btnCancelReset.onclick = () => {
+            console.log("❌ Cancelar reset");
+            if (modalReset) modalReset.style.display = "none";
+        };
+    }
+    
     if (btnConfirmReset) {
         btnConfirmReset.onclick = async () => {
-            modalReset.style.display = "none";
-            await resetSistema();
+            console.log("⚠️ Confirmando reset del sistema...");
+            if (modalReset) modalReset.style.display = "none";
+            
+            if (typeof resetSistema === 'function') {
+                await resetSistema();
+            } else {
+                console.error("❌ función resetSistema no disponible");
+                window.showToast("❌ Error: función de reset no disponible", true);
+            }
         };
     }
-    window.onclick = (event) => { if (event.target === modalReset) modalReset.style.display = "none"; };
     
-    // Tab 3: Actividades
-    await cargarEventosAdmin();
-    
-    document.getElementById("btnAgregarEvento").onclick = async () => {
-        const fecha = document.getElementById("eventoFecha").value;
-        const titulo = document.getElementById("eventoTitulo").value.trim();
-        const lugar = document.getElementById("eventoLugar").value.trim();
-        const descripcion = document.getElementById("eventoDescripcion").value.trim();
-        
-        if (!fecha) { window.showToast("❌ Selecciona una fecha", true); return; }
-        if (!titulo) { window.showToast("❌ Escribe un título", true); return; }
-        
-        await agregarEvento(fecha, titulo, lugar, descripcion);
-        
-        document.getElementById("eventoFecha").value = "";
-        document.getElementById("eventoTitulo").value = "";
-        document.getElementById("eventoLugar").value = "";
-        document.getElementById("eventoDescripcion").value = "";
-        
-        await cargarEventosAdmin();
-        window.showToast("✓ Actividad agregada", false);
+    // Cerrar modal si se hace clic fuera
+    window.onclick = (event) => {
+        if (event.target === modalReset) {
+            if (modalReset) modalReset.style.display = "none";
+        }
     };
     
-    // Tab 4: Contraseñas
-    await cargarContraseñasAdmin();
+    window.showToast("✓ Panel administrativo listo", false);
+    console.log("✅ Panel administrativo inicializado");
 });
-
-async function cargarEventosAdmin() {
-    const eventos = await cargarEventos();
-    const eventosList = document.getElementById("eventosList");
-    if (!eventosList) return;
-    
-    if (eventos.length === 0) {
-        eventosList.innerHTML = '<p style="color: #64748b;">No hay actividades registradas</p>';
-        return;
-    }
-    
-    eventosList.innerHTML = eventos.map(evento => `
-        <div class="evento-item">
-            <div style="flex: 1;">
-                <div class="evento-fecha">📅 ${evento.fecha}</div>
-                <div class="evento-titulo"><strong>${evento.titulo}</strong></div>
-                ${evento.lugar ? `<div class="evento-lugar">📍 ${evento.lugar}</div>` : ''}
-                ${evento.descripcion ? `<div class="evento-descripcion">📝 ${evento.descripcion.substring(0, 100)}${evento.descripcion.length > 100 ? '...' : ''}</div>` : ''}
-            </div>
-            <button class="delete-btn" data-id="${evento.id}">🗑️</button>
-        </div>
-    `).join("");
-    
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.onclick = async () => {
-            await eliminarEvento(btn.dataset.id);
-            await cargarEventosAdmin();
-            window.showToast("✓ Actividad eliminada", false);
-        };
-    });
-}
-
-async function cargarContraseñasAdmin() {
-    const passwords = await cargarContraseñasGrupos();
-    const gruposPassList = document.getElementById("gruposPassList");
-    if (!gruposPassList) return;
-    
-    gruposPassList.innerHTML = GRUPOS.map(grupo => `
-        <div class="grupo-pass-item">
-            <span><strong>👥 ${grupo}</strong></span>
-            <div>
-                <input type="text" id="pass-${grupo}" placeholder="Contraseña" value="${passwords[grupo] || ''}">
-                <button class="save-pass-btn" data-grupo="${grupo}">💾 Guardar</button>
-            </div>
-        </div>
-    `).join("");
-    
-    document.querySelectorAll('.save-pass-btn').forEach(btn => {
-        btn.onclick = async () => {
-            const grupo = btn.dataset.grupo;
-            const password = document.getElementById(`pass-${grupo}`).value.trim();
-            if (!password) { window.showToast("❌ Ingresa una contraseña", true); return; }
-            await guardarContraseñaGrupo(grupo, password);
-            window.showToast(`✓ Contraseña guardada para ${grupo}`, false);
-        };
-    });
-}

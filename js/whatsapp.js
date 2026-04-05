@@ -18,7 +18,6 @@ function mostrarLoaderWhatsApp(mostrar) {
 }
 
 async function subirYEnviar() {
-    // Obtener el teléfono ANTES de cualquier limpieza
     let tel = document.getElementById("whatsapp").value.replace(/\D/g, "");
     if (!tel) { 
         window.showToast("❌ Ingresa el número", true); 
@@ -28,10 +27,8 @@ async function subirYEnviar() {
     
     console.log("📞 Número de teléfono:", tel);
     
-    // Guardar el teléfono en una variable local antes de que se limpie
     const telefonoParaEnviar = tel;
     
-    // Si hay datos pendientes, primero guardar
     if (window.compPendiente && !window.compActual) {
         window.showToast("💾 Guardando comprobante antes de enviar...", false);
         const guardado = await window.confirmarYGuardarComprobante();
@@ -70,17 +67,13 @@ async function subirYEnviar() {
         const mensajeCompleto = mensajeTexto + "\n\n📎 *Comprobante en línea:*\n" + imagenUrl;
         const mensajeCodificado = encodeURIComponent(mensajeCompleto);
         
-        // Construir URL de WhatsApp correctamente
-        const waUrl = `https://wa.me/${telefonoParaEnviar}?text=${mensajeCodificado}`;
+        const waUrl = `https://api.whatsapp.com/send/?phone=${telefonoParaEnviar}&text=${mensajeCodificado}&type=phone_number&app_absent=0`;
         
         console.log("🔗 Abriendo WhatsApp con URL:", waUrl);
         
-        // Pequeña pausa para asegurar que el loader se vea
         setTimeout(() => {
-            // Abrir WhatsApp
             window.open(waUrl, "_blank");
             
-            // Limpiar formulario después de enviar (con delay para que WhatsApp se abra)
             setTimeout(() => {
                 if (typeof window.limpiarFormulario === 'function') {
                     window.limpiarFormulario();
@@ -105,5 +98,6 @@ async function subirYEnviar() {
 
 function construirMensajeConEmojis(registro) {
     if (!registro) return "";
-    return `✅ *COMPROBANTE DE PAGO - Pastoral Juvenil* ✅\n\n👥 *Juvenil:* ${registro.g}\n📌 *Concepto:* ${registro.concepto}\n💰 *Monto:* Q ${parseFloat(registro.mon).toFixed(2)}\n🔢 *No. Recibo:* REC-${registro.num}\n📆 *Fecha:* ${registro.fecha}\n⏰ *Hora:* ${registro.hora}\n\n_Gracias por tu contribución al movimiento juvenil._`;
+    const estadoTexto = registro.estado || "PAGADO";
+    return `✅ *COMPROBANTE DE PAGO - Pastoral Juvenil* ✅\n\n👥 *Juvenil:* ${registro.g}\n📌 *Concepto:* ${registro.concepto}\n💰 *Monto:* Q ${parseFloat(registro.mon).toFixed(2)}\n🔢 *No. Recibo:* REC-${registro.num}\n📆 *Fecha:* ${registro.fecha}\n⏰ *Hora:* ${registro.hora}\n✅ *Estado:* ${estadoTexto}\n\n_Gracias por tu contribución al movimiento juvenil._`;
 }

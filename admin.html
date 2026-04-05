@@ -94,6 +94,10 @@
                         <div class="info-row"><div class="info-label">📌 CONCEPTO</div><div class="info-value" id="vConcepto">-</div></div>
                         <div class="info-row"><div class="info-label">📆 FECHA</div><div class="info-value" id="vFecha">-</div></div>
                         <div class="info-row"><div class="info-label">⏰ HORA</div><div class="info-value" id="vHora">-</div></div>
+                        <div class="info-row" id="estadoRow" style="background: #dcfce7; border-radius: 8px; margin-top: 8px;">
+                            <div class="info-label">✅ ESTADO</div>
+                            <div class="info-value" id="vEstado" style="color: #15803d; font-weight: 800;">PAGADO</div>
+                        </div>
                     </div>
                     <div class="ticket-amount">
                         <div class="amount-label">MONTO TOTAL</div>
@@ -117,7 +121,10 @@
                 <select id="selectAnioControl" style="padding:8px; border-radius:8px;"></select>
             </div>
             <div style="overflow-x: auto;">
-                <table class="excel-table"><thead id="tableHeader"></thead><tbody id="tableBody"></tbody></table>
+                <table class="excel-table">
+                    <thead id="tableHeader"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
         </div>
     </div>

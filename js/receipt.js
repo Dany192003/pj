@@ -1,4 +1,4 @@
-// js/receipt.js - Generación de recibos (vista previa sin guardar)
+// js/receipt.js - Generación de recibos (vista previa con PENDIENTE)
 
 if (typeof window.showToast !== 'function') {
     window.showToast = function(message, isError = false) {
@@ -16,15 +16,22 @@ window.compPendiente = null;
 window.imagenCloudinaryUrl = null;
 
 function construirMensajeConEmojis(registro) {
-    return `✅ *COMPROBANTE DE PAGO - Pastoral Juvenil* ✅\n\n👥 *Juvenil:* ${registro.g}\n📌 *Concepto:* ${registro.concepto}\n💰 *Monto:* Q ${parseFloat(registro.mon).toFixed(2)}\n🔢 *No. Recibo:* REC-${registro.num}\n📆 *Fecha:* ${registro.fecha}\n⏰ *Hora:* ${registro.hora}\n\n_Gracias por tu contribución al movimiento juvenil._`;
+    const estadoTexto = registro.estado || "PAGADO";
+    return `✅ *COMPROBANTE DE PAGO - Pastoral Juvenil* ✅\n\n👥 *Juvenil:* ${registro.g}\n📌 *Concepto:* ${registro.concepto}\n💰 *Monto:* Q ${parseFloat(registro.mon).toFixed(2)}\n🔢 *No. Recibo:* REC-${registro.num}\n📆 *Fecha:* ${registro.fecha}\n⏰ *Hora:* ${registro.hora}\n✅ *Estado:* ${estadoTexto}\n\n_Gracias por tu contribución al movimiento juvenil._`;
 }
 
 // Función para capturar el HTML y subir a Cloudinary
 async function capturarYSubirCloudinary(elemento, reciboNum) {
     console.log("📸 Iniciando captura del comprobante...");
+    
+    if (!elemento) {
+        throw new Error("No se encontró el elemento del comprobante");
+    }
+    
     try {
+        // Configuración de captura
         const canvas = await html2canvas(elemento, {
-            scale: 2,
+            scale: 2.5,
             backgroundColor: '#ffffff',
             logging: false,
             useCORS: true,
@@ -33,7 +40,10 @@ async function capturarYSubirCloudinary(elemento, reciboNum) {
         
         console.log("✓ Captura completada, tamaño:", canvas.width, "x", canvas.height);
         
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png", 0.9));
+        // Convertir a blob
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png", 0.95));
+        
+        // Crear FormData
         const formData = new FormData();
         formData.append("file", blob);
         formData.append("upload_preset", "comprobantes");
@@ -41,6 +51,7 @@ async function capturarYSubirCloudinary(elemento, reciboNum) {
         formData.append("public_id", `REC-${reciboNum}_${Date.now()}`);
         
         console.log("📤 Subiendo a Cloudinary...");
+        
         const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/image/upload", { 
             method: "POST", 
             body: formData 
@@ -69,7 +80,7 @@ function mostrarLoader(mostrar) {
             <div id="loaderGenerando" class="loader-overlay">
                 <div class="loader-content">
                     <div class="loader-spinner"></div>
-                    <p>Procesando...</p>
+                    <p>Generando comprobante...</p>
                 </div>
             </div>
         `;
@@ -79,9 +90,9 @@ function mostrarLoader(mostrar) {
     }
 }
 
-// Mostrar vista previa SIN guardar en BD
+// Mostrar vista previa con estado PENDIENTE
 function mostrarVistaPrevia(data) {
-    console.log("📄 Mostrando vista previa del comprobante (sin guardar)");
+    console.log("📄 Mostrando vista previa del comprobante (ESTADO: PENDIENTE)");
     
     const tempNum = getCurrentNumero();
     
@@ -91,6 +102,20 @@ function mostrarVistaPrevia(data) {
     document.getElementById("vFecha").textContent = data.fecha;
     document.getElementById("vHora").textContent = data.hora;
     document.getElementById("vMonto").textContent = parseFloat(data.mon).toFixed(2);
+    
+    // Estado: PENDIENTE (color naranja)
+    const estadoElement = document.getElementById("vEstado");
+    if (estadoElement) {
+        estadoElement.textContent = "PENDIENTE";
+        estadoElement.style.color = "#f97316";
+        estadoElement.style.fontWeight = "800";
+    }
+    
+    // Cambiar fondo de la fila de estado
+    const estadoRow = document.getElementById("estadoRow");
+    if (estadoRow) {
+        estadoRow.style.background = "#fef9c3";
+    }
     
     window.compPendiente = {
         g: data.g,
@@ -103,14 +128,14 @@ function mostrarVistaPrevia(data) {
     };
     
     document.getElementById("preview").style.display = "block";
-    console.log("✓ Vista previa HTML mostrada - pendiente de confirmar");
+    console.log("✓ Vista previa HTML mostrada - ESTADO: PENDIENTE");
     
     setTimeout(() => { 
         document.getElementById("preview").scrollIntoView({ behavior: 'smooth' }); 
     }, 100);
 }
 
-// Confirmar y guardar el comprobante
+// Confirmar y guardar el comprobante (cambiar estado a PAGADO)
 async function confirmarYGuardarComprobante() {
     if (!window.compPendiente) {
         window.showToast("❌ Primero genera una vista previa", true);
@@ -135,7 +160,23 @@ async function confirmarYGuardarComprobante() {
         const nuevoNumero = getNextNumero();
         datos.num = nuevoNumero;
         document.getElementById("numReciboPreview").value = `REC-${getCurrentNumero()}`;
+        
+        // Cambiar vista previa a PAGADO
         document.getElementById("vNumRecibo").textContent = `REC-${nuevoNumero}`;
+        
+        // Estado: PAGADO (color verde)
+        const estadoElement = document.getElementById("vEstado");
+        if (estadoElement) {
+            estadoElement.textContent = "PAGADO";
+            estadoElement.style.color = "#15803d";
+            estadoElement.style.fontWeight = "800";
+        }
+        
+        // Cambiar fondo de la fila de estado a verde claro
+        const estadoRow = document.getElementById("estadoRow");
+        if (estadoRow) {
+            estadoRow.style.background = "#dcfce7";
+        }
         
         window.compActual = {
             g: datos.g,
@@ -143,12 +184,13 @@ async function confirmarYGuardarComprobante() {
             mon: datos.mon,
             num: nuevoNumero,
             fecha: datos.fecha,
-            hora: datos.hora
+            hora: datos.hora,
+            estado: "PAGADO"
         };
         
         mostrarLoader(false);
-        window.showToast("✓ Comprobante guardado exitosamente", false);
-        console.log("✅ Comprobante guardado con éxito. Folio:", nuevoNumero);
+        window.showToast("✓ Comprobante guardado exitosamente - ESTADO: PAGADO", false);
+        console.log("✅ Comprobante guardado con éxito. Folio:", nuevoNumero, "- ESTADO: PAGADO");
         
         if (anioActual === window.anioSeleccionado && typeof renderTabla === 'function') {
             renderTabla();
@@ -231,9 +273,10 @@ function actNumeroReciboPreview() {
     if (numRecibo) numRecibo.value = `REC-${getCurrentNumero()}`;
 }
 
-// Exportar funciones necesarias para admin.js
+// Exportar funciones
 window.generarVistaPrevia = generarVistaPrevia;
 window.confirmarYGuardarComprobante = confirmarYGuardarComprobante;
 window.limpiarFormulario = limpiarFormulario;
 window.actNumeroReciboPreview = actNumeroReciboPreview;
 window.checkOtroGrupo = checkOtroGrupo;
+window.capturarYSubirCloudinary = capturarYSubirCloudinary;
