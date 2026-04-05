@@ -1,5 +1,6 @@
 /* css/admin.css - Estilos panel administrativo */
 
+/* ========== HEADER ADMIN ========== */
 .admin-header {
     display: flex;
     justify-content: space-between;
@@ -20,13 +21,24 @@
     height: 50px;
     border-radius: 12px;
     object-fit: cover;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.admin-header-logo h1 { font-size: 20px; margin: 0; color: #0f172a; }
-.admin-header-logo p { font-size: 11px; color: #64748b; margin: 0; }
+.admin-header-logo h1 {
+    font-size: 20px;
+    margin: 0;
+    color: #0f172a;
+}
 
-.logout-btn, .reset-btn {
+.admin-header-logo p {
+    font-size: 11px;
+    color: #64748b;
+    margin: 0;
+}
+
+/* ========== BOTONES ========== */
+.logout-btn,
+.reset-btn {
     padding: 10px 20px;
     border-radius: 10px;
     font-weight: 600;
@@ -35,10 +47,25 @@
     border: none;
 }
 
-.logout-btn { background: #ef4444; color: white; }
-.logout-btn:hover { background: #dc2626; transform: scale(0.98); }
-.reset-btn { background: #f97316; color: white; }
-.reset-btn:hover { background: #ea580c; transform: scale(0.98); }
+.logout-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.logout-btn:hover {
+    background: #dc2626;
+    transform: scale(0.98);
+}
+
+.reset-btn {
+    background: #f97316;
+    color: white;
+}
+
+.reset-btn:hover {
+    background: #ea580c;
+    transform: scale(0.98);
+}
 
 .user-badge {
     background: #f1f5f9;
@@ -49,6 +76,7 @@
     color: #0891b2;
 }
 
+/* ========== TABS ========== */
 .tabs-container {
     background: white;
     border-radius: 12px;
@@ -56,7 +84,7 @@
     margin-bottom: 24px;
     display: flex;
     gap: 5px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     flex-wrap: wrap;
 }
 
@@ -70,24 +98,98 @@
     cursor: pointer;
     font-size: 14px;
     white-space: nowrap;
+    transition: all 0.3s ease;
 }
 
-.tab-btn.active { background: var(--primary-gradient); color: white; }
-.tab-content { display: none; animation: fadeIn 0.3s ease; }
-.tab-content.active { display: block; }
+.tab-btn.active {
+    background: var(--primary-gradient);
+    color: white;
+}
 
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-.card { background: white; border-radius: 20px; padding: 30px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-.section-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; color: #0f172a; border-left: 4px solid #0891b2; padding-left: 10px; }
-.field { margin-bottom: 15px; }
-.field label { font-size: 11px; font-weight: 700; color: #0891b2; display: block; margin-bottom: 5px; text-transform: uppercase; }
-.field input, .field select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 16px; }
-.row { display: flex; gap: 15px; }
-.row .field { flex: 1; }
-textarea { resize: vertical; background: #f8fafc; }
-textarea:focus { outline: none; border-color: #0891b2; }
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
 
-.btn-main, .btn-wa, .btn-copy {
+.tab-content.active {
+    display: block;
+}
+
+/* ========== GRID Y CARDS ========== */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #0f172a;
+    border-left: 4px solid #0891b2;
+    padding-left: 10px;
+}
+
+/* ========== FORMULARIOS ========== */
+.field {
+    margin-bottom: 15px;
+}
+
+.field label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0891b2;
+    display: block;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.field input,
+.field select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-family: inherit;
+    font-size: 16px;
+    background: #f8fafc;
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+}
+
+.row .field {
+    flex: 1;
+}
+
+textarea {
+    resize: vertical;
+}
+
+textarea:focus,
+.field input:focus,
+.field select:focus {
+    outline: none;
+    border-color: #0891b2;
+    box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.1);
+}
+
+/* ========== BOTONES PRINCIPALES ========== */
+.btn-main,
+.btn-wa,
+.btn-copy {
     width: 100%;
     padding: 14px;
     border: none;
@@ -96,49 +198,277 @@ textarea:focus { outline: none; border-color: #0891b2; }
     cursor: pointer;
     font-size: 16px;
     margin-top: 10px;
+    transition: all 0.3s ease;
 }
-.btn-main { background: var(--primary-gradient); color: white; }
-.btn-wa { background: #25D366; color: white; }
-.btn-copy { background: #3b82f6; color: white; }
-.btn-group { display: flex; gap: 10px; margin-top: 10px; }
 
-.ticket { border-radius: 20px; overflow: hidden; background: white; max-width: 420px; margin: 0 auto; box-shadow: 0 20px 35px -15px rgba(0,0,0,0.2); }
-.ticket-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 25px 20px; text-align: center; }
-.logo-icon { font-size: 42px; }
-.ticket-title { font-size: 18px; font-weight: 800; color: white; }
-.ticket-subtitle { font-size: 11px; color: rgba(255,255,255,0.7); }
-.ticket-receipt-number { background: #f8fafc; padding: 15px 20px; text-align: center; }
-.receipt-label { font-size: 10px; font-weight: 700; color: #0891b2; }
-.receipt-number { font-size: 24px; font-weight: 800; color: #0f172a; font-family: monospace; }
-.ticket-info { padding: 20px; }
-.info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #e2e8f0; }
-.info-label { font-size: 11px; font-weight: 700; color: #64748b; }
-.info-value { font-size: 14px; font-weight: 600; color: #1e293b; }
-.ticket-amount { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); margin: 0 20px 20px 20px; padding: 20px; text-align: center; border-radius: 16px; }
-.amount-label { font-size: 11px; font-weight: 700; color: #0369a1; }
-.amount-value { font-size: 32px; font-weight: 900; color: #0f172a; }
-.amount-value::before { content: "Q "; font-size: 24px; }
-.ticket-footer { background: #f1f5f9; padding: 15px 20px; text-align: center; }
+.btn-main {
+    background: var(--primary-gradient);
+    color: white;
+}
 
-.excel-container { background: white; border-radius: 20px; padding: 20px; overflow-x: auto; }
-.excel-table { width: 100%; border-collapse: collapse; }
-.excel-table th { background: #f8fafc; padding: 10px; color: #0891b2; }
-.excel-table td { padding: 10px; border-bottom: 1px solid #f1f5f9; text-align: center; }
-.status-btn { width: 36px; height: 36px; border-radius: 8px; border: none; cursor: pointer; font-size: 18px; }
-.status-pagado { background: #dcfce7; color: #15803d; }
-.status-pendiente { background: #fef9c3; color: #854d0e; }
+.btn-wa {
+    background: #25d366;
+    color: white;
+}
 
-.evento-item, .grupo-pass-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; background: #f8fafc; border-radius: 10px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
-.evento-fecha { font-weight: 700; color: #0891b2; min-width: 100px; font-size: 13px; }
-.evento-titulo { font-weight: 700; color: #0f172a; margin: 5px 0; }
-.evento-lugar, .evento-descripcion { font-size: 12px; color: #64748b; margin-top: 3px; }
-.delete-btn { background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; }
-.delete-btn:hover { background: #dc2626; }
+.btn-copy {
+    background: #3b82f6;
+    color: white;
+}
 
-.grupo-pass-item input { width: 150px; padding: 6px; border-radius: 8px; border: 1px solid #cbd5e1; }
-.save-pass-btn { background: #0891b2; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; margin-left: 10px; }
-.save-pass-btn:hover { background: #0e7490; }
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
 
+/* ========== TICKET (COMPROBANTE) ========== */
+.ticket {
+    border-radius: 20px;
+    overflow: hidden;
+    background: white;
+    max-width: 420px;
+    margin: 0 auto;
+    box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.2);
+}
+
+.ticket-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 25px 20px;
+    text-align: center;
+}
+
+.logo-icon {
+    font-size: 42px;
+}
+
+.ticket-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+}
+
+.ticket-subtitle {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.ticket-receipt-number {
+    background: #f8fafc;
+    padding: 15px 20px;
+    text-align: center;
+}
+
+.receipt-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #0891b2;
+    text-transform: uppercase;
+}
+
+.receipt-number {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+    font-family: monospace;
+}
+
+.ticket-info {
+    padding: 20px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.info-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    text-align: right;
+}
+
+.ticket-amount {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    margin: 0 20px 20px 20px;
+    padding: 20px;
+    text-align: center;
+    border-radius: 16px;
+}
+
+.amount-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0369a1;
+}
+
+.amount-value {
+    font-size: 32px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.amount-value::before {
+    content: "Q ";
+    font-size: 24px;
+}
+
+.ticket-footer {
+    background: #f1f5f9;
+    padding: 15px 20px;
+    text-align: center;
+}
+
+/* ========== TABLA CONTROL DE CUOTAS ========== */
+.excel-container {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.excel-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.excel-table th {
+    background: #f8fafc;
+    padding: 10px;
+    color: #0891b2;
+    font-weight: 700;
+}
+
+.excel-table td {
+    padding: 10px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: center;
+}
+
+/* ========== BOTONES DE ESTADO ========== */
+.status-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s ease;
+}
+
+.status-btn:active {
+    transform: scale(0.95);
+}
+
+.status-pagado {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-pendiente {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+/* Spinner pequeño para botones de estado */
+.spinner-small {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 0.6s linear infinite;
+}
+
+.status-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ========== EVENTOS Y CONTRASEÑAS ========== */
+.evento-item,
+.grupo-pass-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.evento-fecha {
+    font-weight: 700;
+    color: #0891b2;
+    min-width: 100px;
+    font-size: 13px;
+}
+
+.evento-titulo {
+    font-weight: 700;
+    color: #0f172a;
+    margin: 5px 0;
+}
+
+.evento-lugar,
+.evento-descripcion {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 3px;
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    transform: scale(0.98);
+}
+
+.grupo-pass-item input {
+    width: 150px;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+}
+
+.save-pass-btn {
+    background: #0891b2;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: all 0.2s ease;
+}
+
+.save-pass-btn:hover {
+    background: #0e7490;
+    transform: scale(0.98);
+}
+
+/* ========== MODAL DE RESET ========== */
 .modal-reset {
     display: none;
     position: fixed;
@@ -147,8 +477,10 @@ textarea:focus { outline: none; border-color: #0891b2; }
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
 }
+
 .modal-reset-content {
     background: white;
     margin: 15% auto;
@@ -157,181 +489,44 @@ textarea:focus { outline: none; border-color: #0891b2; }
     width: 90%;
     max-width: 400px;
     text-align: center;
-}
-.btn-confirm-reset { background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; }
-.btn-cancel-reset { background: #cbd5e1; color: #334155; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; margin-left: 10px; }
-
-@media (max-width: 768px) {
-    .admin-header { flex-direction: column; text-align: center; }
-    .admin-header-logo { flex-direction: column; }
-    .grid { grid-template-columns: 1fr; gap: 20px; }
-    .card { padding: 20px; }
-    .row { flex-direction: column; gap: 10px; }
-    .btn-group { flex-direction: column; }
-    .tab-btn { font-size: 12px; padding: 8px 6px; white-space: normal; }
+    animation: slideUp 0.3s ease;
 }
 
-@media (max-width: 480px) {
-    .ticket { max-width: 100%; }
-    .receipt-number { font-size: 20px; }
-    .amount-value { font-size: 28px; }
-    .modal-reset-content { margin: 40% auto; width: 95%; }
-    .grupo-pass-item input { width: 100%; margin-bottom: 8px; }
-    .save-pass-btn { margin-left: 0; width: 100%; }
-}
-/* Agregar al final de css/admin.css */
-
-/* Spinner pequeño para botones de estado */
-.spinner-small {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
-    border-top-color: currentColor;
-    animation: spin 0.6s linear infinite;
+.modal-reset-content ul {
+    text-align: left;
+    margin: 15px 0;
+    padding-left: 20px;
 }
 
-/* Deshabilitar botones mientras se procesa */
-.status-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Modal de confirmación personalizado */
-.modal-confirmacion {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    animation: fadeIn 0.2s ease;
-}
-
-.modal-confirmacion-content {
-    background-color: white;
-    margin: 20% auto;
-    padding: 0;
-    border-radius: 24px;
-    width: 90%;
-    max-width: 400px;
-    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-.modal-confirmacion-header {
-    padding: 24px 24px 16px 24px;
-    text-align: center;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-}
-
-.modal-confirmacion-icon {
-    font-size: 48px;
-    display: inline-block;
-    margin-bottom: 12px;
-}
-
-.modal-confirmacion-header h3 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.modal-confirmacion-body {
-    padding: 20px 24px;
-    text-align: center;
-}
-
-.modal-confirmacion-body p {
-    margin: 0;
-    color: #475569;
-    font-size: 15px;
-    line-height: 1.5;
-}
-
-.modal-confirmacion-footer {
-    padding: 16px 24px 24px 24px;
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    border-top: 1px solid #e2e8f0;
-    background: #f8fafc;
-}
-
-.btn-confirmar-cancelar, .btn-confirmar-aceptar {
-    flex: 1;
-    padding: 12px 20px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 14px;
+.btn-confirm-reset {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
+}
+
+.btn-confirm-reset:hover {
+    background: #dc2626;
+    transform: scale(0.98);
+}
+
+.btn-cancel-reset {
+    background: #cbd5e1;
+    color: #334155;
     border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: all 0.2s ease;
 }
 
-.btn-confirmar-cancelar {
-    background: #f1f5f9;
-    color: #475569;
-    border: 1px solid #e2e8f0;
-}
-
-.btn-confirmar-cancelar:hover {
-    background: #e2e8f0;
-    transform: translateY(-1px);
-}
-
-.btn-confirmar-aceptar {
-    background: linear-gradient(135deg, #0891b2 0%, #3b82f6 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
-}
-
-.btn-confirmar-aceptar:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.05);
-}
-
-.btn-confirmar-cancelar:active, .btn-confirmar-aceptar:active {
-    transform: translateY(1px);
-}
-
-@media (max-width: 640px) {
-    .modal-confirmacion-content {
-        margin: 30% auto;
-        width: 92%;
-    }
-    .modal-confirmacion-header {
-        padding: 20px 20px 12px 20px;
-    }
-    .modal-confirmacion-body {
-        padding: 16px 20px;
-    }
-    .modal-confirmacion-footer {
-        padding: 14px 20px 20px 20px;
-    }
-}
-
-
-/* ========== SPINNER PEQUEÑO ========== */
-.spinner-small {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
-    border-top-color: currentColor;
-    animation: spin 0.6s linear infinite;
-}
-
-.status-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+.btn-cancel-reset:hover {
+    background: #94a3b8;
+    transform: scale(0.98);
 }
 
 /* ========== MODAL DE CONFIRMACIÓN PERSONALIZADO ========== */
@@ -444,27 +639,112 @@ textarea:focus { outline: none; border-color: #0891b2; }
     transform: translateY(1px);
 }
 
-/* ========== RESPONSIVE MODAL ========== */
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .admin-header-logo {
+        flex-direction: column;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .tab-btn {
+        font-size: 12px;
+        padding: 8px 6px;
+        white-space: normal;
+    }
+
+    .evento-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .evento-fecha {
+        min-width: auto;
+    }
+
+    .grupo-pass-item {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
 @media (max-width: 640px) {
     .modal-confirmacion-content {
         margin: 30% auto;
         width: 92%;
     }
+
     .modal-confirmacion-header {
         padding: 20px 20px 12px 20px;
     }
+
     .modal-confirmacion-body {
         padding: 16px 20px;
     }
+
     .modal-confirmacion-footer {
         padding: 14px 20px 20px 20px;
     }
 }
 
+@media (max-width: 480px) {
+    .ticket {
+        max-width: 100%;
+    }
+
+    .receipt-number {
+        font-size: 20px;
+    }
+
+    .amount-value {
+        font-size: 28px;
+    }
+
+    .modal-reset-content {
+        margin: 40% auto;
+        width: 95%;
+    }
+
+    .grupo-pass-item input {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .save-pass-btn {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
 /* ========== ANIMACIONES ========== */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes slideUp {
@@ -479,5 +759,7 @@ textarea:focus { outline: none; border-color: #0891b2; }
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
