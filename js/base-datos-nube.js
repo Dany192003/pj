@@ -1,45 +1,46 @@
 // js/base-datos-nube.js - Gestión de datos en Firebase
 
-const GRUPOS = ["Confirmación", "Jeshua", "Jufra", "Lectores", "Mujeres y Hombres Nuevos", "PCV", "Pentecostés", "Roca Fuerte", "San Pablo", "Senderos", "Shadai", "Ssael"];
-const MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+const GRUPOS = [
+    'Confirmación', 'Jeshua', 'Jufra', 'Lectores',
+    'Mujeres y Hombres Nuevos', 'PCV', 'Pentecostés',
+    'Roca Fuerte', 'San Pablo', 'Senderos', 'Shadai', 'Ssael'
+];
+const MESES = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+];
 
 let db = {};
 let ultimoNum = 0;
 
 function logMensaje(mensaje, isError = false) {
-    console.log(mensaje);
     if (typeof window.showToast === 'function') {
         window.showToast(mensaje, isError);
     }
 }
 
+// ── Carga y guardado ──────────────────────────────────────────────────────────
+
 async function loadDatabase() {
     return new Promise(async (resolve) => {
         try {
-            console.log("🔄 Cargando datos desde Firebase...");
             const docCorr = await coleccionCorrelativo.get();
-            if (docCorr.exists) {
-                ultimoNum = docCorr.data().valor || 0;
-            } else {
-                ultimoNum = 0;
-                await coleccionCorrelativo.set({ valor: 0 });
-            }
-            
+            ultimoNum = docCorr.exists ? (docCorr.data().valor || 0) : 0;
+            if (!docCorr.exists) await coleccionCorrelativo.set({ valor: 0 });
+
             const snapshot = await coleccionPagos.get();
             db = {};
             snapshot.forEach(doc => {
-                const data = doc.data();
-                const anio = data.anio;
+                const { anio, grupo, mes, estado } = doc.data();
                 if (!db[anio]) db[anio] = [];
-                db[anio].push({ grupo: data.grupo, mes: data.mes, estado: data.estado });
+                db[anio].push({ grupo, mes, estado });
             });
-            
-            const añoActual = new Date().getFullYear();
-            await asegurarDBCloud(añoActual);
-            console.log("✓ Datos cargados exitosamente");
+
+            const anioActual = new Date().getFullYear();
+            await asegurarDBCloud(anioActual);
             resolve(true);
         } catch (error) {
-            console.error("Error cargando datos:", error);
+            console.error('Error cargando datos:', error);
             loadDatabaseLocal();
             resolve(false);
         }
@@ -47,22 +48,15 @@ async function loadDatabase() {
 }
 
 async function asegurarDBCloud(anio) {
-    if (!db[anio]) {
-        db[anio] = [];
-    }
-    
+    if (!db[anio]) db[anio] = [];
+
     for (const grupo of GRUPOS) {
         for (const mes of MESES) {
             const existe = db[anio].some(p => p.grupo === grupo && p.mes === mes);
             if (!existe) {
-                db[anio].push({ grupo, mes, estado: "pendiente" });
+                db[anio].push({ grupo, mes, estado: 'pendiente' });
                 const docId = `${anio}_${grupo}_${mes}`;
-                await coleccionPagos.doc(docId).set({ 
-                    anio: anio, 
-                    grupo: grupo, 
-                    mes: mes, 
-                    estado: "pendiente" 
-                });
+                await coleccionPagos.doc(docId).set({ anio, grupo, mes, estado: 'pendiente' });
             }
         }
     }
@@ -74,250 +68,36 @@ async function saveDatabase() {
         for (const anio in db) {
             for (const pago of db[anio]) {
                 const docId = `${anio}_${pago.grupo}_${pago.mes}`;
-                await coleccionPagos.doc(docId).set({ 
-                    anio: parseInt(anio), 
-                    grupo: pago.grupo, 
-                    mes: pago.mes, 
-                    estado: pago.estado 
+                await coleccionPagos.doc(docId).set({
+                    anio: parseInt(anio),
+                    grupo: pago.grupo,
+                    mes: pago.mes,
+                    estado: pago.estado
                 });
             }
         }
         saveDatabaseLocal();
         return true;
     } catch (error) {
-        console.error("Error guardando:", error);
+        console.error('Error guardando:', error);
         saveDatabaseLocal();
         return false;
     }
 }
 
-async function resetSistema(opciones) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const opcionesSeleccionadas = {
-                pagos: opciones?.pagos !== false,
-                actividades: opciones?.actividades !== false,
-                passwords: opciones?.passwords !== false,
-                recibos: opciones?.recibos !== false,
-                biblioteca: opciones?.biblioteca || false,
-                categorias: opciones?.categorias || false
-            };
-            
-            logMensaje("🔄 Reiniciando elementos seleccionados...", false);
-            
-            if (opcionesSeleccionadas.pagos) {
-                const snapshotPagos = await coleccionPagos.get();
-                const batchPagos = dbFirestore.batch();
-                snapshotPagos.forEach(doc => { batchPagos.delete(doc.ref); });
-                await batchPagos.commit();
-                console.log("✓ Pagos eliminados");
-            }
-            
-            if (opcionesSeleccionadas.recibos) {
-                ultimoNum = 0;
-                await coleccionCorrelativo.set({ valor: 0 });
-                console.log("✓ Correlativo reiniciado");
-            }
-            
-            if (opcionesSeleccionadas.passwords) {
-                const snapshotPasswords = await coleccionPasswords.get();
-                const batchPasswords = dbFirestore.batch();
-                snapshotPasswords.forEach(doc => { batchPasswords.delete(doc.ref); });
-                await batchPasswords.commit();
-                console.log("✓ Contraseñas eliminadas");
-            }
-            
-            if (opcionesSeleccionadas.actividades) {
-                const snapshotEventos = await coleccionEventos.get();
-                const batchEventos = dbFirestore.batch();
-                snapshotEventos.forEach(doc => { batchEventos.delete(doc.ref); });
-                await batchEventos.commit();
-                console.log("✓ Actividades eliminadas");
-            }
-            
-            if (opcionesSeleccionadas.biblioteca) {
-                const snapshotRecursos = await coleccionRecursos.get();
-                const batchRecursos = dbFirestore.batch();
-                snapshotRecursos.forEach(doc => { batchRecursos.delete(doc.ref); });
-                await batchRecursos.commit();
-                console.log("✓ Recursos de biblioteca eliminados");
-            }
-            
-            if (opcionesSeleccionadas.categorias) {
-                const snapshotCategorias = await coleccionCategorias.get();
-                const batchCategorias = dbFirestore.batch();
-                snapshotCategorias.forEach(doc => { batchCategorias.delete(doc.ref); });
-                await batchCategorias.commit();
-                console.log("✓ Categorías eliminadas");
-            }
-            
-            if (opcionesSeleccionadas.pagos) {
-                db = {};
-                const añoActual = new Date().getFullYear();
-                db[añoActual] = [];
-                for (const grupo of GRUPOS) {
-                    for (const mes of MESES) {
-                        db[añoActual].push({ grupo: grupo, mes: mes, estado: "pendiente" });
-                        const docId = `${añoActual}_${grupo}_${mes}`;
-                        await coleccionPagos.doc(docId).set({ 
-                            anio: añoActual, 
-                            grupo: grupo, 
-                            mes: mes, 
-                            estado: "pendiente" 
-                        });
-                    }
-                }
-                console.log("✓ Estructura de pagos recreada");
-            }
-            
-            saveDatabaseLocal();
-            logMensaje("✓ Elementos seleccionados reiniciados correctamente", false);
-            
-            setTimeout(() => { location.reload(); }, 1500);
-            resolve(true);
-        } catch (error) {
-            console.error("Error al reiniciar:", error);
-            logMensaje("❌ Error al reiniciar: " + error.message, true);
-            reject(error);
-        }
-    });
-}
-
-async function cargarEventos() {
-    const snapshot = await coleccionEventos.get();
-    const eventos = [];
-    snapshot.forEach(doc => { eventos.push({ id: doc.id, ...doc.data() }); });
-    return eventos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-}
-
-async function agregarEvento(fecha, titulo, lugar, descripcion) {
-    const evento = { 
-        fecha, 
-        titulo, 
-        lugar: lugar || "", 
-        descripcion: descripcion || "",
-        creado: new Date().toISOString() 
-    };
-    const docRef = await coleccionEventos.add(evento);
-    return { id: docRef.id, ...evento };
-}
-
-async function eliminarEvento(eventoId) {
-    await coleccionEventos.doc(eventoId).delete();
-}
-
-async function cargarContraseñasGrupos() {
-    const snapshot = await coleccionPasswords.get();
-    const passwords = {};
-    snapshot.forEach(doc => { passwords[doc.id] = doc.data().password; });
-    return passwords;
-}
-
-async function guardarContraseñaGrupo(grupo, password) {
-    await coleccionPasswords.doc(grupo).set({ password: password });
-}
-
-async function verificarContraseñaGrupo(grupo, password) {
-    const doc = await coleccionPasswords.doc(grupo).get();
-    if (doc.exists) return doc.data().password === password;
-    return password === "admin123";
-}
-
-async function cargarRecursos() {
-    const snapshot = await coleccionRecursos.get();
-    const recursos = [];
-    snapshot.forEach(doc => {
-        recursos.push({ id: doc.id, ...doc.data() });
-    });
-    return recursos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-}
-
-async function agregarRecurso(titulo, categoria, descripcion, url, tipo, publicId, resourceType) {
-    const recurso = {
-        titulo: titulo,
-        categoria: categoria,
-        descripcion: descripcion || "",
-        url: url,
-        tipo: tipo,
-        public_id: publicId || "",
-        resource_type: resourceType || "image",
-        fecha: new Date().toISOString()
-    };
-    const docRef = await coleccionRecursos.add(recurso);
-    return { id: docRef.id, ...recurso };
-}
-
-async function eliminarRecursoCloud(recursoId) {
-    const doc = await coleccionRecursos.doc(recursoId).get();
-    if (doc.exists) {
-        await coleccionRecursos.doc(recursoId).delete();
-        console.log("✓ Recurso eliminado de Firestore");
-        return true;
-    }
-    return false;
-}
-
-async function cargarCategorias() {
-    const snapshot = await coleccionCategorias.get();
-    const categorias = [];
-    snapshot.forEach(doc => {
-        categorias.push({ id: doc.id, ...doc.data() });
-    });
-    return categorias.sort((a, b) => a.nombre.localeCompare(b.nombre));
-}
-
-async function agregarCategoria(nombre, icono = "📁") {
-    const categoria = {
-        nombre: nombre,
-        icono: icono,
-        fecha: new Date().toISOString()
-    };
-    const docRef = await coleccionCategorias.add(categoria);
-    return { id: docRef.id, ...categoria };
-}
-
-async function eliminarCategoria(categoriaId) {
-    const snapshot = await coleccionRecursos.where("categoria", "==", categoriaId).get();
-    if (!snapshot.empty) {
-        throw new Error(`No se puede eliminar la categoría porque tiene ${snapshot.size} recursos asociados`);
-    }
-    await coleccionCategorias.doc(categoriaId).delete();
-}
-
-async function actualizarCategoria(categoriaId, nombre, icono) {
-    await coleccionCategorias.doc(categoriaId).update({
-        nombre: nombre,
-        icono: icono
-    });
-}
-
 function loadDatabaseLocal() {
-    const storedDb = localStorage.getItem("pj_db_v8");
-    const storedCorr = localStorage.getItem("pj_corr_v8");
-    if (storedDb) db = JSON.parse(storedDb);
-    else db = {};
-    if (storedCorr) ultimoNum = parseInt(storedCorr);
-    else ultimoNum = 0;
+    const storedDb   = localStorage.getItem('pj_db_v8');
+    const storedCorr = localStorage.getItem('pj_corr_v8');
+    db        = storedDb   ? JSON.parse(storedDb) : {};
+    ultimoNum = storedCorr ? parseInt(storedCorr) : 0;
 }
 
 function saveDatabaseLocal() {
-    localStorage.setItem("pj_db_v8", JSON.stringify(db));
-    localStorage.setItem("pj_corr_v8", ultimoNum.toString());
+    localStorage.setItem('pj_db_v8', JSON.stringify(db));
+    localStorage.setItem('pj_corr_v8', ultimoNum.toString());
 }
 
-async function initDatabase() {
-    const snapshot = await coleccionPagos.get();
-    const batch = dbFirestore.batch();
-    snapshot.forEach(doc => batch.delete(doc.ref));
-    await batch.commit();
-    await coleccionCorrelativo.set({ valor: 0 });
-    localStorage.removeItem("pj_db_v8");
-    localStorage.removeItem("pj_corr_v8");
-    db = {};
-    ultimoNum = 0;
-    const añoActual = new Date().getFullYear();
-    await asegurarDBCloud(añoActual);
-}
+// ── Pagos ─────────────────────────────────────────────────────────────────────
 
 async function updatePaymentStatus(anio, grupo, mes, estado) {
     if (!db[anio]) await asegurarDBCloud(anio);
@@ -330,6 +110,23 @@ async function updatePaymentStatus(anio, grupo, mes, estado) {
     return false;
 }
 
+async function addCustomGroup(anio, grupo) {
+    if (!db[anio]) await asegurarDBCloud(anio);
+    const existeGrupo = db[anio].some(item => item.grupo === grupo);
+    if (!existeGrupo) {
+        for (const mes of MESES) {
+            db[anio].push({ grupo, mes, estado: 'pendiente' });
+            const docId = `${anio}_${grupo}_${mes}`;
+            await coleccionPagos.doc(docId).set({ anio, grupo, mes, estado: 'pendiente' });
+        }
+        await saveDatabase();
+        return true;
+    }
+    return false;
+}
+
+// ── Recibos ───────────────────────────────────────────────────────────────────
+
 function getNextNumero() {
     ultimoNum++;
     saveDatabase();
@@ -340,43 +137,176 @@ function getCurrentNumero() {
     return String(ultimoNum + 1).padStart(4, '0');
 }
 
-async function addCustomGroup(anio, grupo) {
-    if (!db[anio]) await asegurarDBCloud(anio);
-    const existeGrupo = db[anio].some(item => item.grupo === grupo);
-    if (!existeGrupo) {
-        for (const mesItem of MESES) {
-            db[anio].push({ grupo: grupo, mes: mesItem, estado: "pendiente" });
-            const docId = `${anio}_${grupo}_${mesItem}`;
-            await coleccionPagos.doc(docId).set({ anio: anio, grupo: grupo, mes: mesItem, estado: "pendiente" });
-        }
-        await saveDatabase();
+// ── Eventos ───────────────────────────────────────────────────────────────────
+
+async function cargarEventos() {
+    const snapshot = await coleccionEventos.get();
+    const eventos = [];
+    snapshot.forEach(doc => eventos.push({ id: doc.id, ...doc.data() }));
+    return eventos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+}
+
+async function agregarEvento(fecha, titulo, lugar, descripcion) {
+    const evento = {
+        fecha,
+        titulo,
+        lugar: lugar || '',
+        descripcion: descripcion || '',
+        creado: new Date().toISOString()
+    };
+    const docRef = await coleccionEventos.add(evento);
+    return { id: docRef.id, ...evento };
+}
+
+async function eliminarEvento(eventoId) {
+    await coleccionEventos.doc(eventoId).delete();
+}
+
+// ── Contraseñas ───────────────────────────────────────────────────────────────
+
+async function cargarContraseñasGrupos() {
+    const snapshot = await coleccionPasswords.get();
+    const passwords = {};
+    snapshot.forEach(doc => { passwords[doc.id] = doc.data().password; });
+    return passwords;
+}
+
+async function guardarContraseñaGrupo(grupo, password) {
+    await coleccionPasswords.doc(grupo).set({ password });
+}
+
+async function verificarContraseñaGrupo(grupo, password) {
+    const doc = await coleccionPasswords.doc(grupo).get();
+    if (doc.exists) return doc.data().password === password;
+    return password === 'admin123';
+}
+
+// ── Recursos / Biblioteca ─────────────────────────────────────────────────────
+
+async function cargarRecursos() {
+    const snapshot = await coleccionRecursos.get();
+    const recursos = [];
+    snapshot.forEach(doc => recursos.push({ id: doc.id, ...doc.data() }));
+    return recursos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+}
+
+async function agregarRecurso(titulo, categoria, descripcion, url, tipo, publicId, resourceType) {
+    const recurso = {
+        titulo,
+        categoria,
+        descripcion: descripcion || '',
+        url,
+        tipo,
+        public_id: publicId || '',
+        resource_type: resourceType || 'image',
+        fecha: new Date().toISOString()
+    };
+    const docRef = await coleccionRecursos.add(recurso);
+    return { id: docRef.id, ...recurso };
+}
+
+async function eliminarRecursoCloud(recursoId) {
+    const doc = await coleccionRecursos.doc(recursoId).get();
+    if (doc.exists) {
+        await coleccionRecursos.doc(recursoId).delete();
         return true;
     }
     return false;
 }
 
-window.cargarContraseñasGrupos = cargarContraseñasGrupos;
-window.verificarContraseñaGrupo = verificarContraseñaGrupo;
-window.guardarContraseñaGrupo = guardarContraseñaGrupo;
-window.cargarEventos = cargarEventos;
-window.agregarEvento = agregarEvento;
-window.eliminarEvento = eliminarEvento;
-window.cargarRecursos = cargarRecursos;
-window.agregarRecurso = agregarRecurso;
-window.eliminarRecursoCloud = eliminarRecursoCloud;
-window.cargarCategorias = cargarCategorias;
-window.agregarCategoria = agregarCategoria;
-window.eliminarCategoria = eliminarCategoria;
-window.actualizarCategoria = actualizarCategoria;
-window.resetSistema = resetSistema;
-window.loadDatabase = loadDatabase;
-window.saveDatabase = saveDatabase;
-window.asegurarDBCloud = asegurarDBCloud;
-window.updatePaymentStatus = updatePaymentStatus;
-window.getNextNumero = getNextNumero;
-window.getCurrentNumero = getCurrentNumero;
-window.addCustomGroup = addCustomGroup;
-window.initDatabase = initDatabase;
-window.db = db;
-window.GRUPOS = GRUPOS;
-window.MESES = MESES;
+// ── Categorías ────────────────────────────────────────────────────────────────
+
+async function cargarCategorias() {
+    const snapshot = await coleccionCategorias.get();
+    const categorias = [];
+    snapshot.forEach(doc => categorias.push({ id: doc.id, ...doc.data() }));
+    return categorias.sort((a, b) => a.nombre.localeCompare(b.nombre));
+}
+
+async function agregarCategoria(nombre, icono = '📁') {
+    const categoria = { nombre, icono, fecha: new Date().toISOString() };
+    const docRef = await coleccionCategorias.add(categoria);
+    return { id: docRef.id, ...categoria };
+}
+
+async function eliminarCategoria(categoriaId) {
+    const snapshot = await coleccionRecursos.where('categoria', '==', categoriaId).get();
+    if (!snapshot.empty) {
+        throw new Error(`No se puede eliminar: tiene ${snapshot.size} recursos asociados`);
+    }
+    await coleccionCategorias.doc(categoriaId).delete();
+}
+
+async function actualizarCategoria(categoriaId, nombre, icono) {
+    await coleccionCategorias.doc(categoriaId).update({ nombre, icono });
+}
+
+// ── Reset sistema ─────────────────────────────────────────────────────────────
+
+async function resetSistema(opciones) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            logMensaje('🔄 Reiniciando elementos seleccionados...', false);
+
+            const deleteCollection = async (coleccion) => {
+                const snap = await coleccion.get();
+                const batch = dbFirestore.batch();
+                snap.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+            };
+
+            if (opciones?.pagos)        await deleteCollection(coleccionPagos);
+            if (opciones?.actividades)  await deleteCollection(coleccionEventos);
+            if (opciones?.passwords)    await deleteCollection(coleccionPasswords);
+            if (opciones?.biblioteca)   await deleteCollection(coleccionRecursos);
+            if (opciones?.categorias)   await deleteCollection(coleccionCategorias);
+
+            if (opciones?.recibos) {
+                ultimoNum = 0;
+                await coleccionCorrelativo.set({ valor: 0 });
+            }
+
+            if (opciones?.pagos) {
+                db = {};
+                const anioActual = new Date().getFullYear();
+                await asegurarDBCloud(anioActual);
+            }
+
+            saveDatabaseLocal();
+            logMensaje('✓ Elementos seleccionados reiniciados correctamente', false);
+            setTimeout(() => location.reload(), 1500);
+            resolve(true);
+        } catch (error) {
+            console.error('Error al reiniciar:', error);
+            logMensaje('❌ Error al reiniciar: ' + error.message, true);
+            reject(error);
+        }
+    });
+}
+
+async function initDatabase() {
+    const snapshot = await coleccionPagos.get();
+    const batch = dbFirestore.batch();
+    snapshot.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+    await coleccionCorrelativo.set({ valor: 0 });
+    localStorage.removeItem('pj_db_v8');
+    localStorage.removeItem('pj_corr_v8');
+    db = {};
+    ultimoNum = 0;
+    await asegurarDBCloud(new Date().getFullYear());
+}
+
+// ── Exportar al scope global ──────────────────────────────────────────────────
+
+Object.assign(window, {
+    db, GRUPOS, MESES,
+    loadDatabase, saveDatabase, asegurarDBCloud, initDatabase,
+    updatePaymentStatus, addCustomGroup,
+    getNextNumero, getCurrentNumero,
+    cargarEventos, agregarEvento, eliminarEvento,
+    cargarContraseñasGrupos, guardarContraseñaGrupo, verificarContraseñaGrupo,
+    cargarRecursos, agregarRecurso, eliminarRecursoCloud,
+    cargarCategorias, agregarCategoria, eliminarCategoria, actualizarCategoria,
+    resetSistema
+});

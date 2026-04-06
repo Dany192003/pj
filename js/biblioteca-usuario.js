@@ -13,6 +13,11 @@ window.showToast = function(message, isError = false) {
     setTimeout(() => { toast.className = "toast"; }, 2000);
 };
 
+// Detectar si es dispositivo móvil
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     await loadDatabase();
     await cargarRecursos();
@@ -175,7 +180,7 @@ async function renderizarRecursos(recursos) {
             e.stopPropagation();
             const url = btn.dataset.url;
             const titulo = btn.dataset.titulo;
-            descargarDirecto(url, titulo);
+            descargarArchivo(url, titulo);
         });
     });
 }
@@ -197,8 +202,8 @@ function abrirPreview(url, titulo) {
     modal.style.display = "block";
 }
 
-// Función mejorada para descargar directamente desde Cloudinary
-function descargarDirecto(url, titulo) {
+// Función de descarga optimizada para móviles y desktop
+function descargarArchivo(url, titulo) {
     // Limpiar el nombre del archivo
     let nombreLimpio = titulo.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
     
@@ -209,12 +214,9 @@ function descargarDirecto(url, titulo) {
     else if (url.includes('.gif')) extension = 'gif';
     else if (url.includes('.webp')) extension = 'webp';
     
-    // Agregar parámetro para forzar descarga en Cloudinary (fl_attachment)
+    // Crear URL con parámetro para forzar descarga en Cloudinary
     let urlDescarga = url;
-    
-    // Si es un PDF o imagen, agregar fl_attachment para forzar descarga
     if (url.includes('cloudinary.com')) {
-        // Para Cloudinary, agregar fl_attachment al final de la URL
         if (url.includes('/upload/')) {
             urlDescarga = url.replace('/upload/', '/upload/fl_attachment/');
         } else if (url.includes('/image/upload/')) {
@@ -224,24 +226,28 @@ function descargarDirecto(url, titulo) {
         }
     }
     
-    console.log("📥 Descargando desde:", urlDescarga);
-    
-    // Crear enlace invisible y forzar descarga
-    const link = document.createElement('a');
-    link.href = urlDescarga;
-    link.download = `${nombreLimpio}.${extension}`;
-    link.setAttribute('download', `${nombreLimpio}.${extension}`);
-    link.style.display = 'none';
-    
-    document.body.appendChild(link);
-    link.click();
-    
-    // Limpiar después de un momento
-    setTimeout(() => {
-        document.body.removeChild(link);
-    }, 100);
-    
-    window.showToast(`⬇️ Descargando: ${titulo}`, false);
+    // Si es móvil, usar el método que funciona mejor
+    if (isMobile()) {
+        // En móvil, abrir en nueva pestaña (el navegador manejará la descarga)
+        window.open(urlDescarga, '_blank');
+        window.showToast(`📥 Abriendo archivo: ${titulo}`, false);
+    } else {
+        // En desktop, usar el método de enlace oculto
+        const link = document.createElement('a');
+        link.href = urlDescarga;
+        link.download = `${nombreLimpio}.${extension}`;
+        link.setAttribute('download', `${nombreLimpio}.${extension}`);
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        setTimeout(() => {
+            document.body.removeChild(link);
+        }, 100);
+        
+        window.showToast(`⬇️ Descargando: ${titulo}`, false);
+    }
 }
 
 function formatearFechaCompleta(fechaISO) {

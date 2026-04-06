@@ -58,12 +58,12 @@
 }
 
 .reset-btn {
-    background: #f97316;
+    background: #00973a;
     color: white;
 }
 
 .reset-btn:hover {
-    background: #ea580c;
+    background: #239c47;
     transform: scale(0.98);
 }
 
@@ -76,85 +76,39 @@
     color: #0891b2;
 }
 
-/* ========== TABS ========== */
+/* ========== TABS (admin override) ========== */
 .tabs-container {
-    background: white;
-    border-radius: 12px;
-    padding: 5px;
-    margin-bottom: 24px;
-    display: flex;
-    gap: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     flex-wrap: wrap;
 }
 
 .tab-btn {
-    flex: 1;
-    background: transparent;
-    border: none;
-    padding: 12px 8px;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
     font-size: 14px;
-    white-space: nowrap;
-    transition: all 0.3s ease;
+    padding: 12px 8px;
 }
 
-.tab-btn.active {
-    background: var(--primary-gradient);
-    color: white;
-}
-
-.tab-content {
-    display: none;
-    animation: fadeIn 0.3s ease;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-/* ========== GRID Y CARDS ========== */
+/* ========== GRID Y CARDS (admin override) ========== */
 .grid {
-    display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
 }
 
 .card {
-    background: white;
-    border-radius: 20px;
     padding: 30px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .section-title {
-    font-size: 18px;
-    font-weight: 800;
-    margin-bottom: 20px;
-    color: #0f172a;
-    border-left: 4px solid #0891b2;
     padding-left: 10px;
 }
 
-/* ========== FORMULARIOS ========== */
-.field {
-    margin-bottom: 15px;
+/* ========== FORMULARIOS (admin override) ========== */
+.field input:focus,
+.field select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #0891b2;
+    box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.1);
 }
 
-.field label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #0891b2;
-    display: block;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-}
-
-.field input,
-.field select,
 textarea {
     width: 100%;
     padding: 12px;
@@ -163,224 +117,10 @@ textarea {
     font-family: inherit;
     font-size: 16px;
     background: #f8fafc;
-}
-
-.row {
-    display: flex;
-    gap: 15px;
-}
-
-.row .field {
-    flex: 1;
-}
-
-textarea {
     resize: vertical;
 }
 
-textarea:focus,
-.field input:focus,
-.field select:focus {
-    outline: none;
-    border-color: #0891b2;
-    box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.1);
-}
-
-/* ========== BOTONES PRINCIPALES ========== */
-.btn-main,
-.btn-wa,
-.btn-copy {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 10px;
-    transition: all 0.3s ease;
-}
-
-.btn-main {
-    background: var(--primary-gradient);
-    color: white;
-}
-
-.btn-wa {
-    background: #25d366;
-    color: white;
-}
-
-.btn-copy {
-    background: #3b82f6;
-    color: white;
-}
-
-.btn-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-/* ========== TICKET (COMPROBANTE) ========== */
-.ticket {
-    border-radius: 20px;
-    overflow: hidden;
-    background: white;
-    max-width: 420px;
-    margin: 0 auto;
-    box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.2);
-}
-
-.ticket-header {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    padding: 25px 20px;
-    text-align: center;
-}
-
-.logo-icon {
-    font-size: 42px;
-}
-
-.ticket-title {
-    font-size: 18px;
-    font-weight: 800;
-    color: white;
-}
-
-.ticket-subtitle {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.ticket-receipt-number {
-    background: #f8fafc;
-    padding: 15px 20px;
-    text-align: center;
-}
-
-.receipt-label {
-    font-size: 10px;
-    font-weight: 700;
-    color: #0891b2;
-    text-transform: uppercase;
-}
-
-.receipt-number {
-    font-size: 24px;
-    font-weight: 800;
-    color: #0f172a;
-    font-family: monospace;
-}
-
-.ticket-info {
-    padding: 20px;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px dashed #e2e8f0;
-}
-
-.info-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-}
-
-.info-value {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1e293b;
-    text-align: right;
-}
-
-.ticket-amount {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    margin: 0 20px 20px 20px;
-    padding: 20px;
-    text-align: center;
-    border-radius: 16px;
-}
-
-.amount-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #0369a1;
-}
-
-.amount-value {
-    font-size: 32px;
-    font-weight: 900;
-    color: #0f172a;
-}
-
-.amount-value::before {
-    content: "Q ";
-    font-size: 24px;
-}
-
-.ticket-footer {
-    background: #f1f5f9;
-    padding: 15px 20px;
-    text-align: center;
-}
-
-/* ========== TABLA CONTROL DE CUOTAS ========== */
-.excel-container {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    overflow-x: auto;
-}
-
-.excel-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.excel-table th {
-    background: #f8fafc;
-    padding: 10px;
-    color: #0891b2;
-    font-weight: 700;
-}
-
-.excel-table td {
-    padding: 10px;
-    border-bottom: 1px solid #f1f5f9;
-    text-align: center;
-}
-
-/* ========== BOTONES DE ESTADO ========== */
-.status-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    transition: all 0.2s ease;
-}
-
-.status-btn:active {
-    transform: scale(0.95);
-}
-
-.status-pagado {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.status-pendiente {
-    background: #fef9c3;
-    color: #854d0e;
-}
-
-/* Spinner pequeño para botones de estado */
+/* ========== SPINNER PEQUEÑO ========== */
 .spinner-small {
     display: inline-block;
     width: 16px;
@@ -529,7 +269,7 @@ textarea:focus,
     transform: scale(0.98);
 }
 
-/* ========== MODAL DE CONFIRMACIÓN PERSONALIZADO ========== */
+/* ========== MODAL DE CONFIRMACIÓN ========== */
 .modal-confirmacion {
     display: none;
     position: fixed;
@@ -556,7 +296,7 @@ textarea:focus,
 }
 
 .modal-confirmacion-header {
-    padding: 24px 24px 16px 24px;
+    padding: 24px 24px 16px;
     text-align: center;
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
@@ -592,7 +332,7 @@ textarea:focus,
 }
 
 .modal-confirmacion-footer {
-    padding: 16px 24px 24px 24px;
+    padding: 16px 24px 24px;
     display: flex;
     gap: 12px;
     justify-content: center;
@@ -703,17 +443,11 @@ textarea:focus,
 }
 
 @keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(100px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(100px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ========== ESTILOS PARA BIBLIOTECA ========== */
+/* ========== BIBLIOTECA (admin) ========== */
 .categoria-badge {
     background: #e0f2fe;
     color: #0891b2;
@@ -755,6 +489,44 @@ textarea:focus,
 .btn-eliminar-recurso:hover {
     background: #dc2626;
     transform: scale(0.98);
+}
+
+/* ========== SELECTOR DE EMOJIS ========== */
+.emoji-option {
+    font-size: 24px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.2s ease;
+}
+
+.emoji-option:hover {
+    background: #e0f2fe;
+    transform: scale(1.1);
+    border-color: #0891b2;
+}
+
+#emojiSelector {
+    scrollbar-width: thin;
+    scrollbar-color: #0891b2 #e2e8f0;
+}
+
+#emojiSelector::-webkit-scrollbar { width: 6px; }
+#emojiSelector::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+#emojiSelector::-webkit-scrollbar-thumb { background: #0891b2; border-radius: 10px; }
+
+/* ========== TABLA DE RECURSOS ========== */
+.excel-table th,
+.excel-table td {
+    padding: 10px 8px;
+    vertical-align: middle;
+}
+
+.excel-table th:nth-child(4),
+.excel-table td:nth-child(4) {
+    white-space: nowrap;
 }
 
 /* ========== RESPONSIVE ========== */
@@ -805,6 +577,12 @@ textarea:focus,
         flex-direction: column;
         text-align: center;
     }
+
+    .excel-table th:nth-child(4),
+    .excel-table td:nth-child(4) {
+        white-space: normal;
+        font-size: 11px;
+    }
 }
 
 @media (max-width: 640px) {
@@ -813,31 +591,14 @@ textarea:focus,
         width: 92%;
     }
 
-    .modal-confirmacion-header {
-        padding: 20px 20px 12px 20px;
-    }
-
-    .modal-confirmacion-body {
-        padding: 16px 20px;
-    }
-
-    .modal-confirmacion-footer {
-        padding: 14px 20px 20px 20px;
-    }
+    .modal-confirmacion-header { padding: 20px 20px 12px; }
+    .modal-confirmacion-body  { padding: 16px 20px; }
+    .modal-confirmacion-footer { padding: 14px 20px 20px; }
 }
 
 @media (max-width: 480px) {
-    .ticket {
-        max-width: 100%;
-    }
-
-    .receipt-number {
-        font-size: 20px;
-    }
-
-    .amount-value {
-        font-size: 28px;
-    }
+    .receipt-number { font-size: 20px; }
+    .amount-value   { font-size: 28px; }
 
     .modal-reset-content {
         margin: 40% auto;
@@ -861,89 +622,5 @@ textarea:focus,
 
     .barra-progreso-header span:last-child {
         font-size: 12px;
-    }
-}
-
-/* ========== ANIMACIONES ========== */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Agregar al final de css/estilos-admin.css */
-
-/* Selector de emojis */
-.emoji-option {
-    font-size: 24px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    cursor: pointer;
-    padding: 8px;
-    transition: all 0.2s ease;
-}
-
-.emoji-option:hover {
-    background: #e0f2fe;
-    transform: scale(1.1);
-    border-color: #0891b2;
-}
-
-#emojiSelector {
-    scrollbar-width: thin;
-    scrollbar-color: #0891b2 #e2e8f0;
-}
-
-#emojiSelector::-webkit-scrollbar {
-    width: 6px;
-}
-
-#emojiSelector::-webkit-scrollbar-track {
-    background: #e2e8f0;
-    border-radius: 10px;
-}
-
-#emojiSelector::-webkit-scrollbar-thumb {
-    background: #0891b2;
-    border-radius: 10px;
-}
-/* Ajustar la tabla de recursos para que se vea mejor */
-.excel-table th,
-.excel-table td {
-    padding: 10px 8px;
-    vertical-align: middle;
-}
-
-.excel-table th:nth-child(4),
-.excel-table td:nth-child(4) {
-    white-space: nowrap;
-}
-
-@media (max-width: 768px) {
-    .excel-table th:nth-child(4),
-    .excel-table td:nth-child(4) {
-        white-space: normal;
-        font-size: 11px;
     }
 }

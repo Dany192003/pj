@@ -12,6 +12,7 @@
 <body>
 
 <div class="app">
+    <!-- Header -->
     <div class="admin-header">
         <div class="admin-header-logo">
             <img src="img/logo.jpg" alt="Logo" class="admin-logo-img">
@@ -27,6 +28,7 @@
         </div>
     </div>
 
+    <!-- Tabs -->
     <div class="tabs-container">
         <button class="tab-btn active" data-tab="tab1">📄 Generar Recibos</button>
         <button class="tab-btn" data-tab="tab2">📊 Control de Cuotas</button>
@@ -54,14 +56,22 @@
                     <label>👥 Juvenil</label>
                     <select id="grupo">
                         <option value="" disabled selected>-- Seleccione un juvenil --</option>
-                        <option>Confirmación</option><option>Jeshua</option><option>Jufra</option>
-                        <option>Lectores</option><option>Mujeres y Hombres Nuevos</option><option>PCV</option>
-                        <option>Pentecostés</option><option>Roca Fuerte</option><option>San Pablo</option>
-                        <option>Senderos</option><option>Shadai</option><option>Ssael</option>
+                        <option>Confirmación</option>
+                        <option>Jeshua</option>
+                        <option>Jufra</option>
+                        <option>Lectores</option>
+                        <option>Mujeres y Hombres Nuevos</option>
+                        <option>PCV</option>
+                        <option>Pentecostés</option>
+                        <option>Roca Fuerte</option>
+                        <option>San Pablo</option>
+                        <option>Senderos</option>
+                        <option>Shadai</option>
+                        <option>Ssael</option>
                         <option value="OTRO">➕ OTRO</option>
                     </select>
                 </div>
-                <div class="field" id="campoOtro" style="display:none;">
+                <div class="field" id="campoOtro" style="display: none;">
                     <label>📝 Nombre del Grupo</label>
                     <input id="nombreOtro" placeholder="Escriba el nombre">
                 </div>
@@ -79,7 +89,8 @@
                 </div>
                 <button class="btn-main" id="btnVistaPrevia">👁️ Vista Previa</button>
             </div>
-            <div class="preview" id="preview" style="display:none;">
+
+            <div class="preview" id="preview" style="display: none;">
                 <div id="vistaPrevia" class="ticket">
                     <div class="ticket-header">
                         <div class="ticket-logo"><span class="logo-icon">⛪</span></div>
@@ -91,10 +102,22 @@
                         <span class="receipt-number" id="vNumRecibo"></span>
                     </div>
                     <div class="ticket-info">
-                        <div class="info-row"><div class="info-label">👥 JUVENIL</div><div class="info-value" id="vGrupo">-</div></div>
-                        <div class="info-row"><div class="info-label">📌 CONCEPTO</div><div class="info-value" id="vConcepto">-</div></div>
-                        <div class="info-row"><div class="info-label">📆 FECHA</div><div class="info-value" id="vFecha">-</div></div>
-                        <div class="info-row"><div class="info-label">⏰ HORA</div><div class="info-value" id="vHora">-</div></div>
+                        <div class="info-row">
+                            <div class="info-label">👥 JUVENIL</div>
+                            <div class="info-value" id="vGrupo">-</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">📌 CONCEPTO</div>
+                            <div class="info-value" id="vConcepto">-</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">📆 FECHA</div>
+                            <div class="info-value" id="vFecha">-</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">⏰ HORA</div>
+                            <div class="info-value" id="vHora">-</div>
+                        </div>
                         <div class="info-row" id="estadoRow" style="background: #dcfce7; border-radius: 8px; margin-top: 8px;">
                             <div class="info-label">✅ ESTADO</div>
                             <div class="info-value" id="vEstado" style="color: #15803d; font-weight: 800;">PAGADO</div>
@@ -117,9 +140,9 @@
     <!-- Tab 2: Control de Cuotas -->
     <div id="tab2" class="tab-content">
         <div class="excel-container">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                 <h3>📋 Historial de Cuotas</h3>
-                <select id="selectAnioControl" style="padding:8px; border-radius:8px;"></select>
+                <select id="selectAnioControl" style="padding: 8px; border-radius: 8px;"></select>
             </div>
             <div style="overflow-x: auto;">
                 <table class="excel-table">
@@ -135,14 +158,26 @@
         <div class="card">
             <div class="section-title">📅 Agregar Actividad</div>
             <div class="row">
-                <div class="field"><label>📆 Fecha</label><input type="date" id="eventoFecha"></div>
-                <div class="field"><label>📌 Título</label><input type="text" id="eventoTitulo" placeholder="Ej: Reunión general"></div>
+                <div class="field">
+                    <label>📆 Fecha</label>
+                    <input type="date" id="eventoFecha">
+                </div>
+                <div class="field">
+                    <label>📌 Título</label>
+                    <input type="text" id="eventoTitulo" placeholder="Ej: Reunión general">
+                </div>
             </div>
-            <div class="field"><label>📍 Lugar</label><input type="text" id="eventoLugar" placeholder="Ej: Salón parroquial"></div>
-            <div class="field"><label>📝 Descripción</label><textarea id="eventoDescripcion" rows="3" placeholder="Descripción detallada..."></textarea></div>
+            <div class="field">
+                <label>📍 Lugar</label>
+                <input type="text" id="eventoLugar" placeholder="Ej: Salón parroquial">
+            </div>
+            <div class="field">
+                <label>📝 Descripción</label>
+                <textarea id="eventoDescripcion" rows="3" placeholder="Descripción detallada..."></textarea>
+            </div>
             <button class="btn-main" id="btnAgregarEvento">➕ Agregar Actividad</button>
         </div>
-        <div class="card" style="margin-top:20px">
+        <div class="card" style="margin-top: 20px;">
             <div class="section-title">📋 Lista de Actividades</div>
             <div id="eventosList"></div>
         </div>
@@ -153,13 +188,15 @@
         <div class="card">
             <div class="section-title">🔑 Contraseñas por Grupo</div>
             <div id="gruposPassList"></div>
-            <p style="font-size:12px; color:#64748b; margin-top:15px;">Cada coordinador usará esta contraseña para consultar los pagos de su grupo.</p>
+            <p style="font-size: 12px; color: #64748b; margin-top: 15px;">
+                Cada coordinador usará esta contraseña para consultar los pagos de su grupo.
+            </p>
         </div>
     </div>
 
-    <!-- Tab 5: Biblioteca (con gestión de categorías dentro) -->
+    <!-- Tab 5: Biblioteca -->
     <div id="tab5" class="tab-content">
-        <!-- Sección para gestionar categorías -->
+        <!-- Gestionar categorías -->
         <div class="card">
             <div class="section-title">🏷️ Gestionar Categorías</div>
             <div class="row">
@@ -175,46 +212,44 @@
                     </div>
                     <div id="emojiSelector" style="display: none; margin-top: 10px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; max-height: 200px; overflow-y: auto;">
                         <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;">
-                            <button class="emoji-option" data-emoji="📚" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📚</button>
-                            <button class="emoji-option" data-emoji="🙏" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🙏</button>
-                            <button class="emoji-option" data-emoji="🎮" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎮</button>
-                            <button class="emoji-option" data-emoji="📄" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📄</button>
-                            <button class="emoji-option" data-emoji="📖" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📖</button>
-                            <button class="emoji-option" data-emoji="✝️" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">✝️</button>
-                            <button class="emoji-option" data-emoji="⛪" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">⛪</button>
-                            <button class="emoji-option" data-emoji="💒" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">💒</button>
-                            <button class="emoji-option" data-emoji="🎵" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎵</button>
-                            <button class="emoji-option" data-emoji="🎭" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎭</button>
-                            <button class="emoji-option" data-emoji="🎨" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎨</button>
-                            <button class="emoji-option" data-emoji="⚽" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">⚽</button>
-                            <button class="emoji-option" data-emoji="🏆" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🏆</button>
-                            <button class="emoji-option" data-emoji="💡" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">💡</button>
-                            <button class="emoji-option" data-emoji="❤️" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">❤️</button>
-                            <button class="emoji-option" data-emoji="💪" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">💪</button>
-                            <button class="emoji-option" data-emoji="🤝" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🤝</button>
-                            <button class="emoji-option" data-emoji="🌟" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🌟</button>
-                            <button class="emoji-option" data-emoji="✨" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">✨</button>
-                            <button class="emoji-option" data-emoji="🎉" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎉</button>
-                            <button class="emoji-option" data-emoji="📢" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📢</button>
-                            <button class="emoji-option" data-emoji="🔔" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🔔</button>
-                            <button class="emoji-option" data-emoji="📅" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📅</button>
-                            <button class="emoji-option" data-emoji="⏰" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">⏰</button>
-                            <button class="emoji-option" data-emoji="📍" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📍</button>
-                            <button class="emoji-option" data-emoji="🗺️" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🗺️</button>
-                            <button class="emoji-option" data-emoji="🎁" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎁</button>
-                            <button class="emoji-option" data-emoji="🍕" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🍕</button>
-                            <button class="emoji-option" data-emoji="☕" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">☕</button>
+                            <button class="emoji-option" data-emoji="📚">📚</button>
+                            <button class="emoji-option" data-emoji="🙏">🙏</button>
+                            <button class="emoji-option" data-emoji="🎮">🎮</button>
+                            <button class="emoji-option" data-emoji="📄">📄</button>
+                            <button class="emoji-option" data-emoji="📖">📖</button>
+                            <button class="emoji-option" data-emoji="✝️">✝️</button>
+                            <button class="emoji-option" data-emoji="⛪">⛪</button>
+                            <button class="emoji-option" data-emoji="💒">💒</button>
+                            <button class="emoji-option" data-emoji="🎵">🎵</button>
+                            <button class="emoji-option" data-emoji="🎭">🎭</button>
+                            <button class="emoji-option" data-emoji="🎨">🎨</button>
+                            <button class="emoji-option" data-emoji="⚽">⚽</button>
+                            <button class="emoji-option" data-emoji="🏆">🏆</button>
+                            <button class="emoji-option" data-emoji="💡">💡</button>
+                            <button class="emoji-option" data-emoji="❤️">❤️</button>
+                            <button class="emoji-option" data-emoji="💪">💪</button>
+                            <button class="emoji-option" data-emoji="🤝">🤝</button>
+                            <button class="emoji-option" data-emoji="🌟">🌟</button>
+                            <button class="emoji-option" data-emoji="✨">✨</button>
+                            <button class="emoji-option" data-emoji="🎉">🎉</button>
+                            <button class="emoji-option" data-emoji="📢">📢</button>
+                            <button class="emoji-option" data-emoji="🔔">🔔</button>
+                            <button class="emoji-option" data-emoji="📅">📅</button>
+                            <button class="emoji-option" data-emoji="⏰">⏰</button>
+                            <button class="emoji-option" data-emoji="📍">📍</button>
+                            <button class="emoji-option" data-emoji="🗺️">🗺️</button>
+                            <button class="emoji-option" data-emoji="🎁">🎁</button>
+                            <button class="emoji-option" data-emoji="🍕">🍕</button>
+                            <button class="emoji-option" data-emoji="☕">☕</button>
                         </div>
                     </div>
                 </div>
             </div>
             <button class="btn-main" id="btnAgregarCategoria" style="background: #64748b; margin-bottom: 10px;">➕ Agregar Categoría</button>
-            <div id="categoriasListAdmin" style="margin-top: 15px;">
-                <!-- Lista de categorías se cargará aquí -->
-            </div>
+            <div id="categoriasListAdmin" style="margin-top: 15px;"></div>
         </div>
 
-        <!-- Sección para subir recursos -->
+        <!-- Subir recurso -->
         <div class="card" style="margin-top: 20px;">
             <div class="section-title">📤 Subir Recurso</div>
             <div class="row">
@@ -241,25 +276,24 @@
             <button class="btn-main" id="btnSubirRecurso">📤 Subir Recurso</button>
         </div>
 
-        <!-- Sección de recursos disponibles -->
-<!-- Sección de recursos disponibles - actualizar el thead -->
-<div class="card" style="margin-top: 20px;">
-    <div class="section-title">📋 Recursos Disponibles</div>
-    <div style="overflow-x: auto;">
-        <table class="excel-table">
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Categoría</th>
-                    <th>Descripción</th>
-                    <th>Fecha de publicación</th>
-                    <th>Acciones</th>
-                 </tr>
-            </thead>
-            <tbody id="recursosTableBody"></tbody>
-        </table>
-    </div>
-</div>
+        <!-- Recursos disponibles -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="section-title">📋 Recursos Disponibles</div>
+            <div style="overflow-x: auto;">
+                <table class="excel-table">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Categoría</th>
+                            <th>Descripción</th>
+                            <th>Fecha de publicación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recursosTableBody"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -270,19 +304,19 @@
         <p>Selecciona qué datos deseas reiniciar:</p>
         <div style="text-align: left; margin: 20px 0;">
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetPagos" value="pagos" >
+                <input type="checkbox" id="resetPagos" value="pagos">
                 <strong>📊 Pagos y cuotas</strong> - Eliminar todos los registros de pagos
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetActividades" value="actividades" >
+                <input type="checkbox" id="resetActividades" value="actividades">
                 <strong>📅 Actividades</strong> - Eliminar todas las actividades del calendario
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetPasswords" value="passwords" >
+                <input type="checkbox" id="resetPasswords" value="passwords">
                 <strong>🔑 Contraseñas</strong> - Eliminar todas las contraseñas de grupos
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetRecibos" value="recibos" >
+                <input type="checkbox" id="resetRecibos" value="recibos">
                 <strong>🔢 Contador de recibos</strong> - Reiniciar a REC-0001
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
@@ -294,7 +328,7 @@
                 <strong>🏷️ Categorías</strong> - Eliminar todas las categorías
             </label>
         </div>
-        <p><strong style="color:#ef4444;">Esta acción NO se puede deshacer.</strong></p>
+        <p><strong style="color: #ef4444;">Esta acción NO se puede deshacer.</strong></p>
         <div style="margin-top: 20px;">
             <button class="btn-cancel-reset" id="btnCancelReset">Cancelar</button>
             <button class="btn-confirm-reset" id="btnConfirmReset">Reiniciar seleccionados</button>
