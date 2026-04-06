@@ -35,6 +35,7 @@
         <button class="tab-btn" data-tab="tab3">📅 Actividades</button>
         <button class="tab-btn" data-tab="tab4">🔑 Contraseñas Grupos</button>
         <button class="tab-btn" data-tab="tab5">📚 Biblioteca</button>
+        <button class="tab-btn" data-tab="tab6">📜 Historial Recibos</button>
     </div>
 
     <!-- Tab 1: Generar Recibos -->
@@ -295,6 +296,44 @@
             </div>
         </div>
     </div>
+    
+    <!-- Tab 6: Historial Recibos -->
+<div id="tab6" class="tab-content">
+    <div class="card">
+        <div class="section-title">📜 Historial de Comprobantes</div>
+        <div class="row">
+            <div class="field">
+                <label>🔍 Buscar</label>
+                <input type="text" id="buscarRecibo" placeholder="Folio o grupo o concepto">
+            </div>
+            <div class="field">
+                <label>📅 Filtrar por fecha</label>
+                <input type="date" id="filtroFecha">
+            </div>
+        </div>
+        <div class="excel-container" style="margin-top: 20px;">
+            <div style="overflow-x: auto;">
+                <table class="excel-table">
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Juvenil</th>
+                            <th>Concepto</th>
+                            <th>Monto</th>
+                            <th>Fecha/Hora</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historialTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button class="btn-main" id="btnExportarHistorial" style="background: #10b981; width: auto; padding: 10px 20px;">📊 Exportar a Excel</button>
+        </div>
+    </div>
+</div>
+
 </div>
 
 <!-- Modal Reset -->
@@ -327,6 +366,10 @@
                 <input type="checkbox" id="resetCategorias" value="categorias">
                 <strong>🏷️ Categorías</strong> - Eliminar todas las categorías
             </label>
+            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
+    <input type="checkbox" id="resetHistorial" value="historial">
+    <strong>📜 Historial de recibos</strong> - Eliminar todos los comprobantes del historial
+</label>
         </div>
         <p><strong style="color: #ef4444;">Esta acción NO se puede deshacer.</strong></p>
         <div style="margin-top: 20px;">
@@ -353,5 +396,6 @@
 <script src="js/autenticacion.js"></script>
 <script src="js/biblioteca-admin.js"></script>
 <script src="js/panel-admin.js"></script>
+<script src="js/historial-recibos.js"></script>
 </body>
 </html>

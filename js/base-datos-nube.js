@@ -1,4 +1,4 @@
-// js/base-datos-nube.js - Gestión de datos en Firebase
+// js/base-datos-nube.js - Gestión de datos en Firebase (actualizado)
 
 const GRUPOS = [
     'Confirmación', 'Jeshua', 'Jufra', 'Lectores',
@@ -291,7 +291,7 @@ async function actualizarCategoria(categoriaId, nombre, icono) {
     await coleccionCategorias.doc(categoriaId).update({ nombre, icono });
 }
 
-// ── Reset sistema ─────────────────────────────────────────────────────────────
+// ── Reset sistema (con historial) ─────────────────────────────────────────────
 
 async function resetSistema(opciones) {
     return new Promise(async (resolve, reject) => {
@@ -310,6 +310,7 @@ async function resetSistema(opciones) {
             if (opciones?.passwords)    await deleteCollection(coleccionPasswords);
             if (opciones?.biblioteca)   await deleteCollection(coleccionRecursos);
             if (opciones?.categorias)   await deleteCollection(coleccionCategorias);
+            if (opciones?.historial)    await deleteCollection(coleccionHistorialRecibos);
 
             if (opciones?.recibos) {
                 ultimoNum = 0;

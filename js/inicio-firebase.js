@@ -18,3 +18,4 @@ const coleccionEventos     = dbFirestore.collection('eventos');
 const coleccionPasswords   = dbFirestore.collection('passwords');
 const coleccionRecursos    = dbFirestore.collection('recursos');
 const coleccionCategorias  = dbFirestore.collection('categorias');
+const coleccionHistorialRecibos = dbFirestore.collection('historial_recibos');

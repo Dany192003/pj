@@ -1,4 +1,4 @@
-// js/recibos.js - Generación de recibos con imagen nativa (sin html2canvas)
+// js/recibos.js - Generación de recibos con imagen nativa
 
 if (typeof window.showToast !== 'function') {
     window.showToast = function(message, isError = false) {
@@ -15,7 +15,6 @@ window.compActual = null;
 window.compPendiente = null;
 window.imagenCloudinaryUrl = null;
 
-// Mostrar barra de progreso
 function mostrarBarraProgreso(porcentaje, mensaje) {
     let barraContainer = document.getElementById("barraProgresoContainer");
     
@@ -84,10 +83,8 @@ function construirMensajeConEmojis(registro) {
     return `✅ *COMPROBANTE DE PAGO - Pastoral Juvenil* ✅\n\n👥 *Juvenil:* ${registro.g}\n📌 *Concepto:* ${registro.concepto}\n💰 *Monto:* Q ${parseFloat(registro.mon).toFixed(2)}\n🔢 *No. Recibo:* REC-${registro.num}\n📆 *Fecha:* ${registro.fecha}\n⏰ *Hora:* ${registro.hora}\n✅ *Estado:* ${estadoTexto}\n\n_Gracias por tu contribución al movimiento juvenil._`;
 }
 
-// Función para generar imagen nativa del comprobante (sin html2canvas)
 function generarImagenComprobante(data, estado) {
     return new Promise((resolve) => {
-        // Dimensiones fijas para la imagen
         const width = 500;
         const height = 620;
         
@@ -96,29 +93,24 @@ function generarImagenComprobante(data, estado) {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         
-        // Fondo blanco sólido
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, width, height);
         
-        // === ENCABEZADO ===
         const gradiente = ctx.createLinearGradient(0, 0, 0, 100);
         gradiente.addColorStop(0, '#0f172a');
         gradiente.addColorStop(1, '#1e293b');
         ctx.fillStyle = gradiente;
         ctx.fillRect(0, 0, width, 100);
         
-        // Icono iglesia
         ctx.font = '48px "Segoe UI Emoji", "Apple Color Emoji"';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.fillText('⛪', width / 2, 55);
         
-        // Título
         ctx.font = 'bold 18px "Plus Jakarta Sans", sans-serif';
         ctx.fillStyle = '#ffffff';
         ctx.fillText('COMPROBANTE DE PAGO', width / 2, 85);
         
-        // === NÚMERO DE RECIBO ===
         ctx.fillStyle = '#f8fafc';
         ctx.fillRect(0, 100, width, 65);
         ctx.font = '10px "Plus Jakarta Sans", sans-serif';
@@ -128,7 +120,6 @@ function generarImagenComprobante(data, estado) {
         ctx.fillStyle = '#0f172a';
         ctx.fillText(`REC-${data.num}`, width / 2, 158);
         
-        // === INFORMACIÓN ===
         let yPos = 185;
         const infoItems = [
             { icon: '👥', label: 'JUVENIL', value: data.g },
@@ -138,7 +129,6 @@ function generarImagenComprobante(data, estado) {
         ];
         
         infoItems.forEach((item) => {
-            // Línea separadora
             ctx.beginPath();
             ctx.strokeStyle = '#e2e8f0';
             ctx.setLineDash([5, 5]);
@@ -147,13 +137,11 @@ function generarImagenComprobante(data, estado) {
             ctx.stroke();
             ctx.setLineDash([]);
             
-            // Label
             ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
             ctx.fillStyle = '#64748b';
             ctx.textAlign = 'left';
             ctx.fillText(`${item.icon} ${item.label}`, 20, yPos + 10);
             
-            // Value
             ctx.font = '600 13px "Plus Jakarta Sans", sans-serif';
             ctx.fillStyle = '#1e293b';
             ctx.textAlign = 'right';
@@ -170,7 +158,6 @@ function generarImagenComprobante(data, estado) {
             yPos += 40;
         });
         
-        // === ESTADO ===
         ctx.fillStyle = estado === "PAGADO" ? "#dcfce7" : "#fef9c3";
         ctx.fillRect(20, yPos, width - 40, 45);
         ctx.strokeStyle = estado === "PAGADO" ? "#15803d" : "#f97316";
@@ -188,7 +175,6 @@ function generarImagenComprobante(data, estado) {
         
         yPos += 60;
         
-        // === MONTO TOTAL ===
         ctx.fillStyle = '#f0f9ff';
         ctx.fillRect(20, yPos, width - 40, 75);
         ctx.strokeStyle = '#bae6fd';
@@ -204,7 +190,6 @@ function generarImagenComprobante(data, estado) {
         
         yPos += 90;
         
-        // === PIE DE PÁGINA ===
         ctx.fillStyle = '#f1f5f9';
         ctx.fillRect(0, height - 55, width, 55);
         
@@ -220,7 +205,6 @@ function generarImagenComprobante(data, estado) {
     });
 }
 
-// Función para subir imagen a Cloudinary
 async function subirImagenCloudinary(canvas, reciboNum) {
     mostrarBarraProgreso(50, "Generando imagen...");
     
@@ -273,7 +257,6 @@ function mostrarLoader(mostrar) {
     }
 }
 
-// Mostrar vista previa con estado PENDIENTE (usando HTML)
 function mostrarVistaPrevia(data) {
     console.log("📄 Mostrando vista previa del comprobante (ESTADO: PENDIENTE)");
     
@@ -316,7 +299,6 @@ function mostrarVistaPrevia(data) {
     }, 100);
 }
 
-// Confirmar y guardar el comprobante (cambiar estado a PAGADO y generar imagen)
 async function confirmarYGuardarComprobante() {
     if (!window.compPendiente) {
         window.showToast("❌ Primero genera una vista previa", true);
@@ -356,7 +338,6 @@ async function confirmarYGuardarComprobante() {
             estadoRow.style.background = "#dcfce7";
         }
         
-        // Generar imagen nativa del comprobante
         mostrarBarraProgreso(10, "Creando imagen...");
         const canvas = await generarImagenComprobante({
             g: datos.g,
@@ -367,9 +348,21 @@ async function confirmarYGuardarComprobante() {
             hora: datos.hora
         }, "PAGADO");
         
-        // Subir a Cloudinary
         const imagenUrl = await subirImagenCloudinary(canvas, nuevoNumero);
         window.imagenCloudinaryUrl = imagenUrl;
+        
+        // Guardar en historial de comprobantes
+        if (typeof window.guardarComprobanteHistorial === 'function') {
+            await window.guardarComprobanteHistorial({
+                numero: nuevoNumero,
+                juvenil: datos.g,
+                concepto: datos.concepto,
+                monto: datos.mon,
+                fecha: datos.fecha,
+                hora: datos.hora,
+                url: imagenUrl
+            });
+        }
         
         window.compActual = {
             g: datos.g,
@@ -400,7 +393,6 @@ async function confirmarYGuardarComprobante() {
     }
 }
 
-// Obtener datos del formulario para vista previa
 function getFormDataParaVistaPrevia() {
     let grupo = document.getElementById("grupo").value;
     if (!grupo || grupo === "") {
@@ -433,7 +425,6 @@ function getFormDataParaVistaPrevia() {
     };
 }
 
-// Evento: Vista Previa
 async function generarVistaPrevia() {
     console.log("👁️ Generando vista previa...");
     const formData = getFormDataParaVistaPrevia();
@@ -467,7 +458,6 @@ function actNumeroReciboPreview() {
     if (numRecibo) numRecibo.value = `REC-${getCurrentNumero()}`;
 }
 
-// Exportar funciones
 window.generarVistaPrevia = generarVistaPrevia;
 window.confirmarYGuardarComprobante = confirmarYGuardarComprobante;
 window.limpiarFormulario = limpiarFormulario;

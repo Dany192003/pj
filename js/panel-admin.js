@@ -268,6 +268,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             await cargarRecursosAdmin();
             await cargarListaCategoriasAdmin();
         }
+        if (tabId === 'tab6') {
+    if (typeof cargarHistorialRecibos === 'function') {
+        await cargarHistorialRecibos();
+    }
+}
     }
 
     tabs.forEach(tab => {
@@ -482,14 +487,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     btnConfirmReset?.addEventListener('click', async () => {
         const getId = (id) => document.getElementById(id)?.checked || false;
-        const opciones = {
-            pagos:       getId('resetPagos'),
-            actividades: getId('resetActividades'),
-            passwords:   getId('resetPasswords'),
-            recibos:     getId('resetRecibos'),
-            biblioteca:  getId('resetBiblioteca'),
-            categorias:  getId('resetCategorias')
-        };
+const opciones = {
+    pagos:       getId('resetPagos'),
+    actividades: getId('resetActividades'),
+    passwords:   getId('resetPasswords'),
+    recibos:     getId('resetRecibos'),
+    biblioteca:  getId('resetBiblioteca'),
+    categorias:  getId('resetCategorias'),
+    historial:   getId('resetHistorial')  // <-- NUEVO
+};
 
         if (!Object.values(opciones).some(Boolean)) {
             window.showToast('❌ Selecciona al menos un elemento para reiniciar', true);
