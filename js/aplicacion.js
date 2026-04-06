@@ -51,5 +51,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     redirectIfAuthenticated();
-    window.showToast('✓ Bienvenido', false);
+    
 });

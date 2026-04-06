@@ -13,10 +13,50 @@ const MESES = [
 let db = {};
 let ultimoNum = 0;
 
-function logMensaje(mensaje, isError = false) {
-    if (typeof window.showToast === 'function') {
-        window.showToast(mensaje, isError);
+// Función para actualizar el label de sincronización
+function actualizarSyncLabel(estado, mensaje) {
+    const syncIcon = document.getElementById('syncIcon');
+    const syncText = document.getElementById('syncText');
+    if (!syncIcon || !syncText) return;
+    
+    if (estado === 'cargando') {
+        syncIcon.innerHTML = '🔄';
+        syncIcon.style.animation = 'spin 1s linear infinite';
+        syncText.textContent = mensaje || 'Sincronizando...';
+    } else if (estado === 'exito') {
+        syncIcon.innerHTML = '✅';
+        syncIcon.style.animation = 'none';
+        syncText.textContent = mensaje || 'Sincronizado';
+        setTimeout(() => {
+            if (syncIcon && syncText) {
+                syncIcon.innerHTML = '☁️';
+                syncText.textContent = 'En línea';
+            }
+        }, 2000);
+    } else if (estado === 'error') {
+        syncIcon.innerHTML = '⚠️';
+        syncIcon.style.animation = 'none';
+        syncText.textContent = mensaje || 'Error de conexión';
+        setTimeout(() => {
+            if (syncIcon && syncText) {
+                syncIcon.innerHTML = '☁️';
+                syncText.textContent = 'En línea';
+            }
+        }, 3000);
     }
+}
+
+// Agregar estilos para la animación del spinner
+if (!document.querySelector('#syncStyles')) {
+    const style = document.createElement('style');
+    style.id = 'syncStyles';
+    style.textContent = `
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // ── Carga y guardado ──────────────────────────────────────────────────────────
@@ -24,6 +64,9 @@ function logMensaje(mensaje, isError = false) {
 async function loadDatabase() {
     return new Promise(async (resolve) => {
         try {
+            actualizarSyncLabel('cargando', 'Cargando datos...');
+            console.log("🔄 Cargando datos desde Firebase...");
+            
             const docCorr = await coleccionCorrelativo.get();
             ultimoNum = docCorr.exists ? (docCorr.data().valor || 0) : 0;
             if (!docCorr.exists) await coleccionCorrelativo.set({ valor: 0 });
@@ -38,9 +81,13 @@ async function loadDatabase() {
 
             const anioActual = new Date().getFullYear();
             await asegurarDBCloud(anioActual);
+            
+            console.log("✓ Datos cargados exitosamente");
+            actualizarSyncLabel('exito', 'Sincronizado');
             resolve(true);
         } catch (error) {
             console.error('Error cargando datos:', error);
+            actualizarSyncLabel('error', 'Error de conexión');
             loadDatabaseLocal();
             resolve(false);
         }
@@ -64,6 +111,7 @@ async function asegurarDBCloud(anio) {
 
 async function saveDatabase() {
     try {
+        actualizarSyncLabel('cargando', 'Guardando...');
         await coleccionCorrelativo.set({ valor: ultimoNum });
         for (const anio in db) {
             for (const pago of db[anio]) {
@@ -77,9 +125,11 @@ async function saveDatabase() {
             }
         }
         saveDatabaseLocal();
+        actualizarSyncLabel('exito', 'Guardado');
         return true;
     } catch (error) {
         console.error('Error guardando:', error);
+        actualizarSyncLabel('error', 'Error al guardar');
         saveDatabaseLocal();
         return false;
     }
@@ -246,8 +296,8 @@ async function actualizarCategoria(categoriaId, nombre, icono) {
 async function resetSistema(opciones) {
     return new Promise(async (resolve, reject) => {
         try {
-            logMensaje('🔄 Reiniciando elementos seleccionados...', false);
-
+            actualizarSyncLabel('cargando', 'Reiniciando...');
+            
             const deleteCollection = async (coleccion) => {
                 const snap = await coleccion.get();
                 const batch = dbFirestore.batch();
@@ -273,12 +323,12 @@ async function resetSistema(opciones) {
             }
 
             saveDatabaseLocal();
-            logMensaje('✓ Elementos seleccionados reiniciados correctamente', false);
+            actualizarSyncLabel('exito', 'Reiniciado');
             setTimeout(() => location.reload(), 1500);
             resolve(true);
         } catch (error) {
             console.error('Error al reiniciar:', error);
-            logMensaje('❌ Error al reiniciar: ' + error.message, true);
+            actualizarSyncLabel('error', 'Error al reiniciar');
             reject(error);
         }
     });
