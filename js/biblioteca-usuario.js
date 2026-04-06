@@ -18,6 +18,70 @@ function isMobile() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
+// Función para limpiar el título y convertirlo en nombre de archivo válido
+function limpiarNombreArchivo(titulo, extension) {
+    let nombreLimpio = titulo
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Eliminar acentos
+        .replace(/[^a-z0-9]/gi, '_') // Reemplazar caracteres especiales por _
+        .replace(/_+/g, '_') // Reemplazar múltiples _ por uno solo
+        .replace(/^_+|_+$/g, ''); // Eliminar _ al inicio y final
+    
+    // Si el nombre queda vacío, usar un nombre por defecto
+    if (!nombreLimpio || nombreLimpio.length < 3) {
+        nombreLimpio = 'recurso_pastoral';
+    }
+    
+    // Limitar longitud
+    if (nombreLimpio.length > 50) {
+        nombreLimpio = nombreLimpio.substring(0, 50);
+    }
+    
+    return `${nombreLimpio}.${extension}`;
+}
+
+// Función para descargar un archivo con el nombre del título (sin depender del original)
+async function descargarConNombrePersonalizado(url, titulo, extension) {
+    try {
+        // Mostrar notificación de inicio
+        window.showToast(`📥 Preparando descarga: ${titulo}...`, false);
+        
+        // Obtener el archivo desde Cloudinary como blob
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('No se pudo obtener el archivo');
+        }
+        
+        const blob = await response.blob();
+        
+        // Crear el nombre del archivo basado en el título
+        const nombreArchivo = limpiarNombreArchivo(titulo, extension);
+        
+        // Crear un enlace de descarga con el nuevo nombre
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = nombreArchivo;
+        link.setAttribute('download', nombreArchivo);
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        // Limpiar
+        setTimeout(() => {
+            URL.revokeObjectURL(link.href);
+            document.body.removeChild(link);
+        }, 100);
+        
+        window.showToast(`✅ Descargado: ${nombreArchivo}`, false);
+        
+    } catch (error) {
+        console.error('Error en descarga:', error);
+        // Fallback: intentar abrir en nueva pestaña
+        window.showToast(`⚠️ Abriendo archivo en nueva pestaña...`, false);
+        window.open(url, '_blank');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     await loadDatabase();
     await cargarRecursos();
@@ -142,9 +206,10 @@ async function renderizarRecursos(recursos) {
             : `<div class="file-icon">📄</div>`;
         
         const fechaFormateada = formatearFechaCompleta(recurso.fecha);
+        const extension = esImagen ? 'jpg' : 'pdf';
         
         return `
-            <div class="recurso-card" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-tipo="${recurso.tipo}">
+            <div class="recurso-card" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-tipo="${recurso.tipo}" data-extension="${extension}">
                 <div class="recurso-preview">
                     ${previewHtml}
                 </div>
@@ -158,7 +223,7 @@ async function renderizarRecursos(recursos) {
                         </div>
                         <div style="display: flex; gap: 8px;">
                             <button class="btn-ver" data-url="${recurso.url}" data-titulo="${recurso.titulo}">👁️ Ver</button>
-                            <button class="btn-descargar" data-url="${recurso.url}" data-titulo="${recurso.titulo}">⬇️ Descargar</button>
+                            <button class="btn-descargar" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-extension="${extension}">⬇️ Descargar</button>
                         </div>
                     </div>
                 </div>
@@ -180,7 +245,8 @@ async function renderizarRecursos(recursos) {
             e.stopPropagation();
             const url = btn.dataset.url;
             const titulo = btn.dataset.titulo;
-            descargarArchivo(url, titulo);
+            const extension = btn.dataset.extension;
+            descargarConNombrePersonalizado(url, titulo, extension);
         });
     });
 }
@@ -200,54 +266,6 @@ function abrirPreview(url, titulo) {
     }
     
     modal.style.display = "block";
-}
-
-// Función de descarga optimizada para móviles y desktop
-function descargarArchivo(url, titulo) {
-    // Limpiar el nombre del archivo
-    let nombreLimpio = titulo.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
-    
-    // Determinar la extensión del archivo
-    let extension = 'pdf';
-    if (url.includes('.jpg') || url.includes('.jpeg')) extension = 'jpg';
-    else if (url.includes('.png')) extension = 'png';
-    else if (url.includes('.gif')) extension = 'gif';
-    else if (url.includes('.webp')) extension = 'webp';
-    
-    // Crear URL con parámetro para forzar descarga en Cloudinary
-    let urlDescarga = url;
-    if (url.includes('cloudinary.com')) {
-        if (url.includes('/upload/')) {
-            urlDescarga = url.replace('/upload/', '/upload/fl_attachment/');
-        } else if (url.includes('/image/upload/')) {
-            urlDescarga = url.replace('/image/upload/', '/image/upload/fl_attachment/');
-        } else if (url.includes('/raw/upload/')) {
-            urlDescarga = url.replace('/raw/upload/', '/raw/upload/fl_attachment/');
-        }
-    }
-    
-    // Si es móvil, usar el método que funciona mejor
-    if (isMobile()) {
-        // En móvil, abrir en nueva pestaña (el navegador manejará la descarga)
-        window.open(urlDescarga, '_blank');
-        window.showToast(`📥 Abriendo archivo: ${titulo}`, false);
-    } else {
-        // En desktop, usar el método de enlace oculto
-        const link = document.createElement('a');
-        link.href = urlDescarga;
-        link.download = `${nombreLimpio}.${extension}`;
-        link.setAttribute('download', `${nombreLimpio}.${extension}`);
-        link.style.display = 'none';
-        
-        document.body.appendChild(link);
-        link.click();
-        
-        setTimeout(() => {
-            document.body.removeChild(link);
-        }, 100);
-        
-        window.showToast(`⬇️ Descargando: ${titulo}`, false);
-    }
 }
 
 function formatearFechaCompleta(fechaISO) {
