@@ -13,26 +13,28 @@
 <body>
 
 <div class="app">
-    <!-- Hero Section con Logo -->
     <div class="hero">
-
         <div class="hero-logo">
             <img src="img/logo.jpg" alt="Parroquia San Agustín Sumpango" class="hero-logo-img">
         </div>
         <h1>Pastoral Juvenil</h1>
-        <h2>Agenda anual 2026</h2> <p>Parroquia San Agustín - Sumpango</p>
+        <h2>Agenda anual 2026</h2>
+        <p>Parroquia San Agustín - Sumpango</p>
     </div>
 
-    <!-- Botones de acción -->
     <div class="actions-container">
         <button class="action-btn action-btn-primary" id="btnConsultaPagos">
             <span>📋</span>
             <span>Consultar Pagos de mi Grupo</span>
             <span>→</span>
         </button>
+        <button class="action-btn" id="btnBiblioteca">
+            <span>📚</span>
+            <span>Biblioteca</span>
+            <span>→</span>
+        </button>
     </div>
 
-    <!-- Calendario -->
     <div class="calendar-container">
         <div class="calendar-header">
             <button class="calendar-nav" id="prevMonth">◀</button>
@@ -45,7 +47,6 @@
         <div class="calendar-days" id="calendarDays"></div>
     </div>
 
-    <!-- Footer con acceso admin -->
     <div class="footer">
         <div class="footer-text">
             📌 Actividades programadas por la Pastoral Juvenil - Parroquia San Agustín Sumpango
@@ -58,7 +59,6 @@
         </div>
     </div>
 
-    <!-- Modal Login -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -74,8 +74,8 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="js/inicio-firebase.js"></script>
 <script src="js/base-datos-nube.js"></script>
 <script src="js/autenticacion.js"></script>

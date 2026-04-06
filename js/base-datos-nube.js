@@ -91,78 +91,93 @@ async function saveDatabase() {
     }
 }
 
-// Función RESET SISTEMA - Reinicia pagos, actividades, contraseñas y contador
-async function resetSistema() {
+async function resetSistema(opciones) {
     return new Promise(async (resolve, reject) => {
         try {
-            logMensaje("🔄 Reiniciando TODO el sistema...", false);
+            const opcionesSeleccionadas = {
+                pagos: opciones?.pagos !== false,
+                actividades: opciones?.actividades !== false,
+                passwords: opciones?.passwords !== false,
+                recibos: opciones?.recibos !== false,
+                biblioteca: opciones?.biblioteca || false,
+                categorias: opciones?.categorias || false
+            };
             
-            // 1. Eliminar TODOS los pagos
-            const snapshotPagos = await coleccionPagos.get();
-            const batchPagos = dbFirestore.batch();
-            snapshotPagos.forEach(doc => {
-                batchPagos.delete(doc.ref);
-            });
-            await batchPagos.commit();
-            console.log("✓ Pagos eliminados");
+            logMensaje("🔄 Reiniciando elementos seleccionados...", false);
             
-            // 2. Reiniciar correlativo de recibos (contador)
-            ultimoNum = 0;
-            await coleccionCorrelativo.set({ valor: 0 });
-            console.log("✓ Correlativo reiniciado");
-            
-            // 3. Eliminar TODAS las contraseñas de los grupos
-            const snapshotPasswords = await coleccionPasswords.get();
-            const batchPasswords = dbFirestore.batch();
-            snapshotPasswords.forEach(doc => {
-                batchPasswords.delete(doc.ref);
-            });
-            await batchPasswords.commit();
-            console.log("✓ Contraseñas eliminadas");
-            
-            // 4. Eliminar TODAS las actividades del calendario
-            const snapshotEventos = await coleccionEventos.get();
-            const batchEventos = dbFirestore.batch();
-            snapshotEventos.forEach(doc => {
-                batchEventos.delete(doc.ref);
-            });
-            await batchEventos.commit();
-            console.log("✓ Actividades eliminadas");
-            
-            // 5. Limpiar la variable local db
-            db = {};
-            
-            // 6. Crear estructura limpia para el año actual (solo grupos, todo pendiente)
-            const añoActual = new Date().getFullYear();
-            db[añoActual] = [];
-            for (const grupo of GRUPOS) {
-                for (const mes of MESES) {
-                    db[añoActual].push({ grupo: grupo, mes: mes, estado: "pendiente" });
-                    const docId = `${añoActual}_${grupo}_${mes}`;
-                    await coleccionPagos.doc(docId).set({ 
-                        anio: añoActual, 
-                        grupo: grupo, 
-                        mes: mes, 
-                        estado: "pendiente" 
-                    });
-                }
+            if (opcionesSeleccionadas.pagos) {
+                const snapshotPagos = await coleccionPagos.get();
+                const batchPagos = dbFirestore.batch();
+                snapshotPagos.forEach(doc => { batchPagos.delete(doc.ref); });
+                await batchPagos.commit();
+                console.log("✓ Pagos eliminados");
             }
-            console.log("✓ Estructura limpia creada para el año", añoActual);
             
-            // 7. Guardar cambios en localStorage
+            if (opcionesSeleccionadas.recibos) {
+                ultimoNum = 0;
+                await coleccionCorrelativo.set({ valor: 0 });
+                console.log("✓ Correlativo reiniciado");
+            }
+            
+            if (opcionesSeleccionadas.passwords) {
+                const snapshotPasswords = await coleccionPasswords.get();
+                const batchPasswords = dbFirestore.batch();
+                snapshotPasswords.forEach(doc => { batchPasswords.delete(doc.ref); });
+                await batchPasswords.commit();
+                console.log("✓ Contraseñas eliminadas");
+            }
+            
+            if (opcionesSeleccionadas.actividades) {
+                const snapshotEventos = await coleccionEventos.get();
+                const batchEventos = dbFirestore.batch();
+                snapshotEventos.forEach(doc => { batchEventos.delete(doc.ref); });
+                await batchEventos.commit();
+                console.log("✓ Actividades eliminadas");
+            }
+            
+            if (opcionesSeleccionadas.biblioteca) {
+                const snapshotRecursos = await coleccionRecursos.get();
+                const batchRecursos = dbFirestore.batch();
+                snapshotRecursos.forEach(doc => { batchRecursos.delete(doc.ref); });
+                await batchRecursos.commit();
+                console.log("✓ Recursos de biblioteca eliminados");
+            }
+            
+            if (opcionesSeleccionadas.categorias) {
+                const snapshotCategorias = await coleccionCategorias.get();
+                const batchCategorias = dbFirestore.batch();
+                snapshotCategorias.forEach(doc => { batchCategorias.delete(doc.ref); });
+                await batchCategorias.commit();
+                console.log("✓ Categorías eliminadas");
+            }
+            
+            if (opcionesSeleccionadas.pagos) {
+                db = {};
+                const añoActual = new Date().getFullYear();
+                db[añoActual] = [];
+                for (const grupo of GRUPOS) {
+                    for (const mes of MESES) {
+                        db[añoActual].push({ grupo: grupo, mes: mes, estado: "pendiente" });
+                        const docId = `${añoActual}_${grupo}_${mes}`;
+                        await coleccionPagos.doc(docId).set({ 
+                            anio: añoActual, 
+                            grupo: grupo, 
+                            mes: mes, 
+                            estado: "pendiente" 
+                        });
+                    }
+                }
+                console.log("✓ Estructura de pagos recreada");
+            }
+            
             saveDatabaseLocal();
+            logMensaje("✓ Elementos seleccionados reiniciados correctamente", false);
             
-            logMensaje("✓ Sistema reiniciado completamente (pagos, contador, contraseñas y actividades)", false);
-            
-            // Recargar la página después de 1.5 segundos
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-            
+            setTimeout(() => { location.reload(); }, 1500);
             resolve(true);
         } catch (error) {
-            console.error("Error al reiniciar sistema:", error);
-            logMensaje("❌ Error al reiniciar el sistema: " + error.message, true);
+            console.error("Error al reiniciar:", error);
+            logMensaje("❌ Error al reiniciar: " + error.message, true);
             reject(error);
         }
     });
@@ -206,6 +221,74 @@ async function verificarContraseñaGrupo(grupo, password) {
     const doc = await coleccionPasswords.doc(grupo).get();
     if (doc.exists) return doc.data().password === password;
     return password === "admin123";
+}
+
+async function cargarRecursos() {
+    const snapshot = await coleccionRecursos.get();
+    const recursos = [];
+    snapshot.forEach(doc => {
+        recursos.push({ id: doc.id, ...doc.data() });
+    });
+    return recursos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+}
+
+async function agregarRecurso(titulo, categoria, descripcion, url, tipo, publicId, resourceType) {
+    const recurso = {
+        titulo: titulo,
+        categoria: categoria,
+        descripcion: descripcion || "",
+        url: url,
+        tipo: tipo,
+        public_id: publicId || "",
+        resource_type: resourceType || "image",
+        fecha: new Date().toISOString()
+    };
+    const docRef = await coleccionRecursos.add(recurso);
+    return { id: docRef.id, ...recurso };
+}
+
+async function eliminarRecursoCloud(recursoId) {
+    const doc = await coleccionRecursos.doc(recursoId).get();
+    if (doc.exists) {
+        await coleccionRecursos.doc(recursoId).delete();
+        console.log("✓ Recurso eliminado de Firestore");
+        return true;
+    }
+    return false;
+}
+
+async function cargarCategorias() {
+    const snapshot = await coleccionCategorias.get();
+    const categorias = [];
+    snapshot.forEach(doc => {
+        categorias.push({ id: doc.id, ...doc.data() });
+    });
+    return categorias.sort((a, b) => a.nombre.localeCompare(b.nombre));
+}
+
+async function agregarCategoria(nombre, icono = "📁") {
+    const categoria = {
+        nombre: nombre,
+        icono: icono,
+        fecha: new Date().toISOString()
+    };
+    const docRef = await coleccionCategorias.add(categoria);
+    return { id: docRef.id, ...categoria };
+}
+
+async function eliminarCategoria(categoriaId) {
+    const snapshot = await coleccionRecursos.where("categoria", "==", categoriaId).get();
+    if (!snapshot.empty) {
+        throw new Error(`No se puede eliminar la categoría porque tiene ${snapshot.size} recursos asociados`);
+    }
+    await coleccionCategorias.doc(categoriaId).delete();
+}
+
+async function actualizarCategoria(categoriaId, nombre, icono) {
+    await coleccionCategorias.doc(categoriaId).update({
+        nombre: nombre,
+        icono: icono
+    });
 }
 
 function loadDatabaseLocal() {
@@ -272,13 +355,19 @@ async function addCustomGroup(anio, grupo) {
     return false;
 }
 
-// Exportar funciones globales
 window.cargarContraseñasGrupos = cargarContraseñasGrupos;
 window.verificarContraseñaGrupo = verificarContraseñaGrupo;
 window.guardarContraseñaGrupo = guardarContraseñaGrupo;
 window.cargarEventos = cargarEventos;
 window.agregarEvento = agregarEvento;
 window.eliminarEvento = eliminarEvento;
+window.cargarRecursos = cargarRecursos;
+window.agregarRecurso = agregarRecurso;
+window.eliminarRecursoCloud = eliminarRecursoCloud;
+window.cargarCategorias = cargarCategorias;
+window.agregarCategoria = agregarCategoria;
+window.eliminarCategoria = eliminarCategoria;
+window.actualizarCategoria = actualizarCategoria;
 window.resetSistema = resetSistema;
 window.loadDatabase = loadDatabase;
 window.saveDatabase = saveDatabase;

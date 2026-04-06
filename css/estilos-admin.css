@@ -639,6 +639,124 @@ textarea:focus,
     transform: translateY(1px);
 }
 
+/* ========== BARRA DE PROGRESO ========== */
+.barra-progreso-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2000;
+    animation: slideInRight 0.3s ease;
+}
+
+.barra-progreso-content {
+    background: white;
+    border-radius: 16px;
+    padding: 16px 20px;
+    width: 320px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+.barra-progreso-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.barra-progreso-icon {
+    font-size: 20px;
+}
+
+.barra-progreso-header span:last-child {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0891b2;
+}
+
+.barra-progreso-barra {
+    background: #e2e8f0;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.barra-progreso-fill {
+    background: linear-gradient(90deg, #0891b2, #3b82f6);
+    width: 0%;
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.barra-progreso-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #64748b;
+}
+
+.barra-progreso-footer span:first-child {
+    font-weight: 700;
+    color: #0891b2;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ========== ESTILOS PARA BIBLIOTECA ========== */
+.categoria-badge {
+    background: #e0f2fe;
+    color: #0891b2;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.btn-ver {
+    display: inline-block;
+    padding: 5px 10px;
+    background: #0891b2;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.2s;
+    margin-right: 5px;
+}
+
+.btn-ver:hover {
+    background: #0e7490;
+    transform: scale(0.98);
+}
+
+.btn-eliminar-recurso {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.btn-eliminar-recurso:hover {
+    background: #dc2626;
+    transform: scale(0.98);
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
     .admin-header {
@@ -735,6 +853,15 @@ textarea:focus,
         margin-left: 0;
         width: 100%;
     }
+
+    .barra-progreso-content {
+        width: 280px;
+        padding: 12px 16px;
+    }
+
+    .barra-progreso-header span:last-child {
+        font-size: 12px;
+    }
 }
 
 /* ========== ANIMACIONES ========== */
@@ -766,87 +893,57 @@ textarea:focus,
 
 /* Agregar al final de css/estilos-admin.css */
 
-/* ========== BARRA DE PROGRESO ========== */
-.barra-progreso-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 2000;
-    animation: slideInRight 0.3s ease;
-}
-
-.barra-progreso-content {
-    background: white;
-    border-radius: 16px;
-    padding: 16px 20px;
-    width: 320px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+/* Selector de emojis */
+.emoji-option {
+    font-size: 24px;
+    background: #f8fafc;
     border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.2s ease;
 }
 
-.barra-progreso-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
+.emoji-option:hover {
+    background: #e0f2fe;
+    transform: scale(1.1);
+    border-color: #0891b2;
 }
 
-.barra-progreso-icon {
-    font-size: 20px;
+#emojiSelector {
+    scrollbar-width: thin;
+    scrollbar-color: #0891b2 #e2e8f0;
 }
 
-.barra-progreso-header span:last-child {
-    font-size: 13px;
-    font-weight: 600;
-    color: #0891b2;
+#emojiSelector::-webkit-scrollbar {
+    width: 6px;
 }
 
-.barra-progreso-barra {
+#emojiSelector::-webkit-scrollbar-track {
     background: #e2e8f0;
     border-radius: 10px;
-    height: 8px;
-    overflow: hidden;
-    margin-bottom: 10px;
 }
 
-.barra-progreso-fill {
-    background: linear-gradient(90deg, #0891b2, #3b82f6);
-    width: 0%;
-    height: 100%;
+#emojiSelector::-webkit-scrollbar-thumb {
+    background: #0891b2;
     border-radius: 10px;
-    transition: width 0.3s ease;
+}
+/* Ajustar la tabla de recursos para que se vea mejor */
+.excel-table th,
+.excel-table td {
+    padding: 10px 8px;
+    vertical-align: middle;
 }
 
-.barra-progreso-footer {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: #64748b;
+.excel-table th:nth-child(4),
+.excel-table td:nth-child(4) {
+    white-space: nowrap;
 }
 
-.barra-progreso-footer span:first-child {
-    font-weight: 700;
-    color: #0891b2;
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(100px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@media (max-width: 480px) {
-    .barra-progreso-content {
-        width: 280px;
-        padding: 12px 16px;
-    }
-    
-    .barra-progreso-header span:last-child {
-        font-size: 12px;
+@media (max-width: 768px) {
+    .excel-table th:nth-child(4),
+    .excel-table td:nth-child(4) {
+        white-space: normal;
+        font-size: 11px;
     }
 }

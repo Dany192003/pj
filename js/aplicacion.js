@@ -10,18 +10,21 @@ window.showToast = function(message, isError = false) {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("🚀 Iniciando aplicación...");
     await loadDatabase();
     await initCalendar();
     
     const modal = document.getElementById("loginModal");
     const btnAdminLogin = document.getElementById("btnAdminLogin");
     const btnConsultaPagos = document.getElementById("btnConsultaPagos");
+    const btnBiblioteca = document.getElementById("btnBiblioteca");
     const closeBtn = document.querySelector(".close");
     const btnLogin = document.getElementById("btnLogin");
     const adminPassword = document.getElementById("adminPassword");
     const loginError = document.getElementById("loginError");
     
     if (btnConsultaPagos) btnConsultaPagos.onclick = () => window.location.href = "consulta-pagos.html";
+    if (btnBiblioteca) btnBiblioteca.onclick = () => window.location.href = "biblioteca.html";
     if (btnAdminLogin) btnAdminLogin.onclick = () => modal.style.display = "block";
     if (closeBtn) closeBtn.onclick = () => { modal.style.display = "none"; if (loginError) loginError.textContent = ""; if (adminPassword) adminPassword.value = ""; };
     window.onclick = (event) => { if (event.target === modal) { modal.style.display = "none"; if (loginError) loginError.textContent = ""; if (adminPassword) adminPassword.value = ""; } };

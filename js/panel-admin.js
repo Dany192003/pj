@@ -9,7 +9,6 @@ window.showToast = function(message, isError = false) {
     setTimeout(() => { toast.className = "toast"; }, 2000);
 };
 
-// Función para escapar HTML
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -22,10 +21,7 @@ async function cargarEventosAdmin() {
     console.log("📅 Cargando eventos...");
     const eventos = await cargarEventos();
     const eventosList = document.getElementById("eventosList");
-    if (!eventosList) {
-        console.log("❌ eventosList no encontrado");
-        return;
-    }
+    if (!eventosList) return;
     
     if (eventos.length === 0) {
         eventosList.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px;">No hay actividades registradas</p>';
@@ -60,10 +56,7 @@ async function cargarContraseñasAdmin() {
     console.log("🔑 Cargando contraseñas...");
     const passwords = await cargarContraseñasGrupos();
     const gruposPassList = document.getElementById("gruposPassList");
-    if (!gruposPassList) {
-        console.log("❌ gruposPassList no encontrado");
-        return;
-    }
+    if (!gruposPassList) return;
     
     gruposPassList.innerHTML = GRUPOS.map(grupo => `
         <div class="grupo-pass-item">
@@ -80,12 +73,7 @@ async function cargarContraseñasAdmin() {
             const grupo = btn.dataset.grupo;
             const passwordInput = document.getElementById(`pass-${grupo}`);
             const password = passwordInput.value.trim();
-            
-            if (!password) {
-                window.showToast("❌ Ingresa una contraseña", true);
-                return;
-            }
-            
+            if (!password) { window.showToast("❌ Ingresa una contraseña", true); return; }
             await guardarContraseñaGrupo(grupo, password);
             window.showToast(`✓ Contraseña guardada para ${grupo}`, false);
         };
@@ -93,6 +81,170 @@ async function cargarContraseñasAdmin() {
     console.log("✅ Contraseñas cargadas");
 }
 
+// ========== FUNCIÓN: CARGAR SELECT DE CATEGORÍAS ==========
+async function cargarSelectCategorias() {
+    const select = document.getElementById("recursoCategoria");
+    if (!select) return;
+    
+    try {
+        const categorias = await cargarCategorias();
+        select.innerHTML = '<option value="" disabled selected>-- Seleccione una categoría --</option>';
+        
+        if (categorias.length === 0) {
+            select.innerHTML = '<option value="" disabled selected>⚠️ No hay categorías - Agrega una arriba</option>';
+        } else {
+            categorias.forEach(cat => {
+                select.innerHTML += `<option value="${cat.id}">${cat.icono || '📁'} ${cat.nombre}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error("Error cargando categorías:", error);
+        select.innerHTML = '<option value="" disabled selected>❌ Error al cargar categorías</option>';
+    }
+}
+
+// ========== FUNCIÓN: CARGAR LISTA DE CATEGORÍAS (ADMIN) ==========
+async function cargarListaCategoriasAdmin() {
+    const categoriasListAdmin = document.getElementById("categoriasListAdmin");
+    if (!categoriasListAdmin) return;
+    
+    try {
+        const categorias = await cargarCategorias();
+        
+        if (categorias.length === 0) {
+            categoriasListAdmin.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px;">No hay categorías. Agrega la primera.</p>';
+            return;
+        }
+        
+        categoriasListAdmin.innerHTML = `
+            <div style="margin-top: 10px;">
+                <h4 style="margin-bottom: 10px; color: #0f172a;">📋 Categorías existentes:</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    ${categorias.map(cat => `
+                        <div style="background: #f8fafc; border-radius: 30px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 18px;">${cat.icono || '📁'}</span>
+                            <span style="font-weight: 500;">${escapeHtml(cat.nombre)}</span>
+                            <button class="btn-editar-categoria-mini" data-id="${cat.id}" data-nombre="${cat.nombre}" data-icono="${cat.icono || '📁'}" style="background: none; border: none; cursor: pointer; color: #0891b2;">✏️</button>
+                            <button class="btn-eliminar-categoria-mini" data-id="${cat.id}" data-nombre="${cat.nombre}" style="background: none; border: none; cursor: pointer; color: #ef4444;">🗑️</button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        document.querySelectorAll('.btn-editar-categoria-mini').forEach(btn => {
+            btn.onclick = async () => {
+                const id = btn.dataset.id;
+                const nombreActual = btn.dataset.nombre;
+                const iconoActual = btn.dataset.icono;
+                
+                const nuevoNombre = prompt("Editar nombre de categoría:", nombreActual);
+                if (nuevoNombre && nuevoNombre.trim()) {
+                    const nuevoIcono = prompt("Editar icono (emojis):", iconoActual);
+                    await actualizarCategoria(id, nuevoNombre.trim(), nuevoIcono || '📁');
+                    await cargarListaCategoriasAdmin();
+                    await cargarSelectCategorias();
+                    window.showToast("✓ Categoría actualizada", false);
+                }
+            };
+        });
+        
+        document.querySelectorAll('.btn-eliminar-categoria-mini').forEach(btn => {
+            btn.onclick = async () => {
+                const id = btn.dataset.id;
+                const nombre = btn.dataset.nombre;
+                
+                if (confirm(`¿Eliminar la categoría "${nombre}"? Los recursos se quedarán sin categoría.`)) {
+                    try {
+                        await eliminarCategoria(id);
+                        await cargarListaCategoriasAdmin();
+                        await cargarSelectCategorias();
+                        window.showToast(`✓ Categoría "${nombre}" eliminada`, false);
+                    } catch (error) {
+                        window.showToast(error.message, true);
+                    }
+                }
+            };
+        });
+        
+    } catch (error) {
+        console.error("Error cargando lista de categorías:", error);
+        categoriasListAdmin.innerHTML = '<p style="color: #ef4444; text-align: center; padding: 20px;">❌ Error al cargar categorías</p>';
+    }
+}
+
+// ========== FUNCIÓN: CARGAR RECURSOS BIBLIOTECA ==========
+// ========== FUNCIÓN: CARGAR RECURSOS BIBLIOTECA ==========
+async function cargarRecursosAdmin() {
+    const recursosTableBody = document.getElementById("recursosTableBody");
+    if (!recursosTableBody) return;
+    
+    try {
+        const snapshot = await coleccionRecursos.get();
+        const recursos = [];
+        snapshot.forEach(doc => {
+            recursos.push({ id: doc.id, ...doc.data() });
+        });
+        
+        const categoriasMap = {};
+        const categoriasSnapshot = await coleccionCategorias.get();
+        categoriasSnapshot.forEach(doc => {
+            categoriasMap[doc.id] = { nombre: doc.data().nombre, icono: doc.data().icono || '📁' };
+        });
+        
+        recursos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        
+        if (recursos.length === 0) {
+            recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">📭 No hay recursos disponibles<\/td><\/tr>';
+            return;
+        }
+        
+        recursosTableBody.innerHTML = recursos.map(recurso => {
+            const categoria = categoriasMap[recurso.categoria];
+            const categoriaDisplay = categoria ? `${categoria.icono} ${categoria.nombre}` : '📁 Sin categoría';
+            const fechaFormateada = formatearFechaAdmin(recurso.fecha);
+            
+            return `
+                <tr>
+                    <td><strong>${escapeHtml(recurso.titulo)}<\/strong><\/td>
+                    <td><span class="categoria-badge">${categoriaDisplay}<\/span><\/td>
+                    <td>${recurso.descripcion ? escapeHtml(recurso.descripcion.substring(0, 60)) + (recurso.descripcion.length > 60 ? '...' : '') : '-'}<\/td>
+                    <td><span style="font-size: 12px; color: #64748b;">📅 ${fechaFormateada}<\/span><\/td>
+                    <td>
+                        <a href="${recurso.url}" target="_blank" class="btn-ver" data-url="${recurso.url}">👁️ Ver<\/a>
+                        <button class="btn-eliminar-recurso" data-id="${recurso.id}" data-url="${recurso.url}">🗑️ Eliminar<\/button>
+                    <\/td>
+                <\/tr>
+            `;
+        }).join("");
+        
+        document.querySelectorAll('.btn-eliminar-recurso').forEach(btn => {
+            btn.onclick = async () => {
+                const id = btn.dataset.id;
+                if (confirm("¿Eliminar este recurso permanentemente?")) {
+                    await eliminarRecursoCloud(id);
+                    await cargarRecursosAdmin();
+                    window.showToast("✓ Recurso eliminado", false);
+                }
+            };
+        });
+        
+    } catch (error) {
+        console.error("Error cargando recursos:", error);
+        recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">❌ Error al cargar recursos<\/td><\/tr>';
+    }
+}
+
+// Función para formatear fecha en el panel admin
+function formatearFechaAdmin(fechaISO) {
+    if (!fechaISO) return "Fecha no disponible";
+    
+    const fecha = new Date(fechaISO);
+    const opciones = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return fecha.toLocaleDateString("es-GT", opciones);
+}
+
+// ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 Iniciando panel administrativo...");
     
@@ -107,6 +259,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     initYearSelect();
     renderTabla();
     actNumeroReciboPreview();
+    await cargarSelectCategorias();
+    await cargarListaCategoriasAdmin();
     
     // Botones principales
     document.getElementById("btnVistaPrevia").onclick = generarVistaPrevia;
@@ -115,25 +269,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("grupo").onchange = checkOtroGrupo;
     document.getElementById("selectAnioControl").onchange = cambiarAnioControl;
     
-    // ========== TABS - Versión mejorada ==========
+    // ========== TABS ==========
     const tabs = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
     
-    // Función para activar una pestaña
     async function activateTab(tabId) {
         console.log("📑 Activando pestaña:", tabId);
         
-        // Desactivar todas las pestañas
         tabs.forEach(t => t.classList.remove('active'));
         tabContents.forEach(c => c.classList.remove('active'));
         
-        // Activar la pestaña seleccionada
         const selectedTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
         if (selectedTab) selectedTab.classList.add('active');
         const selectedContent = document.getElementById(tabId);
         if (selectedContent) selectedContent.classList.add('active');
         
-        // Cargar contenido según la pestaña
         if (tabId === 'tab3') {
             await cargarEventosAdmin();
         }
@@ -143,9 +293,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (tabId === 'tab2') {
             renderTabla();
         }
+        if (tabId === 'tab5') {
+            await cargarRecursosAdmin();
+            await cargarListaCategoriasAdmin();
+        }
     }
     
-    // Agregar event listeners a las pestañas
     tabs.forEach(tab => {
         tab.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -156,8 +309,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
     
-    // Activar la pestaña inicial (tab1)
     await activateTab('tab1');
+    
+    // ========== SELECTOR DE EMOJIS ==========
+    const btnAbrirEmojis = document.getElementById("btnAbrirEmojis");
+    const emojiSelector = document.getElementById("emojiSelector");
+    const categoriaIconoInput = document.getElementById("categoriaIcono");
+    
+    if (btnAbrirEmojis && emojiSelector) {
+        btnAbrirEmojis.onclick = (e) => {
+            e.stopPropagation();
+            if (emojiSelector.style.display === "none") {
+                emojiSelector.style.display = "block";
+            } else {
+                emojiSelector.style.display = "none";
+            }
+        };
+        
+        document.addEventListener("click", (e) => {
+            if (btnAbrirEmojis && emojiSelector) {
+                if (!btnAbrirEmojis.contains(e.target) && !emojiSelector.contains(e.target)) {
+                    emojiSelector.style.display = "none";
+                }
+            }
+        });
+        
+        document.querySelectorAll('.emoji-option').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const emoji = btn.dataset.emoji;
+                if (categoriaIconoInput) {
+                    categoriaIconoInput.value = emoji;
+                    emojiSelector.style.display = "none";
+                }
+            };
+        });
+    }
     
     // ========== BOTÓN AGREGAR EVENTO ==========
     const btnAgregarEvento = document.getElementById("btnAgregarEvento");
@@ -181,11 +368,123 @@ document.addEventListener('DOMContentLoaded', async () => {
             await cargarEventosAdmin();
             window.showToast("✓ Actividad agregada", false);
         };
-    } else {
-        console.log("❌ btnAgregarEvento no encontrado");
     }
     
-    // ========== RESET SISTEMA ==========
+    // ========== BOTÓN AGREGAR CATEGORÍA ==========
+    const btnAgregarCategoria = document.getElementById("btnAgregarCategoria");
+    if (btnAgregarCategoria) {
+        btnAgregarCategoria.onclick = async () => {
+            const nombre = document.getElementById("categoriaNombre").value.trim();
+            const icono = document.getElementById("categoriaIcono").value.trim() || "📁";
+            
+            if (!nombre) {
+                window.showToast("❌ Ingresa un nombre para la categoría", true);
+                return;
+            }
+            
+            await agregarCategoria(nombre, icono);
+            document.getElementById("categoriaNombre").value = "";
+            document.getElementById("categoriaIcono").value = "";
+            await cargarListaCategoriasAdmin();
+            await cargarSelectCategorias();
+            window.showToast("✓ Categoría agregada", false);
+        };
+    }
+    
+    // ========== BOTÓN SUBIR RECURSO ==========
+    const btnSubirRecurso = document.getElementById("btnSubirRecurso");
+    if (btnSubirRecurso) {
+        btnSubirRecurso.onclick = async () => {
+            const titulo = document.getElementById("recursoTitulo").value.trim();
+            const categoria = document.getElementById("recursoCategoria").value;
+            const descripcion = document.getElementById("recursoDescripcion").value.trim();
+            const archivo = document.getElementById("recursoArchivo").files[0];
+            
+            if (!titulo) {
+                window.showToast("❌ Ingresa un título", true);
+                return;
+            }
+            if (!archivo) {
+                window.showToast("❌ Selecciona un archivo", true);
+                return;
+            }
+            if (!categoria) {
+                window.showToast("❌ Selecciona una categoría", true);
+                return;
+            }
+            
+            if (archivo.size > 10 * 1024 * 1024) {
+                window.showToast("❌ El archivo es demasiado grande (máx 10MB)", true);
+                return;
+            }
+            
+            const tipo = archivo.type.startsWith('image/') ? 'image' : 'pdf';
+            
+            window.showToast("📤 Subiendo archivo...", false);
+            btnSubirRecurso.disabled = true;
+            btnSubirRecurso.innerHTML = '<span class="spinner"></span> Subiendo...';
+            
+            try {
+                const formData = new FormData();
+                formData.append("file", archivo);
+                formData.append("upload_preset", "comprobantes");
+                formData.append("folder", "biblioteca");
+                formData.append("public_id", `biblioteca_${Date.now()}_${titulo.replace(/[^a-z0-9]/gi, '_')}`);
+                
+                const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/upload", {
+                    method: "POST",
+                    body: formData
+                });
+                
+                if (!res.ok) throw new Error(`Error: ${res.status}`);
+                
+                const data = await res.json();
+                
+                await agregarRecurso(titulo, categoria, descripcion, data.secure_url, tipo, data.public_id, data.resource_type);
+                
+                document.getElementById("recursoTitulo").value = "";
+                document.getElementById("recursoDescripcion").value = "";
+                document.getElementById("recursoArchivo").value = "";
+                document.getElementById("previewArchivo").innerHTML = "";
+                
+                await cargarRecursosAdmin();
+                window.showToast("✓ Recurso subido exitosamente", false);
+                
+            } catch (error) {
+                console.error("Error:", error);
+                window.showToast("❌ Error al subir el recurso: " + (error.message || "Error desconocido"), true);
+            } finally {
+                btnSubirRecurso.disabled = false;
+                btnSubirRecurso.innerHTML = "📤 Subir Recurso";
+            }
+        };
+    }
+    
+    // Preview del archivo
+    const inputArchivo = document.getElementById("recursoArchivo");
+    if (inputArchivo) {
+        inputArchivo.onchange = (e) => {
+            const previewDiv = document.getElementById("previewArchivo");
+            const file = e.target.files[0];
+            if (file) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewDiv.innerHTML = `<img src="${e.target.result}" style="max-width: 100px; max-height: 100px; border-radius: 8px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file.type === 'application/pdf') {
+                    previewDiv.innerHTML = `<div style="padding: 10px; background: #f1f5f9; border-radius: 8px;">📄 ${file.name}</div>`;
+                } else {
+                    previewDiv.innerHTML = `<div style="padding: 10px; background: #f1f5f9; border-radius: 8px;">📎 ${file.name}</div>`;
+                }
+            } else {
+                previewDiv.innerHTML = "";
+            }
+        };
+    }
+    
+    // ========== RESET SISTEMA CON OPCIONES ==========
     const btnReset = document.getElementById("btnReset");
     const modalReset = document.getElementById("modalReset");
     const btnCancelReset = document.getElementById("btnCancelReset");
@@ -196,24 +495,42 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log("🔄 Botón Reset clickeado - Mostrando modal");
             if (modalReset) modalReset.style.display = "block";
         };
-    } else {
-        console.log("❌ btnReset no encontrado");
     }
     
     if (btnCancelReset) {
         btnCancelReset.onclick = () => {
-            console.log("❌ Cancelar reset");
             if (modalReset) modalReset.style.display = "none";
+            const checkboxes = modalReset.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                if (cb.id === 'resetBiblioteca') cb.checked = false;
+                else if (cb.id === 'resetCategorias') cb.checked = false;
+                else cb.checked = true;
+            });
         };
     }
     
     if (btnConfirmReset) {
         btnConfirmReset.onclick = async () => {
-            console.log("⚠️ Confirmando reset del sistema...");
+            console.log("⚠️ Confirmando reset...");
+            
+            const opciones = {
+                pagos: document.getElementById("resetPagos")?.checked || false,
+                actividades: document.getElementById("resetActividades")?.checked || false,
+                passwords: document.getElementById("resetPasswords")?.checked || false,
+                recibos: document.getElementById("resetRecibos")?.checked || false,
+                biblioteca: document.getElementById("resetBiblioteca")?.checked || false,
+                categorias: document.getElementById("resetCategorias")?.checked || false
+            };
+            
+            if (!opciones.pagos && !opciones.actividades && !opciones.passwords && !opciones.recibos && !opciones.biblioteca && !opciones.categorias) {
+                window.showToast("❌ Selecciona al menos un elemento para reiniciar", true);
+                return;
+            }
+            
             if (modalReset) modalReset.style.display = "none";
             
             if (typeof resetSistema === 'function') {
-                await resetSistema();
+                await resetSistema(opciones);
             } else {
                 console.error("❌ función resetSistema no disponible");
                 window.showToast("❌ Error: función de reset no disponible", true);
@@ -221,7 +538,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
     
-    // Cerrar modal si se hace clic fuera
     window.onclick = (event) => {
         if (event.target === modalReset) {
             if (modalReset) modalReset.style.display = "none";

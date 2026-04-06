@@ -32,6 +32,7 @@
         <button class="tab-btn" data-tab="tab2">📊 Control de Cuotas</button>
         <button class="tab-btn" data-tab="tab3">📅 Actividades</button>
         <button class="tab-btn" data-tab="tab4">🔑 Contraseñas Grupos</button>
+        <button class="tab-btn" data-tab="tab5">📚 Biblioteca</button>
     </div>
 
     <!-- Tab 1: Generar Recibos -->
@@ -155,23 +156,156 @@
             <p style="font-size:12px; color:#64748b; margin-top:15px;">Cada coordinador usará esta contraseña para consultar los pagos de su grupo.</p>
         </div>
     </div>
+
+    <!-- Tab 5: Biblioteca (con gestión de categorías dentro) -->
+    <div id="tab5" class="tab-content">
+        <!-- Sección para gestionar categorías -->
+        <div class="card">
+            <div class="section-title">🏷️ Gestionar Categorías</div>
+            <div class="row">
+                <div class="field">
+                    <label>Nombre de la categoría</label>
+                    <input type="text" id="categoriaNombre" placeholder="Ej: Formación, Espiritualidad, Actividades">
+                </div>
+                <div class="field">
+                    <label>Icono (emojis)</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="categoriaIcono" placeholder="Ej: 📚" maxlength="2" style="flex: 1;">
+                        <button type="button" id="btnAbrirEmojis" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px 15px; cursor: pointer;">😊 Elegir emoji</button>
+                    </div>
+                    <div id="emojiSelector" style="display: none; margin-top: 10px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; max-height: 200px; overflow-y: auto;">
+                        <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;">
+                            <button class="emoji-option" data-emoji="📚" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📚</button>
+                            <button class="emoji-option" data-emoji="🙏" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🙏</button>
+                            <button class="emoji-option" data-emoji="🎮" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎮</button>
+                            <button class="emoji-option" data-emoji="📄" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📄</button>
+                            <button class="emoji-option" data-emoji="📖" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📖</button>
+                            <button class="emoji-option" data-emoji="✝️" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">✝️</button>
+                            <button class="emoji-option" data-emoji="⛪" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">⛪</button>
+                            <button class="emoji-option" data-emoji="💒" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">💒</button>
+                            <button class="emoji-option" data-emoji="🎵" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎵</button>
+                            <button class="emoji-option" data-emoji="🎭" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎭</button>
+                            <button class="emoji-option" data-emoji="🎨" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎨</button>
+                            <button class="emoji-option" data-emoji="⚽" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">⚽</button>
+                            <button class="emoji-option" data-emoji="🏆" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🏆</button>
+                            <button class="emoji-option" data-emoji="💡" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">💡</button>
+                            <button class="emoji-option" data-emoji="❤️" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">❤️</button>
+                            <button class="emoji-option" data-emoji="💪" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">💪</button>
+                            <button class="emoji-option" data-emoji="🤝" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🤝</button>
+                            <button class="emoji-option" data-emoji="🌟" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🌟</button>
+                            <button class="emoji-option" data-emoji="✨" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">✨</button>
+                            <button class="emoji-option" data-emoji="🎉" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎉</button>
+                            <button class="emoji-option" data-emoji="📢" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📢</button>
+                            <button class="emoji-option" data-emoji="🔔" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🔔</button>
+                            <button class="emoji-option" data-emoji="📅" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📅</button>
+                            <button class="emoji-option" data-emoji="⏰" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">⏰</button>
+                            <button class="emoji-option" data-emoji="📍" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">📍</button>
+                            <button class="emoji-option" data-emoji="🗺️" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🗺️</button>
+                            <button class="emoji-option" data-emoji="🎁" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🎁</button>
+                            <button class="emoji-option" data-emoji="🍕" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">🍕</button>
+                            <button class="emoji-option" data-emoji="☕" style="font-size: 24px; background: none; border: none; cursor: pointer; padding: 8px;">☕</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-main" id="btnAgregarCategoria" style="background: #64748b; margin-bottom: 10px;">➕ Agregar Categoría</button>
+            <div id="categoriasListAdmin" style="margin-top: 15px;">
+                <!-- Lista de categorías se cargará aquí -->
+            </div>
+        </div>
+
+        <!-- Sección para subir recursos -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="section-title">📤 Subir Recurso</div>
+            <div class="row">
+                <div class="field">
+                    <label>Título</label>
+                    <input type="text" id="recursoTitulo" placeholder="Ej: Guía de jóvenes">
+                </div>
+                <div class="field">
+                    <label>Categoría</label>
+                    <select id="recursoCategoria">
+                        <option value="" disabled selected>-- Seleccione una categoría --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label>Descripción (opcional)</label>
+                <textarea id="recursoDescripcion" rows="2" placeholder="Breve descripción del recurso..."></textarea>
+            </div>
+            <div class="field">
+                <label>Archivo (PDF o Imagen)</label>
+                <input type="file" id="recursoArchivo" accept=".pdf,.jpg,.jpeg,.png,.gif">
+                <div id="previewArchivo" style="margin-top: 10px;"></div>
+            </div>
+            <button class="btn-main" id="btnSubirRecurso">📤 Subir Recurso</button>
+        </div>
+
+        <!-- Sección de recursos disponibles -->
+<!-- Sección de recursos disponibles - actualizar el thead -->
+<div class="card" style="margin-top: 20px;">
+    <div class="section-title">📋 Recursos Disponibles</div>
+    <div style="overflow-x: auto;">
+        <table class="excel-table">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Categoría</th>
+                    <th>Descripción</th>
+                    <th>Fecha de publicación</th>
+                    <th>Acciones</th>
+                 </tr>
+            </thead>
+            <tbody id="recursosTableBody"></tbody>
+        </table>
+    </div>
+</div>
+    </div>
 </div>
 
 <!-- Modal Reset -->
 <div id="modalReset" class="modal-reset">
     <div class="modal-reset-content">
-        <h3>⚠️ ¡ADVERTENCIA!</h3>
-        <p>Esta acción eliminará <strong>TODOS</strong> los datos del sistema:</p>
-        <ul><li>✓ Todos los pagos</li><li>✓ Actividades</li><li>✓ Contraseñas</li><li>✓ Contador de recibos</li></ul>
+        <h3>⚠️ Reiniciar Sistema</h3>
+        <p>Selecciona qué datos deseas reiniciar:</p>
+        <div style="text-align: left; margin: 20px 0;">
+            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
+                <input type="checkbox" id="resetPagos" value="pagos" >
+                <strong>📊 Pagos y cuotas</strong> - Eliminar todos los registros de pagos
+            </label>
+            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
+                <input type="checkbox" id="resetActividades" value="actividades" >
+                <strong>📅 Actividades</strong> - Eliminar todas las actividades del calendario
+            </label>
+            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
+                <input type="checkbox" id="resetPasswords" value="passwords" >
+                <strong>🔑 Contraseñas</strong> - Eliminar todas las contraseñas de grupos
+            </label>
+            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
+                <input type="checkbox" id="resetRecibos" value="recibos" >
+                <strong>🔢 Contador de recibos</strong> - Reiniciar a REC-0001
+            </label>
+            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
+                <input type="checkbox" id="resetBiblioteca" value="biblioteca">
+                <strong>📚 Biblioteca</strong> - Eliminar todos los recursos de la biblioteca
+            </label>
+            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
+                <input type="checkbox" id="resetCategorias" value="categorias">
+                <strong>🏷️ Categorías</strong> - Eliminar todas las categorías
+            </label>
+        </div>
         <p><strong style="color:#ef4444;">Esta acción NO se puede deshacer.</strong></p>
-        <div><button class="btn-cancel-reset" id="btnCancelReset">Cancelar</button><button class="btn-confirm-reset" id="btnConfirmReset">Sí, reiniciar todo</button></div>
+        <div style="margin-top: 20px;">
+            <button class="btn-cancel-reset" id="btnCancelReset">Cancelar</button>
+            <button class="btn-confirm-reset" id="btnConfirmReset">Reiniciar seleccionados</button>
+        </div>
     </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="js/inicio-firebase.js"></script>
 <script src="js/base-datos-nube.js"></script>
@@ -179,6 +313,7 @@
 <script src="js/tabla-control.js"></script>
 <script src="js/whatsapp.js"></script>
 <script src="js/autenticacion.js"></script>
+<script src="js/biblioteca-admin.js"></script>
 <script src="js/panel-admin.js"></script>
 </body>
 </html>

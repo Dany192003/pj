@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0891b2">
+    <title>Biblioteca | Pastoral Juvenil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/estilos-globales.css">
+    <link rel="stylesheet" href="css/biblioteca.css">
+</head>
+<body>
+
+<div class="app">
+    <!-- Header -->
+    <div class="header-biblioteca">
+        <div class="hero-logo">
+            <img src="img/logo.jpg" alt="Parroquia San Agustín Sumpango" class="hero-logo-img">
+        </div>
+        <h1>Biblioteca Juvenil</h1>
+        <p>Materiales de formación y recursos para jóvenes</p>
+        <button class="btn-back" id="btnVolver">← Volver al Calendario</button>
+    </div>
+
+    <!-- Categorías -->
+    <div class="categorias-container">
+        <button class="categoria-btn active" data-categoria="todos">📌 Todos</button>
+        <div id="categoriasList"></div>
+    </div>
+
+    <!-- Buscador -->
+    <div class="buscador-container">
+        <input type="text" id="buscadorInput" placeholder="🔍 Buscar recursos..." class="buscador-input">
+    </div>
+
+    <!-- Grid de recursos -->
+    <div class="recursos-grid" id="recursosGrid">
+        <div class="loading-recursos">📚 Cargando recursos...</div>
+    </div>
+</div>
+
+<!-- Modal de vista previa -->
+<div id="modalPreview" class="modal-preview">
+    <div class="modal-preview-content">
+        <span class="modal-preview-close">&times;</span>
+        <div class="modal-preview-body" id="modalPreviewBody">
+            <!-- Contenido dinámico -->
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="js/inicio-firebase.js"></script>
+<script src="js/base-datos-nube.js"></script>
+<script src="js/biblioteca-usuario.js"></script>
+</body>
+</html>
