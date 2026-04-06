@@ -136,11 +136,10 @@ async function renderizarRecursos(recursos) {
             ? `<img src="${recurso.url}" alt="${recurso.titulo}" loading="lazy">`
             : `<div class="file-icon">📄</div>`;
         
-        // Formatear fecha para mostrar
         const fechaFormateada = formatearFechaCompleta(recurso.fecha);
         
         return `
-            <div class="recurso-card" data-url="${recurso.url}" data-tipo="${recurso.tipo}">
+            <div class="recurso-card" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-tipo="${recurso.tipo}">
                 <div class="recurso-preview">
                     ${previewHtml}
                 </div>
@@ -198,22 +197,49 @@ function abrirPreview(url, titulo) {
     modal.style.display = "block";
 }
 
+// Función mejorada para descargar directamente desde Cloudinary
 function descargarDirecto(url, titulo) {
-    const link = document.createElement('a');
-    link.href = url;
+    // Limpiar el nombre del archivo
+    let nombreLimpio = titulo.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
     
+    // Determinar la extensión del archivo
     let extension = 'pdf';
     if (url.includes('.jpg') || url.includes('.jpeg')) extension = 'jpg';
     else if (url.includes('.png')) extension = 'png';
     else if (url.includes('.gif')) extension = 'gif';
+    else if (url.includes('.webp')) extension = 'webp';
     
-    const nombreLimpio = titulo.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
+    // Agregar parámetro para forzar descarga en Cloudinary (fl_attachment)
+    let urlDescarga = url;
+    
+    // Si es un PDF o imagen, agregar fl_attachment para forzar descarga
+    if (url.includes('cloudinary.com')) {
+        // Para Cloudinary, agregar fl_attachment al final de la URL
+        if (url.includes('/upload/')) {
+            urlDescarga = url.replace('/upload/', '/upload/fl_attachment/');
+        } else if (url.includes('/image/upload/')) {
+            urlDescarga = url.replace('/image/upload/', '/image/upload/fl_attachment/');
+        } else if (url.includes('/raw/upload/')) {
+            urlDescarga = url.replace('/raw/upload/', '/raw/upload/fl_attachment/');
+        }
+    }
+    
+    console.log("📥 Descargando desde:", urlDescarga);
+    
+    // Crear enlace invisible y forzar descarga
+    const link = document.createElement('a');
+    link.href = urlDescarga;
     link.download = `${nombreLimpio}.${extension}`;
     link.setAttribute('download', `${nombreLimpio}.${extension}`);
+    link.style.display = 'none';
     
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    
+    // Limpiar después de un momento
+    setTimeout(() => {
+        document.body.removeChild(link);
+    }, 100);
     
     window.showToast(`⬇️ Descargando: ${titulo}`, false);
 }
@@ -225,11 +251,9 @@ function formatearFechaCompleta(fechaISO) {
     const ahora = new Date();
     const diferencia = Math.floor((ahora - fecha) / (1000 * 60 * 60 * 24));
     
-    // Formatear fecha completa
     const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
     const fechaFormateada = fecha.toLocaleDateString("es-GT", opciones);
     
-    // Si es reciente, mostrar cuántos días
     if (diferencia === 0) {
         return `Hoy, ${fechaFormateada}`;
     } else if (diferencia === 1) {
