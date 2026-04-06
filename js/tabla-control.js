@@ -1,4 +1,4 @@
-// js/table.js - Tabla de control (con modal de confirmación personalizado)
+// js/tabla-control.js - Tabla de control (con modal de confirmación personalizado)
 
 if (typeof window.showToast !== 'function') {
     window.showToast = function(message, isError = false) {

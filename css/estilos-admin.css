@@ -1,4 +1,4 @@
-/* css/admin.css - Estilos panel administrativo */
+/* css/estilos-admin.css - Estilos panel administrativo */
 
 /* ========== HEADER ADMIN ========== */
 .admin-header {
@@ -764,7 +764,7 @@ textarea:focus,
     }
 }
 
-/* Agregar al final de css/admin.css */
+/* Agregar al final de css/estilos-admin.css */
 
 /* ========== BARRA DE PROGRESO ========== */
 .barra-progreso-container {

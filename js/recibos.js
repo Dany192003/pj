@@ -1,4 +1,4 @@
-// js/receipt.js - Generación de recibos con imagen nativa (sin html2canvas)
+// js/recibos.js - Generación de recibos con imagen nativa (sin html2canvas)
 
 if (typeof window.showToast !== 'function') {
     window.showToast = function(message, isError = false) {

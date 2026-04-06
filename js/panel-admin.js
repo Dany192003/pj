@@ -1,4 +1,4 @@
-// js/admin.js - Panel administrativo
+// js/panel-admin.js - Panel administrativo
 
 window.showToast = function(message, isError = false) {
     const toast = document.getElementById("toast");

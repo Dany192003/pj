@@ -1,4 +1,4 @@
-// js/calendar.js - Calendario de actividades con modal
+// js/calendario.js - Calendario de actividades con modal
 
 let currentDate = new Date();
 let currentYear = currentDate.getFullYear();

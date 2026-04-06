@@ -1,4 +1,4 @@
-// js/database-cloud.js - Gestión de datos en Firebase
+// js/base-datos-nube.js - Gestión de datos en Firebase
 
 const GRUPOS = ["Confirmación", "Jeshua", "Jufra", "Lectores", "Mujeres y Hombres Nuevos", "PCV", "Pentecostés", "Roca Fuerte", "San Pablo", "Senderos", "Shadai", "Ssael"];
 const MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];

@@ -1,4 +1,4 @@
-// js/auth.js - Autenticación
+// js/autenticacion.js - Autenticación
 
 const ADMIN_CREDENTIALS = { password: "321" };
 
@@ -29,7 +29,7 @@ function requireAuth() {
 
 function redirectIfAuthenticated() {
     if (isAuthenticated()) {
-        window.location.href = "admin.html";
+        window.location.href = "panel-admin.html";
         return true;
     }
     return false;

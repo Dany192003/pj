@@ -1,4 +1,4 @@
-// js/app.js - Vista de usuario
+// js/aplicacion.js - Vista de usuario
 
 window.showToast = function(message, isError = false) {
     const toast = document.getElementById("toast");
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnAdminLogin) btnAdminLogin.onclick = () => modal.style.display = "block";
     if (closeBtn) closeBtn.onclick = () => { modal.style.display = "none"; if (loginError) loginError.textContent = ""; if (adminPassword) adminPassword.value = ""; };
     window.onclick = (event) => { if (event.target === modal) { modal.style.display = "none"; if (loginError) loginError.textContent = ""; if (adminPassword) adminPassword.value = ""; } };
-    if (btnLogin) btnLogin.onclick = () => { if (login(adminPassword.value)) { modal.style.display = "none"; window.location.href = "admin.html"; } else { loginError.textContent = "Contraseña incorrecta"; } };
+    if (btnLogin) btnLogin.onclick = () => { if (login(adminPassword.value)) { modal.style.display = "none"; window.location.href = "panel-admin.html"; } else { loginError.textContent = "Contraseña incorrecta"; } };
     if (adminPassword) adminPassword.addEventListener("keypress", (e) => { if (e.key === "Enter") btnLogin.click(); });
     
     redirectIfAuthenticated();

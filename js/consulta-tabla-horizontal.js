@@ -1,4 +1,4 @@
-// js/consulta-tabla.js - Consulta de pagos en tabla horizontal
+// js/consulta-tabla-horizontal.js - Consulta de pagos en tabla horizontal
 
 let anioSeleccionado = 2026;
 

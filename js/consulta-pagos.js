@@ -1,4 +1,4 @@
-// js/consulta.js - Consulta de pagos por grupo
+// js/consulta-pagos.js - Consulta de pagos por grupo
 
 let grupoSeleccionado = null;
 let anioSeleccionado = 2026;
