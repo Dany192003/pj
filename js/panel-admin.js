@@ -216,9 +216,26 @@ async function cargarRecursosAdmin() {
         document.querySelectorAll('.btn-eliminar-recurso').forEach(btn => {
             btn.onclick = async () => {
                 if (confirm('¿Eliminar este recurso permanentemente?')) {
-                    await eliminarRecursoCloud(btn.dataset.id);
-                    await cargarRecursosAdmin();
-                    window.showToast('✓ Recurso eliminado', false);
+                    try {
+                        // Obtener datos del recurso antes de eliminar
+                        const docSnap = await coleccionRecursos.doc(btn.dataset.id).get();
+                        if (docSnap.exists) {
+                            const recursoData = docSnap.data();
+                            // Eliminar de Cloudinary si tiene public_id
+                            if (recursoData.public_id && typeof window.eliminarDeCloudinary === 'function') {
+                                await window.eliminarDeCloudinary(
+                                    recursoData.public_id,
+                                    recursoData.resource_type || 'image'
+                                );
+                            }
+                        }
+                        await eliminarRecursoCloud(btn.dataset.id);
+                        await cargarRecursosAdmin();
+                        window.showToast('✓ Recurso eliminado', false);
+                    } catch (e) {
+                        console.error('Error al eliminar recurso:', e);
+                        window.showToast('❌ Error al eliminar el recurso', true);
+                    }
                 }
             };
         });

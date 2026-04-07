@@ -237,7 +237,8 @@ async function subirImagenCloudinary(canvas, reciboNum) {
     
     setTimeout(() => ocultarBarraProgreso(), 1000);
     
-    return data.secure_url;
+    // Retornar URL y public_id para poder eliminar después
+    return { url: data.secure_url, public_id: data.public_id };
 }
 
 function mostrarLoader(mostrar) {
@@ -348,8 +349,8 @@ async function confirmarYGuardarComprobante() {
             hora: datos.hora
         }, "PAGADO");
         
-        const imagenUrl = await subirImagenCloudinary(canvas, nuevoNumero);
-        window.imagenCloudinaryUrl = imagenUrl;
+        const imagenResult = await subirImagenCloudinary(canvas, nuevoNumero);
+        window.imagenCloudinaryUrl = imagenResult.url;
         
         // Guardar en historial de comprobantes
         if (typeof window.guardarComprobanteHistorial === 'function') {
@@ -360,7 +361,8 @@ async function confirmarYGuardarComprobante() {
                 monto: datos.mon,
                 fecha: datos.fecha,
                 hora: datos.hora,
-                url: imagenUrl
+                url: imagenResult.url,
+                public_id: imagenResult.public_id
             });
         }
         

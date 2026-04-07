@@ -321,6 +321,28 @@ async function resetSistema(opciones) {
                 await batch.commit();
             };
 
+            // Eliminar recursos de Cloudinary antes de borrar de Firestore
+            if (opciones?.biblioteca && typeof window.eliminarDeCloudinary === 'function') {
+                const snapRecursos = await coleccionRecursos.get();
+                for (const doc of snapRecursos.docs) {
+                    const data = doc.data();
+                    if (data.public_id) {
+                        await window.eliminarDeCloudinary(data.public_id, data.resource_type || 'image');
+                    }
+                }
+            }
+
+            // Eliminar comprobantes de Cloudinary antes de borrar de Firestore
+            if (opciones?.historial && typeof window.eliminarDeCloudinary === 'function') {
+                const snapHistorial = await coleccionHistorialRecibos.get();
+                for (const doc of snapHistorial.docs) {
+                    const data = doc.data();
+                    if (data.public_id) {
+                        await window.eliminarDeCloudinary(data.public_id, 'image');
+                    }
+                }
+            }
+
             if (opciones?.pagos)        await deleteCollection(coleccionPagos);
             if (opciones?.actividades)  await deleteCollection(coleccionEventos);
             if (opciones?.passwords)    await deleteCollection(coleccionPasswords);

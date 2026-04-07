@@ -90,6 +90,7 @@ async function guardarComprobanteHistorial(datos) {
         fecha: datos.fecha,
         hora: datos.hora,
         url: datos.url,
+        public_id: datos.public_id || '',
         fecha_creacion: new Date().toISOString()
     };
     
@@ -115,8 +116,19 @@ async function descargarComprobante(url, folio) {
     }
 }
 
-// Eliminar del historial
+// Eliminar del historial (y de Cloudinary si tiene public_id)
 async function eliminarReciboHistorial(id) {
+    try {
+        const doc = await coleccionHistorialRecibos.doc(id).get();
+        if (doc.exists) {
+            const data = doc.data();
+            if (data.public_id && typeof window.eliminarDeCloudinary === 'function') {
+                await window.eliminarDeCloudinary(data.public_id, 'image');
+            }
+        }
+    } catch (e) {
+        console.warn('⚠️ No se pudo eliminar de Cloudinary:', e);
+    }
     await coleccionHistorialRecibos.doc(id).delete();
 }
 
