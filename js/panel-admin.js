@@ -476,18 +476,71 @@ if (btnSubirRecurso) {
     });
 
     // ── Modal Reset ───────────────────────────────────────────────────────────
-    const modalReset     = document.getElementById('modalReset');
-    const btnReset       = document.getElementById('btnReset');
-    const btnCancelReset = document.getElementById('btnCancelReset');
-    const btnConfirmReset = document.getElementById('btnConfirmReset');
+   // ── Modal Reset ───────────────────────────────────────────────────────────
+const modalReset = document.getElementById('modalReset');
+const btnReset = document.getElementById('btnReset');
+const btnCancelReset = document.getElementById('btnCancelReset');
+const btnConfirmReset = document.getElementById('btnConfirmReset');
 
-    btnReset?.addEventListener('click', () => {
-        if (modalReset) modalReset.style.display = 'block';
-    });
+if (btnReset) {
+    btnReset.onclick = () => {
+        if (modalReset) {
+            modalReset.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Evitar scroll de fondo
+        }
+    };
+}
 
-    btnCancelReset?.addEventListener('click', () => {
-        if (modalReset) modalReset.style.display = 'none';
-    });
+if (btnCancelReset) {
+    btnCancelReset.onclick = () => {
+        if (modalReset) {
+            modalReset.style.display = 'none';
+            document.body.style.overflow = ''; // Restaurar scroll
+        }
+    };
+}
+
+if (btnConfirmReset) {
+    btnConfirmReset.onclick = async () => {
+        const getId = (id) => document.getElementById(id)?.checked || false;
+        const opciones = {
+            pagos:       getId('resetPagos'),
+            actividades: getId('resetActividades'),
+            passwords:   getId('resetPasswords'),
+            recibos:     getId('resetRecibos'),
+            biblioteca:  getId('resetBiblioteca'),
+            categorias:  getId('resetCategorias'),
+            historial:   getId('resetHistorial')
+        };
+
+        if (!Object.values(opciones).some(Boolean)) {
+            window.showToast('❌ Selecciona al menos un elemento para reiniciar', true);
+            return;
+        }
+
+        if (modalReset) {
+            modalReset.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        await resetSistema(opciones);
+    };
+}
+
+// Cerrar modal si se hace clic fuera
+window.addEventListener('click', (e) => {
+    if (e.target === modalReset) {
+        modalReset.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+});
+
+// Cerrar con tecla ESC
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalReset && modalReset.style.display === 'block') {
+        modalReset.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+});
 
     btnConfirmReset?.addEventListener('click', async () => {
         const getId = (id) => document.getElementById(id)?.checked || false;

@@ -337,25 +337,26 @@
 </div>
 
 <!-- Modal Reset -->
+<!-- Modal Reset -->
 <div id="modalReset" class="modal-reset">
     <div class="modal-reset-content">
         <h3>⚠️ Reiniciar Sistema</h3>
         <p>Selecciona qué datos deseas reiniciar:</p>
         <div style="text-align: left; margin: 20px 0;">
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetPagos" value="pagos">
+                <input type="checkbox" id="resetPagos" value="pagos" >
                 <strong>📊 Pagos y cuotas</strong> - Eliminar todos los registros de pagos
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetActividades" value="actividades">
+                <input type="checkbox" id="resetActividades" value="actividades" >
                 <strong>📅 Actividades</strong> - Eliminar todas las actividades del calendario
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetPasswords" value="passwords">
+                <input type="checkbox" id="resetPasswords" value="passwords" >
                 <strong>🔑 Contraseñas</strong> - Eliminar todas las contraseñas de grupos
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetRecibos" value="recibos">
+                <input type="checkbox" id="resetRecibos" value="recibos" >
                 <strong>🔢 Contador de recibos</strong> - Reiniciar a REC-0001
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
@@ -367,14 +368,14 @@
                 <strong>🏷️ Categorías</strong> - Eliminar todas las categorías
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-    <input type="checkbox" id="resetHistorial" value="historial">
-    <strong>📜 Historial de recibos</strong> - Eliminar todos los comprobantes del historial
-</label>
+                <input type="checkbox" id="resetHistorial" value="historial">
+                <strong>📜 Historial de recibos</strong> - Eliminar todos los comprobantes del historial
+            </label>
         </div>
-        <p><strong style="color: #ef4444;">Esta acción NO se puede deshacer.</strong></p>
-        <div style="margin-top: 20px;">
+        <p><strong style="color: #ef4444;">⚠️ Esta acción NO se puede deshacer.</strong></p>
+        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
             <button class="btn-cancel-reset" id="btnCancelReset">Cancelar</button>
-            <button class="btn-confirm-reset" id="btnConfirmReset">Reiniciar seleccionados</button>
+            <button class="btn-confirm-reset" id="btnConfirmReset">Sí, reiniciar seleccionados</button>
         </div>
     </div>
 </div>
