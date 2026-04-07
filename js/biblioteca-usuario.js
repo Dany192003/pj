@@ -21,17 +21,15 @@ function isMobile() {
 // Función para limpiar el título y convertirlo en nombre de archivo válido
 function limpiarNombreArchivo(titulo, extension) {
     let nombreLimpio = titulo
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Eliminar acentos
-        .replace(/[^a-z0-9]/gi, '_') // Reemplazar caracteres especiales por _
-        .replace(/_+/g, '_') // Reemplazar múltiples _ por uno solo
-        .replace(/^_+|_+$/g, ''); // Eliminar _ al inicio y final
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]/gi, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_+|_+$/g, '');
     
-    // Si el nombre queda vacío, usar un nombre por defecto
     if (!nombreLimpio || nombreLimpio.length < 3) {
         nombreLimpio = 'recurso_pastoral';
     }
     
-    // Limitar longitud
     if (nombreLimpio.length > 50) {
         nombreLimpio = nombreLimpio.substring(0, 50);
     }
@@ -39,24 +37,76 @@ function limpiarNombreArchivo(titulo, extension) {
     return `${nombreLimpio}.${extension}`;
 }
 
-// Función para descargar un archivo con el nombre del título (sin depender del original)
+// Función para obtener extensión del archivo
+function obtenerExtension(url, tipo) {
+    if (tipo === 'pdf') return 'pdf';
+    if (tipo === 'image') {
+        const extensionMatch = url.match(/\.(jpg|jpeg|png|gif|webp)(\?|$)/i);
+        if (extensionMatch) return extensionMatch[1].toLowerCase();
+        return 'img';
+    }
+    const extensionMatch = url.match(/\.(pdf|jpg|jpeg|png|gif|webp|doc|docx|xls|xlsx|ppt|pptx|mp4|mp3|zip)(\?|$)/i);
+    if (extensionMatch) return extensionMatch[1].toLowerCase();
+    return 'archivo';
+}
+
+// Función para obtener icono según extensión
+function obtenerIconoArchivo(extension) {
+    const iconos = {
+        'pdf': '📑',
+        'jpg': '🖼️',
+        'jpeg': '🖼️',
+        'png': '🖼️',
+        'gif': '🎞️',
+        'webp': '🖼️',
+        'img': '🖼️',
+        'doc': '📘',
+        'docx': '📘',
+        'xls': '📗',
+        'xlsx': '📗',
+        'ppt': '📙',
+        'pptx': '📙',
+        'mp4': '🎬',
+        'mp3': '🎵',
+        'zip': '🗜️',
+        'archivo': '📄',
+        'default': '📄'
+    };
+    return iconos[extension] || iconos['default'];
+}
+
+// Función para obtener clase CSS según extensión
+function obtenerClaseExtension(extension) {
+    const clases = {
+        'pdf': 'extension-pdf',
+        'jpg': 'extension-imagen',
+        'jpeg': 'extension-imagen',
+        'png': 'extension-imagen',
+        'gif': 'extension-imagen',
+        'webp': 'extension-imagen',
+        'img': 'extension-imagen',
+        'doc': 'extension-documento',
+        'docx': 'extension-documento',
+        'xls': 'extension-hoja',
+        'xlsx': 'extension-hoja',
+        'default': 'extension-default'
+    };
+    return clases[extension] || clases['default'];
+}
+
+// Función para descargar un archivo con el nombre del título
 async function descargarConNombrePersonalizado(url, titulo, extension) {
     try {
-        // Mostrar notificación de inicio
         window.showToast(`📥 Preparando descarga: ${titulo}...`, false);
         
-        // Obtener el archivo desde Cloudinary como blob
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error('No se pudo obtener el archivo');
         }
         
         const blob = await response.blob();
-        
-        // Crear el nombre del archivo basado en el título
         const nombreArchivo = limpiarNombreArchivo(titulo, extension);
         
-        // Crear un enlace de descarga con el nuevo nombre
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = nombreArchivo;
@@ -66,7 +116,6 @@ async function descargarConNombrePersonalizado(url, titulo, extension) {
         document.body.appendChild(link);
         link.click();
         
-        // Limpiar
         setTimeout(() => {
             URL.revokeObjectURL(link.href);
             document.body.removeChild(link);
@@ -76,7 +125,6 @@ async function descargarConNombrePersonalizado(url, titulo, extension) {
         
     } catch (error) {
         console.error('Error en descarga:', error);
-        // Fallback: intentar abrir en nueva pestaña
         window.showToast(`⚠️ Abriendo archivo en nueva pestaña...`, false);
         window.open(url, '_blank');
     }
@@ -200,31 +248,44 @@ async function renderizarRecursos(recursos) {
     recursosGrid.innerHTML = recursos.map(recurso => {
         const categoria = categoriasMap[recurso.categoria];
         const categoriaDisplay = categoria ? `${categoria.icono} ${categoria.nombre}` : '📁 Sin categoría';
-        const esImagen = recurso.tipo === "image" || (recurso.url && (recurso.url.includes('.jpg') || recurso.url.includes('.png') || recurso.url.includes('.jpeg') || recurso.url.includes('.webp')));
+        
+        const extension = obtenerExtension(recurso.url, recurso.tipo);
+        const esImagen = extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif' || extension === 'webp';
+        
+        const iconoArchivo = obtenerIconoArchivo(extension);
+        const claseExtension = obtenerClaseExtension(extension);
+        
         const previewHtml = esImagen 
             ? `<img src="${recurso.url}" alt="${recurso.titulo}" loading="lazy">`
-            : `<div class="file-icon">📄</div>`;
+            : `<div class="file-icon">${iconoArchivo}</div>`;
         
         const fechaFormateada = formatearFechaCompleta(recurso.fecha);
-        const extension = esImagen ? 'jpg' : 'pdf';
+        
+        const tieneDescripcion = recurso.descripcion && recurso.descripcion.trim() !== '';
+        const descripcionHtml = tieneDescripcion 
+            ? `<div class="recurso-descripcion">${escapeHtml(recurso.descripcion)}</div>`
+            : '';
         
         return `
-            <div class="recurso-card" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-tipo="${recurso.tipo}" data-extension="${extension}">
+            <div class="recurso-card">
                 <div class="recurso-preview">
                     ${previewHtml}
                 </div>
                 <div class="recurso-info">
                     <div class="recurso-categoria">${categoriaDisplay}</div>
                     <div class="recurso-titulo">${escapeHtml(recurso.titulo)}</div>
-                    <div class="recurso-descripcion">${escapeHtml(recurso.descripcion || '')}</div>
+                    ${descripcionHtml}
                     <div class="recurso-footer">
                         <div class="recurso-fecha">
                             <span>📅 ${fechaFormateada}</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn-ver" data-url="${recurso.url}" data-titulo="${recurso.titulo}">👁️ Ver</button>
-                            <button class="btn-descargar" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-extension="${extension}">⬇️ Descargar</button>
+                        <div class="recurso-extension">
+                            <span class="extension-badge ${claseExtension}" title="Archivo ${extension.toUpperCase()}">${extension.toUpperCase()}</span>
                         </div>
+                    </div>
+                    <div class="recurso-actions">
+                        <button class="btn-ver" data-url="${recurso.url}" data-titulo="${recurso.titulo}">Ver</button>
+                        <button class="btn-descargar" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-extension="${extension}">⬇Descargar</button>
                     </div>
                 </div>
             </div>

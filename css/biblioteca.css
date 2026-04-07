@@ -114,6 +114,9 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .recurso-card:hover {
@@ -121,6 +124,7 @@
     box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.15);
 }
 
+/* ========== PREVIEW DEL RECURSO ========== */
 .recurso-preview {
     height: 160px;
     background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
@@ -128,6 +132,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .recurso-preview img {
@@ -137,27 +142,21 @@
 }
 
 .recurso-preview .file-icon {
-    font-size: 48px;
+    font-size: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    color: #0891b2;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    width: 100%;
+    height: 100%;
 }
 
-.recurso-preview .file-icon::before       { content: "📄"; font-size: 48px; }
-.recurso-preview .file-icon-pdf::before   { content: "📑"; }
-.recurso-preview .file-icon-image::before { content: "🖼️"; }
-
+/* ========== INFO DEL RECURSO ========== */
 .recurso-info {
-    padding: 16px;
-}
-
-.recurso-titulo {
-    font-size: 16px;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 6px;
+    padding: 14px 16px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .recurso-categoria {
@@ -168,24 +167,41 @@
     border-radius: 20px;
     font-size: 10px;
     font-weight: 600;
+    width: fit-content;
     margin-bottom: 8px;
+}
+
+.recurso-titulo {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 8px 0;
+    line-height: 1.3;
 }
 
 .recurso-descripcion {
     font-size: 13px;
     color: #64748b;
     line-height: 1.4;
-    margin-bottom: 12px;
+    margin: 0 0 12px 0;
 }
 
+.recurso-descripcion:empty {
+    display: none;
+    margin: 0;
+}
+
+/* ========== FOOTER Y EXTENSIÓN ========== */
 .recurso-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 10px;
+    padding-top: 8px;
     border-top: 1px solid #e2e8f0;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
+    margin-top: auto;
+    margin-bottom: 12px;
 }
 
 .recurso-fecha {
@@ -196,17 +212,75 @@
     gap: 4px;
 }
 
-.recurso-fecha span {
-    font-size: 11px;
+.recurso-extension {
+    display: inline-flex;
+    align-items: center;
+}
+
+.extension-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: help;
+    transition: transform 0.2s;
+}
+
+.extension-badge:hover {
+    transform: scale(1.05);
+}
+
+/* Colores por tipo de extensión */
+.extension-pdf {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.extension-imagen {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.extension-documento {
+    background: #e0e7ff;
+    color: #4f46e5;
+}
+
+.extension-hoja {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.extension-default {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+/* ========== ACCIONES DEL RECURSO ========== */
+.recurso-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 0;
+}
+
+.recurso-actions .btn-ver,
+.recurso-actions .btn-descargar {
+    flex: 1;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 12px;
 }
 
 .btn-ver {
     background: #0891b2;
     color: white;
     border: none;
-    padding: 5px 12px;
+    padding: 8px 12px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -221,9 +295,9 @@
     background: #10b981;
     color: white;
     border: none;
-    padding: 5px 12px;
+    padding: 8px 12px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -234,6 +308,7 @@
     transform: scale(1.02);
 }
 
+/* ========== ESTADOS VACÍOS ========== */
 .loading-recursos {
     text-align: center;
     padding: 40px;
@@ -310,6 +385,12 @@
     border: none;
 }
 
+/* ========== ANIMACIONES ========== */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 640px) {
     .recursos-grid {
@@ -327,8 +408,45 @@
         font-size: 12px;
     }
 
+    .recurso-info {
+        padding: 12px 14px 14px 14px;
+    }
+
+    .recurso-titulo {
+        font-size: 15px;
+    }
+
+    .recurso-descripcion {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
     .recurso-footer {
-        flex-direction: column;
-        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+    
+    .extension-badge {
+        font-size: 8px;
+        padding: 2px 6px;
+    }
+    
+    .recurso-preview .file-icon {
+        font-size: 48px;
+    }
+
+    .btn-ver,
+    .btn-descargar,
+    .recurso-actions .btn-ver,
+    .recurso-actions .btn-descargar {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+}
+
+/* ========== RESPONSIVE PARA TABLETS ========== */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .recursos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
     }
 }
