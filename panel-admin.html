@@ -154,35 +154,52 @@
         </div>
     </div>
 
-    <!-- Tab 3: Actividades -->
-    <div id="tab3" class="tab-content">
-        <div class="card">
-            <div class="section-title">📅 Agregar Actividad</div>
-            <div class="row">
-                <div class="field">
-                    <label>📆 Fecha</label>
-                    <input type="date" id="eventoFecha">
-                </div>
-                <div class="field">
-                    <label>📌 Título</label>
-                    <input type="text" id="eventoTitulo" placeholder="Ej: Reunión general">
-                </div>
+<!-- Tab 3: Actividades - actualizado -->
+<div id="tab3" class="tab-content">
+    <div class="card">
+        <div class="section-title">📅 Agregar Actividad</div>
+        <div class="row">
+            <div class="field">
+                <label>📆 Fecha</label>
+                <input type="date" id="eventoFecha">
             </div>
+            <div class="field">
+                <label>📌 Título</label>
+                <input type="text" id="eventoTitulo" placeholder="Ej: Reunión general">
+            </div>
+        </div>
+        <div class="row">
             <div class="field">
                 <label>📍 Lugar</label>
                 <input type="text" id="eventoLugar" placeholder="Ej: Salón parroquial">
             </div>
             <div class="field">
-                <label>📝 Descripción</label>
-                <textarea id="eventoDescripcion" rows="3" placeholder="Descripción detallada..."></textarea>
+                <label>🎨 Color de la actividad</label>
+                <select id="eventoColor">
+                    <option value="#0891b2">🔵 Azul (por defecto)</option>
+                    <option value="#ef4444">🔴 Rojo</option>
+                    <option value="#f97316">🟠 Naranja</option>
+                    <option value="#eab308">🟡 Amarillo</option>
+                    <option value="#10b981">🟢 Verde</option>
+                    <option value="#8b5cf6">🟣 Morado</option>
+                    <option value="#ec4899">🩷 Rosa</option>
+                    <option value="#06b6d4">💙 Cian</option>
+                    <option value="#f59e0b">🟧 Ámbar</option>
+                    <option value="#6366f1">🔵 Índigo</option>
+                </select>
             </div>
-            <button class="btn-main" id="btnAgregarEvento">➕ Agregar Actividad</button>
         </div>
-        <div class="card" style="margin-top: 20px;">
-            <div class="section-title">📋 Lista de Actividades</div>
-            <div id="eventosList"></div>
+        <div class="field">
+            <label>📝 Descripción</label>
+            <textarea id="eventoDescripcion" rows="3" placeholder="Descripción detallada..."></textarea>
         </div>
+        <button class="btn-main" id="btnAgregarEvento">➕ Agregar Actividad</button>
     </div>
+    <div class="card" style="margin-top: 20px;">
+        <div class="section-title">📋 Lista de Actividades</div>
+        <div id="eventosList"></div>
+    </div>
+</div>
 
     <!-- Tab 4: Contraseñas -->
     <div id="tab4" class="tab-content">

@@ -25,7 +25,7 @@ function formatearFechaAdmin(fechaISO) {
 }
 
 // ── Eventos ───────────────────────────────────────────────────────────────────
-
+// En cargarEventosAdmin, mostrar el color en la lista
 async function cargarEventosAdmin() {
     const eventosList = document.getElementById('eventosList');
     if (!eventosList) return;
@@ -38,12 +38,13 @@ async function cargarEventosAdmin() {
     }
 
     eventosList.innerHTML = eventos.map(evento => `
-        <div class="evento-item">
+        <div class="evento-item" style="border-left: 4px solid ${evento.color || '#0891b2'};">
             <div style="flex:1;">
                 <div class="evento-fecha">📅 ${evento.fecha}</div>
                 <div class="evento-titulo"><strong>${escapeHtml(evento.titulo)}</strong></div>
-                ${evento.lugar       ? `<div class="evento-lugar">📍 ${escapeHtml(evento.lugar)}</div>` : ''}
+                ${evento.lugar ? `<div class="evento-lugar">📍 ${escapeHtml(evento.lugar)}</div>` : ''}
                 ${evento.descripcion ? `<div class="evento-descripcion">📝 ${escapeHtml(evento.descripcion.substring(0, 100))}${evento.descripcion.length > 100 ? '...' : ''}</div>` : ''}
+                <div class="evento-color" style="display: inline-block; background: ${evento.color || '#0891b2'}; width: 16px; height: 16px; border-radius: 4px; margin-top: 5px;"></div>
             </div>
             <button class="delete-btn" data-id="${evento.id}">🗑️</button>
         </div>
@@ -311,23 +312,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ── Agregar evento ────────────────────────────────────────────────────────
-    document.getElementById('btnAgregarEvento')?.addEventListener('click', async () => {
-        const fecha       = document.getElementById('eventoFecha').value;
-        const titulo      = document.getElementById('eventoTitulo').value.trim();
-        const lugar       = document.getElementById('eventoLugar').value.trim();
-        const descripcion = document.getElementById('eventoDescripcion').value.trim();
+// ── Agregar evento (con color) ────────────────────────────────────────────────
+document.getElementById('btnAgregarEvento')?.addEventListener('click', async () => {
+    const fecha       = document.getElementById('eventoFecha').value;
+    const titulo      = document.getElementById('eventoTitulo').value.trim();
+    const lugar       = document.getElementById('eventoLugar').value.trim();
+    const descripcion = document.getElementById('eventoDescripcion').value.trim();
+    const color       = document.getElementById('eventoColor').value;
 
-        if (!fecha)  { window.showToast('❌ Selecciona una fecha', true); return; }
-        if (!titulo) { window.showToast('❌ Escribe un título', true); return; }
+    if (!fecha)  { window.showToast('❌ Selecciona una fecha', true); return; }
+    if (!titulo) { window.showToast('❌ Escribe un título', true); return; }
 
-        await agregarEvento(fecha, titulo, lugar, descripcion);
+    await agregarEvento(fecha, titulo, lugar, descripcion, color);
 
-        ['eventoFecha', 'eventoTitulo', 'eventoLugar', 'eventoDescripcion']
-            .forEach(id => { document.getElementById(id).value = ''; });
+    ['eventoFecha', 'eventoTitulo', 'eventoLugar', 'eventoDescripcion']
+        .forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('eventoColor').value = '#0891b2'; // Resetear color
 
-        await cargarEventosAdmin();
-        window.showToast('✓ Actividad agregada', false);
-    });
+    await cargarEventosAdmin();
+    window.showToast('✓ Actividad agregada', false);
+});
 
     // ── Agregar categoría ─────────────────────────────────────────────────────
     document.getElementById('btnAgregarCategoria')?.addEventListener('click', async () => {

@@ -196,12 +196,14 @@ async function cargarEventos() {
     return eventos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 }
 
-async function agregarEvento(fecha, titulo, lugar, descripcion) {
+
+async function agregarEvento(fecha, titulo, lugar, descripcion, color) {
     const evento = {
         fecha,
         titulo,
         lugar: lugar || '',
         descripcion: descripcion || '',
+        color: color || '#0891b2', // Color por defecto azul
         creado: new Date().toISOString()
     };
     const docRef = await coleccionEventos.add(evento);
