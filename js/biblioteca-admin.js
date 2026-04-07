@@ -1,4 +1,4 @@
-// js/biblioteca-admin.js - Gestión de biblioteca (simplificado)
+// js/biblioteca-admin.js - Gestión de biblioteca
 
 function escapeHtml(text) {
     if (!text) return '';
@@ -12,7 +12,7 @@ async function eliminarRecursoCloud(recursoId) {
     console.log("🗑️ Eliminando recurso:", recursoId);
     await coleccionRecursos.doc(recursoId).delete();
     console.log("✓ Recurso eliminado de Firestore");
-    window.showToast("✓ Recurso eliminado", false);
+    window.showToast("✓ Recurso eliminado de la biblioteca", false);
 }
 
 // Cargar recursos admin
@@ -36,7 +36,7 @@ async function cargarRecursosAdmin() {
         recursos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
         
         if (recursos.length === 0) {
-            recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">📭 No hay recursos disponibles</td></tr>';
+            recursosTableBody.innerHTML = '<td><td colspan="5" style="text-align: center; padding: 40px;">📭 No hay recursos disponibles<\/td><\/tr>';
             return;
         }
         
@@ -54,17 +54,21 @@ async function cargarRecursosAdmin() {
             const desc = recurso.descripcion 
                 ? escapeHtml(recurso.descripcion.substring(0, 60)) + (recurso.descripcion.length > 60 ? '...' : '')
                 : '-';
+            
+            // Mostrar la ubicación en Cloudinary
+            const cloudinaryPath = recurso.public_id || 'N/A';
+            
             return `
                 <tr>
-                    <td><strong>${escapeHtml(recurso.titulo)}</strong></td>
-                    <td><span class="categoria-badge">${categoriaDisplay}</span></td>
-                    <td>${desc}</td>
-                    <td><span style="font-size: 12px; color: #64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}</span></td>
+                    <td><strong>${escapeHtml(recurso.titulo)}<\/strong><\/td>
+                    <td><span class="categoria-badge">${categoriaDisplay}<\/span><\/td>
+                    <td>${desc}<\/td>
+                    <td><span style="font-size: 12px; color: #64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}<\/span><\/td>
                     <td>
-                        <a href="${recurso.url}" target="_blank" class="btn-ver">👁️ Ver</a>
-                        <button class="btn-eliminar-recurso" data-id="${recurso.id}">🗑️ Eliminar</button>
-                    </td>
-                </tr>
+                        <a href="${recurso.url}" target="_blank" class="btn-ver" style="display: inline-block; padding: 4px 8px; background: #0891b2; color: white; border-radius: 6px; text-decoration: none; font-size: 11px;">👁️ Ver</a>
+                        <button class="btn-eliminar-recurso" data-id="${recurso.id}" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-left: 5px;">🗑️ Eliminar</button>
+                     <\/td>
+                 <\/tr>
             `;
         }).join("");
         
@@ -81,7 +85,7 @@ async function cargarRecursosAdmin() {
         
     } catch (error) {
         console.error("Error cargando recursos:", error);
-        recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">❌ Error al cargar recursos</td></tr>';
+        recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">❌ Error al cargar recursos<\/td><\/tr>';
     }
 }
 

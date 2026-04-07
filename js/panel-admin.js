@@ -344,114 +344,118 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.showToast('✓ Categoría agregada', false);
     });
 
-    // ── Subir recurso (SOLO UNA VEZ - CENTRALIZADO) ──────────────────────────
-    const btnSubirRecurso = document.getElementById('btnSubirRecurso');
-    if (btnSubirRecurso) {
-        // Remover event listeners anteriores para evitar duplicados
-        const nuevoBtn = btnSubirRecurso.cloneNode(true);
-        btnSubirRecurso.parentNode.replaceChild(nuevoBtn, btnSubirRecurso);
+// ── Subir recurso (con carpeta biblioteca en Cloudinary) ─────────────────────
+const btnSubirRecurso = document.getElementById('btnSubirRecurso');
+if (btnSubirRecurso) {
+    // Remover event listeners anteriores para evitar duplicados
+    const nuevoBtn = btnSubirRecurso.cloneNode(true);
+    btnSubirRecurso.parentNode.replaceChild(nuevoBtn, btnSubirRecurso);
+    
+    nuevoBtn.addEventListener('click', async function subirRecursoHandler(e) {
+        e.preventDefault();
+        e.stopPropagation();
         
-        nuevoBtn.addEventListener('click', async function subirRecursoHandler(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        if (nuevoBtn.disabled) {
+            console.log("⚠️ Subida ya en proceso, espera...");
+            return;
+        }
+        
+        const titulo = document.getElementById('recursoTitulo').value.trim();
+        const categoria = document.getElementById('recursoCategoria').value;
+        const descripcion = document.getElementById('recursoDescripcion').value.trim();
+        const archivo = document.getElementById('recursoArchivo').files[0];
+
+        if (!titulo) { window.showToast('❌ Ingresa un título', true); return; }
+        if (!archivo) { window.showToast('❌ Selecciona un archivo', true); return; }
+        if (!categoria) { window.showToast('❌ Selecciona una categoría', true); return; }
+        if (archivo.size > 10 * 1024 * 1024) {
+            window.showToast('❌ El archivo es demasiado grande (máx 10MB)', true);
+            return;
+        }
+
+        nuevoBtn.disabled = true;
+        const textoOriginal = nuevoBtn.innerHTML;
+        nuevoBtn.innerHTML = '<span class="spinner"></span> Subiendo...';
+        
+        window.showToast('📤 Subiendo archivo...', false);
+
+        try {
+            // Limpiar el título para usarlo como nombre
+            let nombreLimpio = titulo
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/gi, '_')
+                .replace(/_+/g, '_')
+                .toLowerCase()
+                .substring(0, 40);
             
-            // Verificar si ya está en proceso
-            if (nuevoBtn.disabled) {
-                console.log("⚠️ Subida ya en proceso, espera...");
-                return;
+            if (!nombreLimpio) nombreLimpio = 'recurso';
+            
+            const extension = archivo.name.split('.').pop();
+            const publicId = `${nombreLimpio}`;
+            
+            // Crear FormData
+            const formData = new FormData();
+            formData.append("file", archivo);
+            formData.append("upload_preset", "comprobantes");
+            formData.append("folder", "biblioteca");  // <-- CARPETA BIBLIOTECA
+            formData.append("public_id", publicId);
+            
+            console.log("📤 Subiendo a Cloudinary (carpeta: biblioteca)...", { 
+                publicId: publicId,
+                folder: "biblioteca"
+            });
+            
+            const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/upload", {
+                method: "POST",
+                body: formData
+            });
+            
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error("❌ Error Cloudinary:", errorText);
+                throw new Error(`Error en Cloudinary: ${res.status}`);
             }
             
-            const titulo = document.getElementById('recursoTitulo').value.trim();
-            const categoria = document.getElementById('recursoCategoria').value;
-            const descripcion = document.getElementById('recursoDescripcion').value.trim();
-            const archivo = document.getElementById('recursoArchivo').files[0];
-
-            if (!titulo) { window.showToast('❌ Ingresa un título', true); return; }
-            if (!archivo) { window.showToast('❌ Selecciona un archivo', true); return; }
-            if (!categoria) { window.showToast('❌ Selecciona una categoría', true); return; }
-            if (archivo.size > 10 * 1024 * 1024) {
-                window.showToast('❌ El archivo es demasiado grande (máx 10MB)', true);
-                return;
-            }
-
-            // Deshabilitar botón para evitar doble clic
-            nuevoBtn.disabled = true;
-            const textoOriginal = nuevoBtn.innerHTML;
-            nuevoBtn.innerHTML = '<span class="spinner"></span> Subiendo...';
+            const data = await res.json();
+            console.log("✓ Archivo subido a Cloudinary:", data.secure_url);
+            console.log("✓ Public ID:", data.public_id);
+            console.log("✓ Carpeta:", data.folder || "biblioteca");
             
-            window.showToast('📤 Subiendo archivo...', false);
-
-            try {
-                // Limpiar el título para usarlo como nombre
-                let nombreLimpio = titulo
-                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                    .replace(/[^a-z0-9]/gi, '_')
-                    .replace(/_+/g, '_')
-                    .toLowerCase()
-                    .substring(0, 40);
-                
-                if (!nombreLimpio) nombreLimpio = 'recurso';
-                
-                const extension = archivo.name.split('.').pop();
-                const publicId = `${nombreLimpio}`;
-                
-                // Crear FormData
-                const formData = new FormData();
-                formData.append("file", archivo);
-                formData.append("upload_preset", "comprobantes");
-                formData.append("public_id", publicId);
-                
-                console.log("📤 Subiendo a Cloudinary con ID:", publicId);
-                
-                const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/upload", {
-                    method: "POST",
-                    body: formData
-                });
-                
-                if (!res.ok) {
-                    const errorText = await res.text();
-                    console.error("❌ Error Cloudinary:", errorText);
-                    throw new Error(`Error en Cloudinary: ${res.status}`);
-                }
-                
-                const data = await res.json();
-                console.log("✓ Archivo subido:", data.secure_url);
-                
-                const tipo = archivo.type.startsWith('image/') ? 'image' : 'pdf';
-                
-                // Guardar en Firestore
-                const recurso = {
-                    titulo: titulo,
-                    categoria: categoria,
-                    descripcion: descripcion || "",
-                    url: data.secure_url,
-                    public_id: data.public_id,
-                    resource_type: data.resource_type,
-                    tipo: tipo,
-                    fecha: new Date().toISOString()
-                };
-                
-                await coleccionRecursos.add(recurso);
-                
-                // Limpiar formulario
-                document.getElementById('recursoTitulo').value = '';
-                document.getElementById('recursoDescripcion').value = '';
-                document.getElementById('recursoArchivo').value = '';
-                document.getElementById('previewArchivo').innerHTML = '';
-                
-                // Recargar lista
-                await cargarRecursosAdmin();
-                window.showToast('✓ Recurso subido exitosamente', false);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                window.showToast('❌ Error al subir el recurso: ' + (error.message || 'Error desconocido'), true);
-            } finally {
-                nuevoBtn.disabled = false;
-                nuevoBtn.innerHTML = textoOriginal;
-            }
-        });
-    }
+            const tipo = archivo.type.startsWith('image/') ? 'image' : 'pdf';
+            
+            // Guardar en Firestore
+            const recurso = {
+                titulo: titulo,
+                categoria: categoria,
+                descripcion: descripcion || "",
+                url: data.secure_url,
+                public_id: data.public_id,
+                resource_type: data.resource_type,
+                tipo: tipo,
+                fecha: new Date().toISOString()
+            };
+            
+            await coleccionRecursos.add(recurso);
+            
+            // Limpiar formulario
+            document.getElementById('recursoTitulo').value = '';
+            document.getElementById('recursoDescripcion').value = '';
+            document.getElementById('recursoArchivo').value = '';
+            document.getElementById('previewArchivo').innerHTML = '';
+            
+            // Recargar lista
+            await cargarRecursosAdmin();
+            window.showToast('✓ Recurso subido exitosamente', false);
+            
+        } catch (error) {
+            console.error('Error:', error);
+            window.showToast('❌ Error al subir el recurso: ' + (error.message || 'Error desconocido'), true);
+        } finally {
+            nuevoBtn.disabled = false;
+            nuevoBtn.innerHTML = textoOriginal;
+        }
+    });
+}
 
     // Preview del archivo seleccionado
     document.getElementById('recursoArchivo')?.addEventListener('change', (e) => {
