@@ -189,7 +189,7 @@ async function cargarRecursosAdmin() {
         lista.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
         if (lista.length === 0) {
-            recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">📭 No hay recursos disponibles</td></tr>';
+            recursosTableBody.innerHTML = '<td><td colspan="5" style="text-align:center;padding:40px;">📭 No hay recursos disponibles<\/td><\/tr>';
             return;
         }
 
@@ -201,15 +201,15 @@ async function cargarRecursosAdmin() {
                 : '-';
             return `
                 <tr>
-                    <td><strong>${escapeHtml(recurso.titulo)}</strong></td>
-                    <td><span class="categoria-badge">${catDisplay}</span></td>
-                    <td>${desc}</td>
-                    <td><span style="font-size:12px;color:#64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}</span></td>
+                    <td><strong>${escapeHtml(recurso.titulo)}<\/strong><\/td>
+                    <td><span class="categoria-badge">${catDisplay}<\/span><\/td>
+                    <td>${desc}<\/td>
+                    <td><span style="font-size:12px;color:#64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}<\/span><\/td>
                     <td>
-                        <a href="${recurso.url}" target="_blank" class="btn-ver">👁️ Ver</a>
-                        <button class="btn-eliminar-recurso" data-id="${recurso.id}">🗑️ Eliminar</button>
-                    </td>
-                </tr>
+                        <a href="${recurso.url}" target="_blank" class="btn-ver">👁️ Ver<\/a>
+                        <button class="btn-eliminar-recurso" data-id="${recurso.id}">🗑️ Eliminar<\/button>
+                    <\/td>
+                <\/tr>
             `;
         }).join('');
 
@@ -223,7 +223,7 @@ async function cargarRecursosAdmin() {
             };
         });
     } catch (error) {
-        recursosTableBody.innerHTML = '<td><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos</td></tr>';
+        recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos<\/td><\/tr>';
     }
 }
 
@@ -271,42 +271,35 @@ async function cargarSignificadosAdmin() {
     }).join('');
     
     document.querySelectorAll('.btn-guardar-significado').forEach(btn => {
-        // En la función cargarSignificadosAdmin, dentro del btn.onclick:
-
-btn.onclick = async () => {
-    const color = btn.dataset.color;
-    const input = document.getElementById(`significado_${color.replace('#', '')}`);
-    const significado = input.value.trim();
-    
-    await guardarSignificadoColor(color, significado);
-    
-    // Actualizar el badge y la clase
-    const parent = btn.closest('.significado-item');
-    if (significado) {
-        parent.classList.add('tiene-significado');
-        const badge = parent.querySelector('.significado-badge');
-        if (badge) {
-            badge.textContent = '✓ Activo';
-            badge.classList.remove('inactivo');
-        }
-    } else {
-        parent.classList.remove('tiene-significado');
-        const badge = parent.querySelector('.significado-badge');
-        if (badge) {
-            badge.textContent = '⚡ Sin significado';
-            badge.classList.add('inactivo');
-        }
-    }
-    
-    // Recargar el selector de colores en actividades
-    await cargarSelectColoresActividades();
-    
-    window.showToast(significado ? `✓ Significado guardado para ${color}` : `✓ Significado eliminado para ${color}`, false);
-};
+        btn.onclick = async () => {
+            const color = btn.dataset.color;
+            const input = document.getElementById(`significado_${color.replace('#', '')}`);
+            const significado = input.value.trim();
+            
+            await guardarSignificadoColor(color, significado);
+            
+            const parent = btn.closest('.significado-item');
+            if (significado) {
+                parent.classList.add('tiene-significado');
+                const badge = parent.querySelector('.significado-badge');
+                if (badge) {
+                    badge.textContent = '✓ Activo';
+                    badge.classList.remove('inactivo');
+                }
+            } else {
+                parent.classList.remove('tiene-significado');
+                const badge = parent.querySelector('.significado-badge');
+                if (badge) {
+                    badge.textContent = '⚡ Sin significado';
+                    badge.classList.add('inactivo');
+                }
+            }
+            
+            await cargarSelectColoresActividades();
+            window.showToast(significado ? `✓ Significado guardado para ${color}` : `✓ Significado eliminado para ${color}`, false);
+        };
     });
 }
-
-// ── Cargar selector de colores para actividades (solo colores con significado) ─
 
 // ── Cargar selector de colores para actividades (solo colores con significado) ─
 
@@ -329,25 +322,56 @@ async function cargarSelectColoresActividades() {
         { codigo: '#6366f1', nombre: 'Índigo', icono: '🔮' }
     ];
     
-    // Filtrar solo colores que tienen significado guardado (no vacío)
     const coloresConSignificado = coloresPredeterminados.filter(color => {
         const significado = significados[color.codigo];
         return significado && significado.trim() !== '';
     });
     
-    // Si no hay colores con significado, mostrar mensaje y deshabilitar
     if (coloresConSignificado.length === 0) {
-        select.innerHTML = '<option value="" disabled selected>⚠️ No hay colores disponibles - Ve a "Significado Colores"</option>';
+        select.innerHTML = '<option value="" disabled selected>⚠️ No hay colores disponibles - Ve a "Gestionar significados"</option>';
         select.disabled = true;
         return;
     }
     
-    // Habilitar el select y mostrar solo colores con significado
     select.disabled = false;
     select.innerHTML = '<option value="" disabled selected>-- Seleccione un color --</option>' +
         coloresConSignificado.map(color => 
             `<option value="${color.codigo}" style="background-color: ${color.codigo}; color: white; padding: 5px;">${color.icono} ${color.nombre}</option>`
         ).join('');
+}
+
+// ── Modal de gestión de colores ──────────────────────────────────────────────
+
+function initModalColores() {
+    const btnGestionarColores = document.getElementById('btnGestionarColores');
+    const modalGestionColores = document.getElementById('modalGestionColores');
+    const closeModalColores = document.querySelector('.close-modal-colores');
+    const btnCerrarModalColores = document.getElementById('btnCerrarModalColores');
+    
+    if (btnGestionarColores) {
+        btnGestionarColores.onclick = async () => {
+            await cargarSignificadosAdmin();
+            if (modalGestionColores) modalGestionColores.style.display = 'flex';
+        };
+    }
+    
+    if (closeModalColores) {
+        closeModalColores.onclick = () => {
+            if (modalGestionColores) modalGestionColores.style.display = 'none';
+        };
+    }
+    
+    if (btnCerrarModalColores) {
+        btnCerrarModalColores.onclick = () => {
+            if (modalGestionColores) modalGestionColores.style.display = 'none';
+        };
+    }
+    
+    window.addEventListener('click', (e) => {
+        if (e.target === modalGestionColores) {
+            modalGestionColores.style.display = 'none';
+        }
+    });
 }
 
 // ── Subir recurso ─────────────────────────────────────────────────────────────
@@ -476,7 +500,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     actNumeroReciboPreview();
     await cargarSelectCategorias();
     await cargarListaCategoriasAdmin();
-    await cargarSelectColoresActividades(); // Cargar solo colores con significado
+    await cargarSelectColoresActividades();
+    initModalColores();
 
     document.getElementById('btnVistaPrevia').onclick    = generarVistaPrevia;
     document.getElementById('btnConfirmarEnviar').onclick = subirYEnviar;
@@ -506,9 +531,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (typeof cargarHistorialRecibos === 'function') {
                 await cargarHistorialRecibos();
             }
-        }
-        if (tabId === 'tab7') {
-            await cargarSignificadosAdmin();
         }
     }
 
@@ -557,12 +579,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!fecha)  { window.showToast('❌ Selecciona una fecha', true); return; }
         if (!titulo) { window.showToast('❌ Escribe un título', true); return; }
+        if (!color)  { window.showToast('❌ Selecciona un color para la actividad', true); return; }
 
         await agregarEvento(fecha, titulo, lugar, descripcion, color);
 
         ['eventoFecha', 'eventoTitulo', 'eventoLugar', 'eventoDescripcion']
             .forEach(id => { document.getElementById(id).value = ''; });
-        document.getElementById('eventoColor').value = '#0891b2';
+        document.getElementById('eventoColor').value = '';
 
         await cargarEventosAdmin();
         window.showToast('✓ Actividad agregada', false);

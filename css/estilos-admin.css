@@ -209,7 +209,6 @@ textarea {
 }
 
 /* ========== MODAL DE RESET ========== */
-/* ========== MODAL DE RESET ========== */
 .modal-reset {
     display: none;
     position: fixed;
@@ -286,35 +285,6 @@ textarea {
 .btn-cancel-reset:hover {
     background: #94a3b8;
     transform: scale(0.98);
-}
-
-/* Responsive para modal reset */
-@media (max-width: 640px) {
-    .modal-reset-content {
-        width: 95%;
-        padding: 20px;
-        max-height: 80vh;
-    }
-    
-    .btn-cancel-reset, .btn-confirm-reset {
-        padding: 8px 16px;
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 480px) {
-    .modal-reset-content {
-        width: 98%;
-        padding: 16px;
-    }
-    
-    .modal-reset-content h3 {
-        font-size: 18px;
-    }
-    
-    .modal-reset-content p {
-        font-size: 13px;
-    }
 }
 
 /* ========== MODAL DE CONFIRMACIÓN ========== */
@@ -490,11 +460,6 @@ textarea {
     color: #0891b2;
 }
 
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(100px); }
-    to   { opacity: 1; transform: translateX(0); }
-}
-
 /* ========== BIBLIOTECA (admin) ========== */
 .categoria-badge {
     background: #e0f2fe;
@@ -577,6 +542,223 @@ textarea {
     white-space: nowrap;
 }
 
+/* ========== SIGNIFICADOS DE COLORES ========== */
+.significado-colores-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.significado-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+    transition: all 0.2s ease;
+}
+
+.significado-item.tiene-significado {
+    background: #ecfdf5;
+    border-left: 4px solid #10b981;
+}
+
+.significado-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.significado-color {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.significado-nombre {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 14px;
+}
+
+.significado-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #15803d;
+    margin-left: 8px;
+}
+
+.significado-badge.inactivo {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.significado-input-group {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    max-width: 400px;
+}
+
+.significado-input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    background: white;
+}
+
+.significado-input:focus {
+    outline: none;
+    border-color: #0891b2;
+    box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.1);
+}
+
+.btn-guardar-significado {
+    background: #0891b2;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-guardar-significado:hover {
+    background: #0e7490;
+    transform: scale(0.98);
+}
+
+/* ========== MODAL DE GESTIÓN DE COLORES ========== */
+.modal-gestion-colores {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-gestion-colores-content {
+    background: white;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 85vh;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-gestion-colores-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.modal-gestion-colores-header h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.close-modal-colores {
+    font-size: 28px;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: all 0.2s;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.close-modal-colores:hover {
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+.modal-gestion-colores-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-gestion-colores-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-cerrar-modal-colores {
+    background: #64748b;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-cerrar-modal-colores:hover {
+    background: #475569;
+    transform: translateY(-2px);
+}
+
+.btn-gestionar-colores {
+margin-top: 8px; background: #146b60; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; width: 100%;
+}
+
+.btn-gestionar-colores:hover {
+    background: #475569;
+    transform: translateY(-2px);
+}
+
+/* ========== KEYFRAMES ========== */
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translate(-50%, -60%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
     .admin-header {
@@ -631,9 +813,39 @@ textarea {
         white-space: normal;
         font-size: 11px;
     }
+
+    .significado-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .significado-input-group {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .significado-input {
+        flex: 1;
+    }
+
+    .modal-gestion-colores-content {
+        width: 95%;
+        max-height: 90vh;
+    }
 }
 
 @media (max-width: 640px) {
+    .modal-reset-content {
+        width: 95%;
+        padding: 20px;
+        max-height: 80vh;
+    }
+    
+    .btn-cancel-reset, .btn-confirm-reset {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
     .modal-confirmacion-content {
         margin: 30% auto;
         width: 92%;
@@ -673,204 +885,3 @@ textarea {
     }
 }
 
-/* Significados de colores - Estilos */
-.significado-colores-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.significado-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: #f8fafc;
-    border-radius: 12px;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.significado-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.significado-color {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.significado-nombre {
-    font-weight: 700;
-    color: #0f172a;
-    font-size: 14px;
-}
-
-.significado-input-group {
-    display: flex;
-    gap: 10px;
-    flex: 1;
-    max-width: 400px;
-}
-
-.significado-input {
-    flex: 1;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid #cbd5e1;
-    font-size: 14px;
-    background: white;
-}
-
-.significado-input:focus {
-    outline: none;
-    border-color: #0891b2;
-    box-shadow: 0 0 0 2px rgba(8,145,178,0.1);
-}
-
-.btn-guardar-significado {
-    background: #0891b2;
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.btn-guardar-significado:hover {
-    background: #0e7490;
-    transform: scale(0.98);
-}
-
-@media (max-width: 768px) {
-    .significado-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .significado-input-group {
-        max-width: 100%;
-        width: 100%;
-    }
-    
-    .significado-input {
-        flex: 1;
-    }
-}
-
-/* Significados de colores - Estilos */
-.significado-colores-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.significado-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: #f8fafc;
-    border-radius: 12px;
-    flex-wrap: wrap;
-    gap: 10px;
-    transition: all 0.2s ease;
-}
-
-.significado-item.tiene-significado {
-    background: #ecfdf5;
-    border-left: 4px solid #10b981;
-}
-
-.significado-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.significado-color {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.significado-nombre {
-    font-weight: 700;
-    color: #0f172a;
-    font-size: 14px;
-}
-
-.significado-badge {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 20px;
-    background: #dcfce7;
-    color: #15803d;
-    margin-left: 8px;
-}
-
-.significado-badge.inactivo {
-    background: #fef9c3;
-    color: #854d0e;
-}
-
-.significado-input-group {
-    display: flex;
-    gap: 10px;
-    flex: 1;
-    max-width: 400px;
-}
-
-.significado-input {
-    flex: 1;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid #cbd5e1;
-    font-size: 14px;
-    background: white;
-}
-
-.significado-input:focus {
-    outline: none;
-    border-color: #0891b2;
-    box-shadow: 0 0 0 2px rgba(8,145,178,0.1);
-}
-
-.btn-guardar-significado {
-    background: #0891b2;
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.btn-guardar-significado:hover {
-    background: #0e7490;
-    transform: scale(0.98);
-}
-
-@media (max-width: 768px) {
-    .significado-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .significado-input-group {
-        max-width: 100%;
-        width: 100%;
-    }
-    
-    .significado-input {
-        flex: 1;
-    }
-}

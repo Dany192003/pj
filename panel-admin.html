@@ -12,7 +12,6 @@
 <body>
 
 <div class="app">
-    <!-- Header -->
     <div class="admin-header">
         <div class="admin-header-logo">
             <img src="img/logo.jpg" alt="Logo" class="admin-logo-img">
@@ -28,7 +27,6 @@
         </div>
     </div>
 
-    <!-- Tabs -->
     <div class="tabs-container">
         <button class="tab-btn active" data-tab="tab1">📄 Generar Recibos</button>
         <button class="tab-btn" data-tab="tab2">📊 Control de Cuotas</button>
@@ -36,7 +34,6 @@
         <button class="tab-btn" data-tab="tab4">🔑 Contraseñas Grupos</button>
         <button class="tab-btn" data-tab="tab5">📚 Biblioteca</button>
         <button class="tab-btn" data-tab="tab6">📜 Historial Recibos</button>
-        <button class="tab-btn" data-tab="tab7">🎨 Significado Colores</button>
     </div>
 
     <!-- Tab 1: Generar Recibos -->
@@ -58,18 +55,10 @@
                     <label>👥 Juvenil</label>
                     <select id="grupo">
                         <option value="" disabled selected>-- Seleccione un juvenil --</option>
-                        <option>Confirmación</option>
-                        <option>Jeshua</option>
-                        <option>Jufra</option>
-                        <option>Lectores</option>
-                        <option>Mujeres y Hombres Nuevos</option>
-                        <option>PCV</option>
-                        <option>Pentecostés</option>
-                        <option>Roca Fuerte</option>
-                        <option>San Pablo</option>
-                        <option>Senderos</option>
-                        <option>Shadai</option>
-                        <option>Ssael</option>
+                        <option>Confirmación</option><option>Jeshua</option><option>Jufra</option>
+                        <option>Lectores</option><option>Mujeres y Hombres Nuevos</option><option>PCV</option>
+                        <option>Pentecostés</option><option>Roca Fuerte</option><option>San Pablo</option>
+                        <option>Senderos</option><option>Shadai</option><option>Ssael</option>
                         <option value="OTRO">➕ OTRO</option>
                     </select>
                 </div>
@@ -104,22 +93,10 @@
                         <span class="receipt-number" id="vNumRecibo"></span>
                     </div>
                     <div class="ticket-info">
-                        <div class="info-row">
-                            <div class="info-label">👥 JUVENIL</div>
-                            <div class="info-value" id="vGrupo">-</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">📌 CONCEPTO</div>
-                            <div class="info-value" id="vConcepto">-</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">📆 FECHA</div>
-                            <div class="info-value" id="vFecha">-</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label">⏰ HORA</div>
-                            <div class="info-value" id="vHora">-</div>
-                        </div>
+                        <div class="info-row"><div class="info-label">👥 JUVENIL</div><div class="info-value" id="vGrupo">-</div></div>
+                        <div class="info-row"><div class="info-label">📌 CONCEPTO</div><div class="info-value" id="vConcepto">-</div></div>
+                        <div class="info-row"><div class="info-label">📆 FECHA</div><div class="info-value" id="vFecha">-</div></div>
+                        <div class="info-row"><div class="info-label">⏰ HORA</div><div class="info-value" id="vHora">-</div></div>
                         <div class="info-row" id="estadoRow" style="background: #dcfce7; border-radius: 8px; margin-top: 8px;">
                             <div class="info-label">✅ ESTADO</div>
                             <div class="info-value" id="vEstado" style="color: #15803d; font-weight: 800;">PAGADO</div>
@@ -155,44 +132,46 @@
         </div>
     </div>
 
-<!-- Tab 3: Actividades - actualizado -->
-<div id="tab3" class="tab-content">
-    <div class="card">
-        <div class="section-title">📅 Agregar Actividad</div>
-        <div class="row">
-            <div class="field">
-                <label>📆 Fecha</label>
-                <input type="date" id="eventoFecha">
+    <!-- Tab 3: Actividades (con modal de colores integrado) -->
+    <div id="tab3" class="tab-content">
+        <div class="card">
+            <div class="section-title">📅 Agregar Actividad</div>
+            <div class="row">
+                <div class="field">
+                    <label>📆 Fecha</label>
+                    <input type="date" id="eventoFecha">
+                </div>
+                <div class="field">
+                    <label>📌 Título</label>
+                    <input type="text" id="eventoTitulo" placeholder="Ej: Reunión general">
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label>📍 Lugar</label>
+                    <input type="text" id="eventoLugar" placeholder="Ej: Salón parroquial">
+                </div>
+                <div class="field">
+                    <label>🎨 Color de la actividad</label>
+                    <select id="eventoColor" disabled>
+                        <option value="" disabled selected>⚠️ No hay colores disponibles</option>
+                    </select>
+                    <button type="button" id="btnGestionarColores" class="btn-gestionar-colores">
+                        🎨 Gestionar significados de colores
+                    </button>
+                </div>
             </div>
             <div class="field">
-                <label>📌 Título</label>
-                <input type="text" id="eventoTitulo" placeholder="Ej: Reunión general">
+                <label>📝 Descripción</label>
+                <textarea id="eventoDescripcion" rows="3" placeholder="Descripción detallada..."></textarea>
             </div>
+            <button class="btn-main" id="btnAgregarEvento">➕ Agregar Actividad</button>
         </div>
-        <div class="row">
-            <div class="field">
-                <label>📍 Lugar</label>
-                <input type="text" id="eventoLugar" placeholder="Ej: Salón parroquial">
-            </div>
-<div class="field">
-    <label>🎨 Color de la actividad</label>
-    <select id="eventoColor" disabled>
-        <option value="" disabled selected>⚠️ No hay colores disponibles - Ve a "Significado Colores"</option>
-    </select>
-
-</div>
+        <div class="card" style="margin-top: 20px;">
+            <div class="section-title">📋 Lista de Actividades</div>
+            <div id="eventosList"></div>
         </div>
-        <div class="field">
-            <label>📝 Descripción</label>
-            <textarea id="eventoDescripcion" rows="3" placeholder="Descripción detallada..."></textarea>
-        </div>
-        <button class="btn-main" id="btnAgregarEvento">➕ Agregar Actividad</button>
     </div>
-    <div class="card" style="margin-top: 20px;">
-        <div class="section-title">📋 Lista de Actividades</div>
-        <div id="eventosList"></div>
-    </div>
-</div>
 
     <!-- Tab 4: Contraseñas -->
     <div id="tab4" class="tab-content">
@@ -207,7 +186,6 @@
 
     <!-- Tab 5: Biblioteca -->
     <div id="tab5" class="tab-content">
-        <!-- Gestionar categorías -->
         <div class="card">
             <div class="section-title">🏷️ Gestionar Categorías</div>
             <div class="row">
@@ -260,7 +238,6 @@
             <div id="categoriasListAdmin" style="margin-top: 15px;"></div>
         </div>
 
-        <!-- Subir recurso -->
         <div class="card" style="margin-top: 20px;">
             <div class="section-title">📤 Subir Recurso</div>
             <div class="row">
@@ -287,86 +264,71 @@
             <button class="btn-main" id="btnSubirRecurso">📤 Subir Recurso</button>
         </div>
 
-        <!-- Recursos disponibles -->
         <div class="card" style="margin-top: 20px;">
             <div class="section-title">📋 Recursos Disponibles</div>
             <div style="overflow-x: auto;">
                 <table class="excel-table">
                     <thead>
-                        <tr>
-                            <th>Título</th>
-                            <th>Categoría</th>
-                            <th>Descripción</th>
-                            <th>Fecha de publicación</th>
-                            <th>Acciones</th>
-                        </tr>
+                        <tr><th>Título</th><th>Categoría</th><th>Descripción</th><th>Fecha</th><th>Acciones</th></tr>
                     </thead>
                     <tbody id="recursosTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
-    
+
     <!-- Tab 6: Historial Recibos -->
-<div id="tab6" class="tab-content">
-    <div class="card">
-        <div class="section-title">📜 Historial de Comprobantes</div>
-        <div class="row">
-            <div class="field">
-                <label>🔍 Buscar</label>
-                <input type="text" id="buscarRecibo" placeholder="Folio o grupo o concepto">
+    <div id="tab6" class="tab-content">
+        <div class="card">
+            <div class="section-title">📜 Historial de Comprobantes</div>
+            <div class="row">
+                <div class="field">
+                    <label>🔍 Buscar</label>
+                    <input type="text" id="buscarRecibo" placeholder="Folio o grupo o concepto">
+                </div>
+                <div class="field">
+                    <label>📅 Filtrar por fecha</label>
+                    <input type="date" id="filtroFecha">
+                </div>
             </div>
-            <div class="field">
-                <label>📅 Filtrar por fecha</label>
-                <input type="date" id="filtroFecha">
+            <div class="excel-container" style="margin-top: 20px;">
+                <div style="overflow-x: auto;">
+                    <table class="excel-table">
+                        <thead>
+                            <tr><th>Folio</th><th>Juvenil</th><th>Concepto</th><th>Monto</th><th>Fecha/Hora</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody id="historialTableBody"></tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div class="excel-container" style="margin-top: 20px;">
-            <div style="overflow-x: auto;">
-                <table class="excel-table">
-                    <thead>
-                        <tr>
-                            <th>Folio</th>
-                            <th>Juvenil</th>
-                            <th>Concepto</th>
-                            <th>Monto</th>
-                            <th>Fecha/Hora</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historialTableBody"></tbody>
-                </table>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn-main" id="btnExportarHistorial" style="background: #10b981; width: auto; padding: 10px 20px;">📊 Exportar a Excel</button>
             </div>
-        </div>
-        <div style="margin-top: 20px; text-align: center;">
-            <button class="btn-main" id="btnExportarHistorial" style="background: #10b981; width: auto; padding: 10px 20px;">📊 Exportar a Excel</button>
         </div>
     </div>
 </div>
 
-<!-- Tab 7: Significado de Colores -->
-<div id="tab7" class="tab-content">
-    <div class="card">
-        <div class="section-title">🎨 Significado de Colores</div>
-        <p style="color: #64748b; margin-bottom: 20px;">
-            Define qué significa cada color para que los usuarios lo entiendan en el calendario.
-            Estos significados aparecerán en la leyenda de la página principal.
-        </p>
-        
-        <div class="significado-colores-grid" id="significadoColoresGrid">
-            <!-- Los colores se cargarán dinámicamente -->
+<!-- Modal de gestión de colores -->
+<div id="modalGestionColores" class="modal-gestion-colores">
+    <div class="modal-gestion-colores-content">
+        <div class="modal-gestion-colores-header">
+            <h3>🎨 Gestionar Significados de Colores</h3>
+            <span class="close-modal-colores">&times;</span>
         </div>
-        
-        <div style="margin-top: 20px; padding: 12px; background: #fef9c3; border-radius: 12px;">
-            <p style="font-size: 12px; color: #854d0e; margin: 0;">
-                💡 Los significados que guardes aquí se mostrarán automáticamente en la leyenda del calendario principal.
+        <div class="modal-gestion-colores-body">
+            <p style="color: #64748b; margin-bottom: 20px;">
+                Define el significado de cada color. Solo los colores con significado aparecerán en el selector de actividades.
             </p>
+            <div class="significado-colores-grid" id="significadoColoresGrid">
+                <!-- Los colores se cargarán dinámicamente -->
+            </div>
+        </div>
+        <div class="modal-gestion-colores-footer">
+            <button class="btn-cerrar-modal-colores" id="btnCerrarModalColores">Cerrar</button>
         </div>
     </div>
 </div>
-</div>
 
-<!-- Modal Reset -->
 <!-- Modal Reset -->
 <div id="modalReset" class="modal-reset">
     <div class="modal-reset-content">
@@ -402,9 +364,9 @@
                 <strong>📜 Historial de recibos</strong> - Eliminar todos los comprobantes del historial
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-    <input type="checkbox" id="resetSignificados" value="significados">
-    <strong>🎨 Significados de colores</strong> - Eliminar todos los significados personalizados
-</label>
+                <input type="checkbox" id="resetSignificados" value="significados">
+                <strong>🎨 Significados de colores</strong> - Eliminar todos los significados personalizados
+            </label>
         </div>
         <p><strong style="color: #ef4444;">⚠️ Esta acción NO se puede deshacer.</strong></p>
         <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
@@ -415,10 +377,9 @@
 </div>
 
 <div id="toast" class="toast"></div>
-<!-- Agregar justo antes de cerrar el body, después del div toast -->
 <div id="syncStatusLabel" style="position: fixed; bottom: 15px; left: 15px; background: #f1f5f9; padding: 6px 12px; border-radius: 20px; font-size: 11px; color: #0891b2; display: flex; align-items: center; gap: 6px; z-index: 999; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <span id="syncIcon">🔄</span>
-    <span id="syncText">Sincronizando...</span>
+    <span id="syncIcon">☁️</span>
+    <span id="syncText">En línea</span>
 </div>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -430,9 +391,7 @@
 <script src="js/whatsapp.js"></script>
 <script src="js/autenticacion.js"></script>
 <script src="js/biblioteca-admin.js"></script>
-<script src="js/panel-admin.js"></script>
 <script src="js/historial-recibos.js"></script>
-<!-- Agregar al final del body, antes de cerrar -->
-<script src="js/seguridad.js"></script>
+<script src="js/panel-admin.js"></script>
 </body>
 </html>
