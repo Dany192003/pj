@@ -89,6 +89,72 @@
     background: linear-gradient(135deg, #0e7490 0%, #2563eb 100%);
 }
 
+/* Leyenda de colores */
+.leyenda-container {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 30px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.leyenda-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.leyenda-header span {
+    font-size: 24px;
+}
+
+.leyenda-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.leyenda-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+}
+
+.leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 18px;
+    background: #f8fafc;
+    border-radius: 40px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.leyenda-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    background: #f1f5f9;
+}
+
+.leyenda-color {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.leyenda-texto {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
 .footer {
     text-align: center;
     margin-top: 40px;
@@ -214,4 +280,9 @@
     .hero-logo-img { max-width: 70px; }
     .action-btn { padding: 12px 20px; font-size: 14px; }
     .modal-content { margin: 30% auto; padding: 24px; }
+    .leyenda-container { padding: 16px; }
+    .leyenda-header h3 { font-size: 16px; }
+    .leyenda-item { padding: 5px 12px; }
+    .leyenda-texto { font-size: 11px; }
+    .leyenda-color { width: 18px; height: 18px; }
 }

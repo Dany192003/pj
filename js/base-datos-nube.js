@@ -1,4 +1,4 @@
-// js/base-datos-nube.js - Gestión de datos en Firebase (actualizado)
+// js/base-datos-nube.js - Gestión de datos en Firebase
 
 const GRUPOS = [
     'Confirmación', 'Jeshua', 'Jufra', 'Lectores',
@@ -57,6 +57,21 @@ if (!document.querySelector('#syncStyles')) {
         }
     `;
     document.head.appendChild(style);
+}
+
+// ── Significados de colores ──────────────────────────────────────────────────
+
+async function cargarSignificadosColores() {
+    const snapshot = await coleccionSignificadosColores.get();
+    const significados = {};
+    snapshot.forEach(doc => {
+        significados[doc.id] = doc.data().significado;
+    });
+    return significados;
+}
+
+async function guardarSignificadoColor(color, significado) {
+    await coleccionSignificadosColores.doc(color).set({ significado: significado });
 }
 
 // ── Carga y guardado ──────────────────────────────────────────────────────────
@@ -196,14 +211,13 @@ async function cargarEventos() {
     return eventos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 }
 
-
 async function agregarEvento(fecha, titulo, lugar, descripcion, color) {
     const evento = {
         fecha,
         titulo,
         lugar: lugar || '',
         descripcion: descripcion || '',
-        color: color || '#0891b2', // Color por defecto azul
+        color: color || '#0891b2',
         creado: new Date().toISOString()
     };
     const docRef = await coleccionEventos.add(evento);
@@ -293,7 +307,7 @@ async function actualizarCategoria(categoriaId, nombre, icono) {
     await coleccionCategorias.doc(categoriaId).update({ nombre, icono });
 }
 
-// ── Reset sistema (con historial) ─────────────────────────────────────────────
+// ── Reset sistema ─────────────────────────────────────────────────────────────
 
 async function resetSistema(opciones) {
     return new Promise(async (resolve, reject) => {
@@ -313,6 +327,7 @@ async function resetSistema(opciones) {
             if (opciones?.biblioteca)   await deleteCollection(coleccionRecursos);
             if (opciones?.categorias)   await deleteCollection(coleccionCategorias);
             if (opciones?.historial)    await deleteCollection(coleccionHistorialRecibos);
+            if (opciones?.significados) await deleteCollection(coleccionSignificadosColores);
 
             if (opciones?.recibos) {
                 ultimoNum = 0;
@@ -361,5 +376,6 @@ Object.assign(window, {
     cargarContraseñasGrupos, guardarContraseñaGrupo, verificarContraseñaGrupo,
     cargarRecursos, agregarRecurso, eliminarRecursoCloud,
     cargarCategorias, agregarCategoria, eliminarCategoria, actualizarCategoria,
+    cargarSignificadosColores, guardarSignificadoColor,
     resetSistema
 });

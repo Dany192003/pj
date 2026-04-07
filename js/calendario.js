@@ -1,4 +1,4 @@
-// js/calendario.js - Calendario de actividades (con colores de fondo)
+// js/calendario.js - Calendario de actividades con leyenda de colores
 
 let currentDate = new Date();
 let currentYear = currentDate.getFullYear();
@@ -8,6 +8,7 @@ let eventosGlobal = [];
 async function initCalendar() {
     eventosGlobal = await cargarEventos();
     renderCalendar();
+    generarLeyendaColores();
     crearModalActividad();
     
     const prevBtn = document.getElementById("prevMonth");
@@ -74,11 +75,8 @@ function renderCalendar() {
         
         if (eventosDia.length > 0) {
             dayElement.classList.add("has-event");
-            // Obtener el color de la primera actividad
             const colorPrincipal = eventosDia[0].color || '#0891b2';
-            // Aplicar color de fondo
             dayElement.style.backgroundColor = colorPrincipal;
-            // Aplicar borde izquierdo del mismo color
             dayElement.style.borderLeftColor = colorPrincipal;
             
             eventosDia.forEach(evento => {
@@ -109,6 +107,71 @@ function renderCalendar() {
         
         calendarDays.appendChild(dayElement);
     }
+    
+    generarLeyendaColores();
+}
+
+async function generarLeyendaColores() {
+    const leyendaContainer = document.getElementById('leyendaContainer');
+    const leyendaGrid = document.getElementById('leyendaColores');
+    
+    if (!leyendaContainer || !leyendaGrid) return;
+    
+    const significados = await cargarSignificadosColores();
+    
+    const coloresUnicos = new Map();
+    eventosGlobal.forEach(evento => {
+        const color = evento.color || '#0891b2';
+        if (!coloresUnicos.has(color)) {
+            coloresUnicos.set(color, {
+                titulo: evento.titulo,
+                color: color
+            });
+        }
+    });
+    
+    if (coloresUnicos.size === 0) {
+        leyendaContainer.style.display = 'none';
+        return;
+    }
+    
+    leyendaContainer.style.display = 'block';
+    
+    const nombresColores = {
+        '#0891b2': '🔵 Azul',
+        '#ef4444': '🔴 Rojo',
+        '#f97316': '🟠 Naranja',
+        '#eab308': '🟡 Amarillo',
+        '#10b981': '🟢 Verde',
+        '#8b5cf6': '🟣 Morado',
+        '#ec4899': '🩷 Rosa',
+        '#06b6d4': '💙 Cian',
+        '#f59e0b': '🟧 Ámbar',
+        '#6366f1': '🔮 Índigo'
+    };
+    
+    leyendaGrid.innerHTML = Array.from(coloresUnicos.entries()).map(([color, info]) => {
+        let significado = significados[color];
+        let mostrarSignificado = '';
+        
+        if (significado && significado.trim() !== '') {
+            mostrarSignificado = `<span style="font-size: 11px;">${significado.length > 35 ? significado.substring(0, 35) + '...' : significado}</span>`;
+        } else {
+            mostrarSignificado = `<span style="font-size: 11px; opacity: 0.7;">📌 ${info.titulo.length > 30 ? info.titulo.substring(0, 30) + '...' : info.titulo}</span>`;
+        }
+        
+        const nombreColor = nombresColores[color] || '🎨 Color';
+        
+        return `
+            <div class="leyenda-item">
+                <div class="leyenda-color" style="background-color: ${color};"></div>
+                <div class="leyenda-texto">
+                    <strong>${nombreColor}</strong><br>
+                    ${mostrarSignificado}
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function crearModalActividad() {

@@ -47,6 +47,16 @@
         <div class="calendar-days" id="calendarDays"></div>
     </div>
 
+    <!-- Leyenda de colores -->
+    <div class="leyenda-container" id="leyendaContainer" style="display: none;">
+        <div class="leyenda-header">
+            <span>🎨</span>
+            <h3>Significado de colores</h3>
+            <span>📌</span>
+        </div>
+        <div class="leyenda-grid" id="leyendaColores"></div>
+    </div>
+
     <div class="footer">
         <div class="footer-text">
             📌 Actividades programadas por la Pastoral Juvenil - Parroquia San Agustín Sumpango
@@ -72,13 +82,10 @@
     </div>
 </div>
 
-
 <div id="toast" class="toast"></div>
-
-<!-- Agregar justo antes de cerrar el body, después del div toast -->
 <div id="syncStatusLabel" style="position: fixed; bottom: 15px; left: 15px; background: #f1f5f9; padding: 6px 12px; border-radius: 20px; font-size: 11px; color: #0891b2; display: flex; align-items: center; gap: 6px; z-index: 999; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <span id="syncIcon">🔄</span>
-    <span id="syncText">Sincronizando...</span>
+    <span id="syncIcon">☁️</span>
+    <span id="syncText">En línea</span>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>

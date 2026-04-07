@@ -25,7 +25,7 @@ function formatearFechaAdmin(fechaISO) {
 }
 
 // ── Eventos ───────────────────────────────────────────────────────────────────
-// En cargarEventosAdmin, mostrar el color en la lista
+
 async function cargarEventosAdmin() {
     const eventosList = document.getElementById('eventosList');
     if (!eventosList) return;
@@ -223,9 +223,242 @@ async function cargarRecursosAdmin() {
             };
         });
     } catch (error) {
-        recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos</td></tr>';
+        recursosTableBody.innerHTML = '<td><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos</td></tr>';
     }
 }
+
+// ── Significados de colores (todos los colores predefinidos) ─────────────────
+
+async function cargarSignificadosAdmin() {
+    const significadosGrid = document.getElementById('significadoColoresGrid');
+    if (!significadosGrid) return;
+    
+    const significados = await cargarSignificadosColores();
+    
+    const colores = [
+        { codigo: '#0891b2', nombre: 'Azul', icono: '🔵', default: '' },
+        { codigo: '#ef4444', nombre: 'Rojo', icono: '🔴', default: '' },
+        { codigo: '#f97316', nombre: 'Naranja', icono: '🟠', default: '' },
+        { codigo: '#eab308', nombre: 'Amarillo', icono: '🟡', default: '' },
+        { codigo: '#10b981', nombre: 'Verde', icono: '🟢', default: '' },
+        { codigo: '#8b5cf6', nombre: 'Morado', icono: '🟣', default: '' },
+        { codigo: '#ec4899', nombre: 'Rosa', icono: '🩷', default: '' },
+        { codigo: '#06b6d4', nombre: 'Cian', icono: '💙', default: '' },
+        { codigo: '#f59e0b', nombre: 'Ámbar', icono: '🟧', default: '' },
+        { codigo: '#6366f1', nombre: 'Índigo', icono: '🔮', default: '' }
+    ];
+    
+    significadosGrid.innerHTML = colores.map(color => {
+        const significadoActual = significados[color.codigo] || '';
+        const tieneSignificado = significadoActual.trim() !== '';
+        
+        return `
+            <div class="significado-item ${tieneSignificado ? 'tiene-significado' : ''}" data-color="${color.codigo}">
+                <div class="significado-info">
+                    <div class="significado-color" style="background-color: ${color.codigo};"></div>
+                    <span class="significado-nombre">${color.icono} ${color.nombre}</span>
+                    ${tieneSignificado ? '<span class="significado-badge">✓ Activo</span>' : '<span class="significado-badge inactivo">⚡ Sin significado</span>'}
+                </div>
+                <div class="significado-input-group">
+                    <input type="text" id="significado_${color.codigo.replace('#', '')}" 
+                           class="significado-input" 
+                           placeholder="Ej: Actividades de formación, Eventos importantes..."
+                           value="${significadoActual.replace(/"/g, '&quot;')}">
+                    <button class="btn-guardar-significado" data-color="${color.codigo}">💾 Guardar</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    document.querySelectorAll('.btn-guardar-significado').forEach(btn => {
+        // En la función cargarSignificadosAdmin, dentro del btn.onclick:
+
+btn.onclick = async () => {
+    const color = btn.dataset.color;
+    const input = document.getElementById(`significado_${color.replace('#', '')}`);
+    const significado = input.value.trim();
+    
+    await guardarSignificadoColor(color, significado);
+    
+    // Actualizar el badge y la clase
+    const parent = btn.closest('.significado-item');
+    if (significado) {
+        parent.classList.add('tiene-significado');
+        const badge = parent.querySelector('.significado-badge');
+        if (badge) {
+            badge.textContent = '✓ Activo';
+            badge.classList.remove('inactivo');
+        }
+    } else {
+        parent.classList.remove('tiene-significado');
+        const badge = parent.querySelector('.significado-badge');
+        if (badge) {
+            badge.textContent = '⚡ Sin significado';
+            badge.classList.add('inactivo');
+        }
+    }
+    
+    // Recargar el selector de colores en actividades
+    await cargarSelectColoresActividades();
+    
+    window.showToast(significado ? `✓ Significado guardado para ${color}` : `✓ Significado eliminado para ${color}`, false);
+};
+    });
+}
+
+// ── Cargar selector de colores para actividades (solo colores con significado) ─
+
+// ── Cargar selector de colores para actividades (solo colores con significado) ─
+
+async function cargarSelectColoresActividades() {
+    const select = document.getElementById('eventoColor');
+    if (!select) return;
+    
+    const significados = await cargarSignificadosColores();
+    
+    const coloresPredeterminados = [
+        { codigo: '#0891b2', nombre: 'Azul', icono: '🔵' },
+        { codigo: '#ef4444', nombre: 'Rojo', icono: '🔴' },
+        { codigo: '#f97316', nombre: 'Naranja', icono: '🟠' },
+        { codigo: '#eab308', nombre: 'Amarillo', icono: '🟡' },
+        { codigo: '#10b981', nombre: 'Verde', icono: '🟢' },
+        { codigo: '#8b5cf6', nombre: 'Morado', icono: '🟣' },
+        { codigo: '#ec4899', nombre: 'Rosa', icono: '🩷' },
+        { codigo: '#06b6d4', nombre: 'Cian', icono: '💙' },
+        { codigo: '#f59e0b', nombre: 'Ámbar', icono: '🟧' },
+        { codigo: '#6366f1', nombre: 'Índigo', icono: '🔮' }
+    ];
+    
+    // Filtrar solo colores que tienen significado guardado (no vacío)
+    const coloresConSignificado = coloresPredeterminados.filter(color => {
+        const significado = significados[color.codigo];
+        return significado && significado.trim() !== '';
+    });
+    
+    // Si no hay colores con significado, mostrar mensaje y deshabilitar
+    if (coloresConSignificado.length === 0) {
+        select.innerHTML = '<option value="" disabled selected>⚠️ No hay colores disponibles - Ve a "Significado Colores"</option>';
+        select.disabled = true;
+        return;
+    }
+    
+    // Habilitar el select y mostrar solo colores con significado
+    select.disabled = false;
+    select.innerHTML = '<option value="" disabled selected>-- Seleccione un color --</option>' +
+        coloresConSignificado.map(color => 
+            `<option value="${color.codigo}" style="background-color: ${color.codigo}; color: white; padding: 5px;">${color.icono} ${color.nombre}</option>`
+        ).join('');
+}
+
+// ── Subir recurso ─────────────────────────────────────────────────────────────
+
+const btnSubirRecurso = document.getElementById('btnSubirRecurso');
+if (btnSubirRecurso) {
+    const nuevoBtn = btnSubirRecurso.cloneNode(true);
+    btnSubirRecurso.parentNode.replaceChild(nuevoBtn, btnSubirRecurso);
+    
+    nuevoBtn.addEventListener('click', async function subirRecursoHandler(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (nuevoBtn.disabled) {
+            console.log("⚠️ Subida ya en proceso, espera...");
+            return;
+        }
+        
+        const titulo = document.getElementById('recursoTitulo').value.trim();
+        const categoria = document.getElementById('recursoCategoria').value;
+        const descripcion = document.getElementById('recursoDescripcion').value.trim();
+        const archivo = document.getElementById('recursoArchivo').files[0];
+
+        if (!titulo) { window.showToast('❌ Ingresa un título', true); return; }
+        if (!archivo) { window.showToast('❌ Selecciona un archivo', true); return; }
+        if (!categoria) { window.showToast('❌ Selecciona una categoría', true); return; }
+        if (archivo.size > 10 * 1024 * 1024) {
+            window.showToast('❌ El archivo es demasiado grande (máx 10MB)', true);
+            return;
+        }
+
+        nuevoBtn.disabled = true;
+        const textoOriginal = nuevoBtn.innerHTML;
+        nuevoBtn.innerHTML = '<span class="spinner"></span> Subiendo...';
+        
+        window.showToast('📤 Subiendo archivo...', false);
+
+        try {
+            let nombreLimpio = titulo
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/gi, '_')
+                .replace(/_+/g, '_')
+                .toLowerCase()
+                .substring(0, 40);
+            
+            if (!nombreLimpio) nombreLimpio = 'recurso';
+            
+            const formData = new FormData();
+            formData.append("file", archivo);
+            formData.append("upload_preset", "comprobantes");
+            formData.append("folder", "biblioteca");
+            formData.append("public_id", nombreLimpio);
+            
+            const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/upload", {
+                method: "POST",
+                body: formData
+            });
+            
+            if (!res.ok) throw new Error(`Error: ${res.status}`);
+            const data = await res.json();
+            
+            const tipo = archivo.type.startsWith('image/') ? 'image' : 'pdf';
+            
+            const recurso = {
+                titulo: titulo,
+                categoria: categoria,
+                descripcion: descripcion || "",
+                url: data.secure_url,
+                public_id: data.public_id,
+                resource_type: data.resource_type,
+                tipo: tipo,
+                fecha: new Date().toISOString()
+            };
+            
+            await coleccionRecursos.add(recurso);
+            
+            document.getElementById('recursoTitulo').value = '';
+            document.getElementById('recursoDescripcion').value = '';
+            document.getElementById('recursoArchivo').value = '';
+            document.getElementById('previewArchivo').innerHTML = '';
+            
+            await cargarRecursosAdmin();
+            window.showToast('✓ Recurso subido exitosamente', false);
+            
+        } catch (error) {
+            console.error('Error:', error);
+            window.showToast('❌ Error al subir el recurso: ' + (error.message || 'Error desconocido'), true);
+        } finally {
+            nuevoBtn.disabled = false;
+            nuevoBtn.innerHTML = textoOriginal;
+        }
+    });
+}
+
+// Preview del archivo seleccionado
+document.getElementById('recursoArchivo')?.addEventListener('change', (e) => {
+    const previewDiv = document.getElementById('previewArchivo');
+    const file = e.target.files[0];
+    if (!file) { previewDiv.innerHTML = ''; return; }
+
+    if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            previewDiv.innerHTML = `<img src="${ev.target.result}" style="max-width:100px;max-height:100px;border-radius:8px;">`;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        const icon = file.type === 'application/pdf' ? '📄' : '📎';
+        previewDiv.innerHTML = `<div style="padding:10px;background:#f1f5f9;border-radius:8px;">${icon} ${file.name}</div>`;
+    }
+});
 
 // ── Inicialización ────────────────────────────────────────────────────────────
 
@@ -243,8 +476,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     actNumeroReciboPreview();
     await cargarSelectCategorias();
     await cargarListaCategoriasAdmin();
+    await cargarSelectColoresActividades(); // Cargar solo colores con significado
 
-    // Botones principales
     document.getElementById('btnVistaPrevia').onclick    = generarVistaPrevia;
     document.getElementById('btnConfirmarEnviar').onclick = subirYEnviar;
     document.getElementById('btnLogout').onclick          = logout;
@@ -270,10 +503,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             await cargarListaCategoriasAdmin();
         }
         if (tabId === 'tab6') {
-    if (typeof cargarHistorialRecibos === 'function') {
-        await cargarHistorialRecibos();
-    }
-}
+            if (typeof cargarHistorialRecibos === 'function') {
+                await cargarHistorialRecibos();
+            }
+        }
+        if (tabId === 'tab7') {
+            await cargarSignificadosAdmin();
+        }
     }
 
     tabs.forEach(tab => {
@@ -311,27 +547,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ── Agregar evento ────────────────────────────────────────────────────────
-// ── Agregar evento (con color) ────────────────────────────────────────────────
-document.getElementById('btnAgregarEvento')?.addEventListener('click', async () => {
-    const fecha       = document.getElementById('eventoFecha').value;
-    const titulo      = document.getElementById('eventoTitulo').value.trim();
-    const lugar       = document.getElementById('eventoLugar').value.trim();
-    const descripcion = document.getElementById('eventoDescripcion').value.trim();
-    const color       = document.getElementById('eventoColor').value;
+    // ── Agregar evento (con colores filtrados) ────────────────────────────────
+    document.getElementById('btnAgregarEvento')?.addEventListener('click', async () => {
+        const fecha       = document.getElementById('eventoFecha').value;
+        const titulo      = document.getElementById('eventoTitulo').value.trim();
+        const lugar       = document.getElementById('eventoLugar').value.trim();
+        const descripcion = document.getElementById('eventoDescripcion').value.trim();
+        const color       = document.getElementById('eventoColor').value;
 
-    if (!fecha)  { window.showToast('❌ Selecciona una fecha', true); return; }
-    if (!titulo) { window.showToast('❌ Escribe un título', true); return; }
+        if (!fecha)  { window.showToast('❌ Selecciona una fecha', true); return; }
+        if (!titulo) { window.showToast('❌ Escribe un título', true); return; }
 
-    await agregarEvento(fecha, titulo, lugar, descripcion, color);
+        await agregarEvento(fecha, titulo, lugar, descripcion, color);
 
-    ['eventoFecha', 'eventoTitulo', 'eventoLugar', 'eventoDescripcion']
-        .forEach(id => { document.getElementById(id).value = ''; });
-    document.getElementById('eventoColor').value = '#0891b2'; // Resetear color
+        ['eventoFecha', 'eventoTitulo', 'eventoLugar', 'eventoDescripcion']
+            .forEach(id => { document.getElementById(id).value = ''; });
+        document.getElementById('eventoColor').value = '#0891b2';
 
-    await cargarEventosAdmin();
-    window.showToast('✓ Actividad agregada', false);
-});
+        await cargarEventosAdmin();
+        window.showToast('✓ Actividad agregada', false);
+    });
 
     // ── Agregar categoría ─────────────────────────────────────────────────────
     document.getElementById('btnAgregarCategoria')?.addEventListener('click', async () => {
@@ -348,227 +583,69 @@ document.getElementById('btnAgregarEvento')?.addEventListener('click', async () 
         window.showToast('✓ Categoría agregada', false);
     });
 
-// ── Subir recurso (con carpeta biblioteca en Cloudinary) ─────────────────────
-const btnSubirRecurso = document.getElementById('btnSubirRecurso');
-if (btnSubirRecurso) {
-    // Remover event listeners anteriores para evitar duplicados
-    const nuevoBtn = btnSubirRecurso.cloneNode(true);
-    btnSubirRecurso.parentNode.replaceChild(nuevoBtn, btnSubirRecurso);
-    
-    nuevoBtn.addEventListener('click', async function subirRecursoHandler(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (nuevoBtn.disabled) {
-            console.log("⚠️ Subida ya en proceso, espera...");
-            return;
-        }
-        
-        const titulo = document.getElementById('recursoTitulo').value.trim();
-        const categoria = document.getElementById('recursoCategoria').value;
-        const descripcion = document.getElementById('recursoDescripcion').value.trim();
-        const archivo = document.getElementById('recursoArchivo').files[0];
-
-        if (!titulo) { window.showToast('❌ Ingresa un título', true); return; }
-        if (!archivo) { window.showToast('❌ Selecciona un archivo', true); return; }
-        if (!categoria) { window.showToast('❌ Selecciona una categoría', true); return; }
-        if (archivo.size > 10 * 1024 * 1024) {
-            window.showToast('❌ El archivo es demasiado grande (máx 10MB)', true);
-            return;
-        }
-
-        nuevoBtn.disabled = true;
-        const textoOriginal = nuevoBtn.innerHTML;
-        nuevoBtn.innerHTML = '<span class="spinner"></span> Subiendo...';
-        
-        window.showToast('📤 Subiendo archivo...', false);
-
-        try {
-            // Limpiar el título para usarlo como nombre
-            let nombreLimpio = titulo
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-z0-9]/gi, '_')
-                .replace(/_+/g, '_')
-                .toLowerCase()
-                .substring(0, 40);
-            
-            if (!nombreLimpio) nombreLimpio = 'recurso';
-            
-            const extension = archivo.name.split('.').pop();
-            const publicId = `${nombreLimpio}`;
-            
-            // Crear FormData
-            const formData = new FormData();
-            formData.append("file", archivo);
-            formData.append("upload_preset", "comprobantes");
-            formData.append("folder", "biblioteca");  // <-- CARPETA BIBLIOTECA
-            formData.append("public_id", publicId);
-            
-            console.log("📤 Subiendo a Cloudinary (carpeta: biblioteca)...", { 
-                publicId: publicId,
-                folder: "biblioteca"
-            });
-            
-            const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/upload", {
-                method: "POST",
-                body: formData
-            });
-            
-            if (!res.ok) {
-                const errorText = await res.text();
-                console.error("❌ Error Cloudinary:", errorText);
-                throw new Error(`Error en Cloudinary: ${res.status}`);
-            }
-            
-            const data = await res.json();
-            console.log("✓ Archivo subido a Cloudinary:", data.secure_url);
-            console.log("✓ Public ID:", data.public_id);
-            console.log("✓ Carpeta:", data.folder || "biblioteca");
-            
-            const tipo = archivo.type.startsWith('image/') ? 'image' : 'pdf';
-            
-            // Guardar en Firestore
-            const recurso = {
-                titulo: titulo,
-                categoria: categoria,
-                descripcion: descripcion || "",
-                url: data.secure_url,
-                public_id: data.public_id,
-                resource_type: data.resource_type,
-                tipo: tipo,
-                fecha: new Date().toISOString()
-            };
-            
-            await coleccionRecursos.add(recurso);
-            
-            // Limpiar formulario
-            document.getElementById('recursoTitulo').value = '';
-            document.getElementById('recursoDescripcion').value = '';
-            document.getElementById('recursoArchivo').value = '';
-            document.getElementById('previewArchivo').innerHTML = '';
-            
-            // Recargar lista
-            await cargarRecursosAdmin();
-            window.showToast('✓ Recurso subido exitosamente', false);
-            
-        } catch (error) {
-            console.error('Error:', error);
-            window.showToast('❌ Error al subir el recurso: ' + (error.message || 'Error desconocido'), true);
-        } finally {
-            nuevoBtn.disabled = false;
-            nuevoBtn.innerHTML = textoOriginal;
-        }
-    });
-}
-
-    // Preview del archivo seleccionado
-    document.getElementById('recursoArchivo')?.addEventListener('change', (e) => {
-        const previewDiv = document.getElementById('previewArchivo');
-        const file = e.target.files[0];
-        if (!file) { previewDiv.innerHTML = ''; return; }
-
-        if (file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                previewDiv.innerHTML = `<img src="${ev.target.result}" style="max-width:100px;max-height:100px;border-radius:8px;">`;
-            };
-            reader.readAsDataURL(file);
-        } else {
-            const icon = file.type === 'application/pdf' ? '📄' : '📎';
-            previewDiv.innerHTML = `<div style="padding:10px;background:#f1f5f9;border-radius:8px;">${icon} ${file.name}</div>`;
-        }
-    });
-
     // ── Modal Reset ───────────────────────────────────────────────────────────
-   // ── Modal Reset ───────────────────────────────────────────────────────────
-const modalReset = document.getElementById('modalReset');
-const btnReset = document.getElementById('btnReset');
-const btnCancelReset = document.getElementById('btnCancelReset');
-const btnConfirmReset = document.getElementById('btnConfirmReset');
+    const modalReset     = document.getElementById('modalReset');
+    const btnReset       = document.getElementById('btnReset');
+    const btnCancelReset = document.getElementById('btnCancelReset');
+    const btnConfirmReset = document.getElementById('btnConfirmReset');
 
-if (btnReset) {
-    btnReset.onclick = () => {
-        if (modalReset) {
-            modalReset.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Evitar scroll de fondo
-        }
-    };
-}
-
-if (btnCancelReset) {
-    btnCancelReset.onclick = () => {
-        if (modalReset) {
-            modalReset.style.display = 'none';
-            document.body.style.overflow = ''; // Restaurar scroll
-        }
-    };
-}
-
-if (btnConfirmReset) {
-    btnConfirmReset.onclick = async () => {
-        const getId = (id) => document.getElementById(id)?.checked || false;
-        const opciones = {
-            pagos:       getId('resetPagos'),
-            actividades: getId('resetActividades'),
-            passwords:   getId('resetPasswords'),
-            recibos:     getId('resetRecibos'),
-            biblioteca:  getId('resetBiblioteca'),
-            categorias:  getId('resetCategorias'),
-            historial:   getId('resetHistorial')
+    if (btnReset) {
+        btnReset.onclick = () => {
+            if (modalReset) {
+                modalReset.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
         };
+    }
 
-        if (!Object.values(opciones).some(Boolean)) {
-            window.showToast('❌ Selecciona al menos un elemento para reiniciar', true);
-            return;
-        }
+    if (btnCancelReset) {
+        btnCancelReset.onclick = () => {
+            if (modalReset) {
+                modalReset.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        };
+    }
 
-        if (modalReset) {
+    if (btnConfirmReset) {
+        btnConfirmReset.onclick = async () => {
+            const getId = (id) => document.getElementById(id)?.checked || false;
+            const opciones = {
+                pagos:       getId('resetPagos'),
+                actividades: getId('resetActividades'),
+                passwords:   getId('resetPasswords'),
+                recibos:     getId('resetRecibos'),
+                biblioteca:  getId('resetBiblioteca'),
+                categorias:  getId('resetCategorias'),
+                historial:   getId('resetHistorial'),
+                significados: getId('resetSignificados')
+            };
+
+            if (!Object.values(opciones).some(Boolean)) {
+                window.showToast('❌ Selecciona al menos un elemento para reiniciar', true);
+                return;
+            }
+
+            if (modalReset) {
+                modalReset.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            await resetSistema(opciones);
+        };
+    }
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modalReset) {
             modalReset.style.display = 'none';
             document.body.style.overflow = '';
         }
-        await resetSistema(opciones);
-    };
-}
-
-// Cerrar modal si se hace clic fuera
-window.addEventListener('click', (e) => {
-    if (e.target === modalReset) {
-        modalReset.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-});
-
-// Cerrar con tecla ESC
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modalReset && modalReset.style.display === 'block') {
-        modalReset.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-});
-
-    btnConfirmReset?.addEventListener('click', async () => {
-        const getId = (id) => document.getElementById(id)?.checked || false;
-const opciones = {
-    pagos:       getId('resetPagos'),
-    actividades: getId('resetActividades'),
-    passwords:   getId('resetPasswords'),
-    recibos:     getId('resetRecibos'),
-    biblioteca:  getId('resetBiblioteca'),
-    categorias:  getId('resetCategorias'),
-    historial:   getId('resetHistorial')  // <-- NUEVO
-};
-
-        if (!Object.values(opciones).some(Boolean)) {
-            window.showToast('❌ Selecciona al menos un elemento para reiniciar', true);
-            return;
-        }
-
-        if (modalReset) modalReset.style.display = 'none';
-        await resetSistema(opciones);
     });
 
-    window.addEventListener('click', (e) => {
-        if (e.target === modalReset) modalReset.style.display = 'none';
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalReset && modalReset.style.display === 'flex') {
+            modalReset.style.display = 'none';
+            document.body.style.overflow = '';
+        }
     });
 
     window.showToast('✓ Panel administrativo listo', false);
