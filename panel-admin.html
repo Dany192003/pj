@@ -5,26 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#0891b2">
     <title>Admin | Pastoral Juvenil</title>
-      <!-- Favicon universal -->
-<!-- Favicon para todos los dispositivos (iPad, iPhone, Android, Desktop) -->
-<link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="img/favicon-48x48.png">
-<link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64x64.png">
-<link rel="icon" type="image/png" sizes="96x96" href="img/favicon-96x96.png">
-<link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
-<link rel="manifest" href="site.webmanifest">
-<meta name="msapplication-TileColor" content="#0891b2">
-<meta name="theme-color" content="#0891b2">
-
-<!-- Para iOS -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Pastoral Juvenil">
-
-<!-- Para Android -->
-<meta name="mobile-web-app-capable" content="yes">
-
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon universal -->
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="img/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="img/favicon-64x64.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="img/favicon-96x96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    
+    <!-- iOS soporte -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Pastoral Juvenil">
+    
+    <!-- Android soporte -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0891b2">
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/estilos-globales.css">
     <link rel="stylesheet" href="css/estilos-admin.css">
@@ -98,7 +100,7 @@
                     <label>📱 WhatsApp</label>
                     <input id="whatsapp" type="tel" placeholder="Número de teléfono">
                 </div>
-                <button class="btn-main" id="btnVistaPrevia">👀 Vista Previa</button>
+                <button class="btn-main" id="btnVistaPrevia">👁️ Vista Previa</button>
             </div>
 
             <div class="preview" id="preview" style="display: none;">
@@ -152,7 +154,7 @@
         </div>
     </div>
 
-    <!-- Tab 3: Actividades (con modal de colores integrado) -->
+    <!-- Tab 3: Actividades -->
     <div id="tab3" class="tab-content">
         <div class="card">
             <div class="section-title">📅 Agregar Actividad</div>
@@ -339,9 +341,7 @@
             <p style="color: #64748b; margin-bottom: 20px;">
                 Define el significado de cada color. Solo los colores con significado aparecerán en el selector de actividades.
             </p>
-            <div class="significado-colores-grid" id="significadoColoresGrid">
-                <!-- Los colores se cargarán dinámicamente -->
-            </div>
+            <div class="significado-colores-grid" id="significadoColoresGrid"></div>
         </div>
         <div class="modal-gestion-colores-footer">
             <button class="btn-cerrar-modal-colores" id="btnCerrarModalColores">Cerrar</button>
@@ -356,19 +356,19 @@
         <p>Selecciona qué datos deseas reiniciar:</p>
         <div style="text-align: left; margin: 20px 0;">
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetPagos" value="pagos" >
+                <input type="checkbox" id="resetPagos" value="pagos">
                 <strong>📊 Pagos y cuotas</strong> - Eliminar todos los registros de pagos
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetActividades" value="actividades" >
+                <input type="checkbox" id="resetActividades" value="actividades">
                 <strong>📅 Actividades</strong> - Eliminar todas las actividades del calendario
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetPasswords" value="passwords" >
+                <input type="checkbox" id="resetPasswords" value="passwords">
                 <strong>🔑 Contraseñas</strong> - Eliminar todas las contraseñas de grupos
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetRecibos" value="recibos" >
+                <input type="checkbox" id="resetRecibos" value="recibos">
                 <strong>🔢 Contador de recibos</strong> - Reiniciar a REC-0001
             </label>
             <label style="display: block; margin-bottom: 10px; cursor: pointer;">
@@ -401,6 +401,7 @@
     <span id="syncIcon">☁️</span>
     <span id="syncText">En línea</span>
 </div>
+
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -414,5 +415,20 @@
 <script src="js/biblioteca-admin.js"></script>
 <script src="js/historial-recibos.js"></script>
 <script src="js/panel-admin.js"></script>
+
+<script>
+// Registrar Service Worker para PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('Service Worker registrado:', registration);
+            })
+            .catch(error => {
+                console.log('Error al registrar Service Worker:', error);
+            });
+    });
+}
+</script>
 </body>
 </html>
