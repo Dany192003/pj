@@ -13,46 +13,68 @@ if (typeof window.showToast !== 'function') {
 
 let anioSeleccionado = new Date().getFullYear();
 
-// Crear modal de confirmación personalizado
-function crearModalConfirmacion() {
-    if (document.getElementById("modalConfirmacion")) return;
-    
-    const modalHTML = `
-        <div id="modalConfirmacion" class="modal-confirmacion">
-            <div class="modal-confirmacion-content">
-                <div class="modal-confirmacion-header">
-                    <span class="modal-confirmacion-icon" id="confirmacionIcono">⚠️</span>
-                    <h3 id="confirmacionTitulo">Confirmar cambio</h3>
-                </div>
-                <div class="modal-confirmacion-body">
-                    <p id="confirmacionMensaje">¿Estás seguro de realizar esta acción?</p>
-                </div>
-                <div class="modal-confirmacion-footer">
-                    <button class="btn-confirmar-cancelar" id="btnConfirmarNo">Cancelar</button>
-                    <button class="btn-confirmar-aceptar" id="btnConfirmarSi">Aceptar</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML("beforeend", modalHTML);
-}
-
-// Mostrar modal de confirmación
-function mostrarConfirmacion(mensaje, titulo = "Confirmar acción", icono = "⚠️") {
+// ========== MODAL DE CONFIRMACIÓN PARA TABLA DE CONTROL ==========
+function mostrarConfirmacionTabla(opciones) {
     return new Promise((resolve) => {
-        crearModalConfirmacion();
+        let modal = document.getElementById("modalConfirmacionTabla");
         
-        const modal = document.getElementById("modalConfirmacion");
-        const tituloElem = document.getElementById("confirmacionTitulo");
-        const mensajeElem = document.getElementById("confirmacionMensaje");
-        const iconoElem = document.getElementById("confirmacionIcono");
-        const btnSi = document.getElementById("btnConfirmarSi");
-        const btnNo = document.getElementById("btnConfirmarNo");
+        if (!modal) {
+            const modalHTML = `
+                <div id="modalConfirmacionTabla" class="modal-confirmacion">
+                    <div class="modal-confirmacion-content">
+                        <div class="modal-confirmacion-header">
+                            <div class="modal-confirmacion-icon" id="confirmacionTablaIcono">⚠️</div>
+                            <h3 id="confirmacionTablaTitulo">Confirmar acción</h3>
+                        </div>
+                        <div class="modal-confirmacion-body" id="confirmacionTablaBody">
+                            <p id="confirmacionTablaMensaje">¿Estás seguro de realizar esta acción?</p>
+                        </div>
+                        <div class="modal-confirmacion-footer">
+                            <button class="btn-confirmar-cancelar" id="btnTablaNo">
+                                <span>✗</span> Cancelar
+                            </button>
+                            <button class="btn-confirmar-aceptar" id="btnTablaSi">
+                                <span>✓</span> Confirmar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML("beforeend", modalHTML);
+            modal = document.getElementById("modalConfirmacionTabla");
+        }
         
-        tituloElem.textContent = titulo;
-        mensajeElem.innerHTML = mensaje; // Usar innerHTML para que renderice <strong>
-        iconoElem.textContent = icono;
+        const tituloElem = document.getElementById("confirmacionTablaTitulo");
+        const mensajeElem = document.getElementById("confirmacionTablaMensaje");
+        const iconoElem = document.getElementById("confirmacionTablaIcono");
+        const bodyElem = document.getElementById("confirmacionTablaBody");
+        const btnSi = document.getElementById("btnTablaSi");
+        const btnNo = document.getElementById("btnTablaNo");
+        
+        tituloElem.textContent = opciones.titulo || "Confirmar acción";
+        iconoElem.textContent = opciones.icono || "⚠️";
+        
+        // Limpiar elementos adicionales
+        const extras = bodyElem.querySelectorAll(".info-adicional");
+        extras.forEach(el => el.remove());
+        
+        let mensajeHTML = `<p>${opciones.mensaje}</p>`;
+        
+        if (opciones.grupo && opciones.mes) {
+            mensajeHTML = `
+                <p>${opciones.mensaje}</p>
+                <div class="info-adicional" style="background: #f1f5f9; padding: 12px; border-radius: 16px; margin: 12px 0; text-align: center;">
+                    <div style="font-weight: 700; color: #0891b2;">👥 ${escapeHtml(opciones.grupo)}</div>
+                    <div style="font-size: 13px; color: #475569;">📅 ${opciones.mes}</div>
+                </div>
+            `;
+        }
+        
+        if (opciones.advertencia) {
+            mensajeHTML += `<p style="color: #f97316; font-size: 13px; margin-top: 12px;">⚠️ ${opciones.advertencia}</p>`;
+        }
+        
+        mensajeElem.innerHTML = mensajeHTML;
         
         const cerrar = (resultado) => {
             modal.style.display = "none";
@@ -66,8 +88,40 @@ function mostrarConfirmacion(mensaje, titulo = "Confirmar acción", icono = "⚠
             if (e.target === modal) cerrar(false);
         };
         
-        modal.style.display = "block";
+        modal.style.display = "flex";
     });
+}
+
+// Función para mostrar toast de éxito
+function mostrarToastExitoTabla(mensaje) {
+    const toast = document.createElement("div");
+    toast.className = "toast-exito";
+    toast.innerHTML = `<span class="toast-icon">✅</span><span>${mensaje}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function mostrarToastErrorTabla(mensaje) {
+    const toast = document.createElement("div");
+    toast.className = "toast-error";
+    toast.innerHTML = `<span class="toast-icon">❌</span><span>${mensaje}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function renderTabla() {
@@ -126,10 +180,17 @@ async function handleStatusClick(e) {
     const icono = nuevoEstado === "pagado" ? "✅" : "⏳";
     const titulo = nuevoEstado === "pagado" ? "Confirmar pago" : "Confirmar cambio";
     
-    // Usar innerHTML para que renderice las etiquetas <strong>
-    const mensajeHtml = `¿Estás seguro de ${accion} el pago de <strong>${grupo}</strong> para el mes de <strong>${mes}</strong>?`;
+    // Construir mensaje correctamente
+    const mensaje = `¿Estás seguro de ${accion} el pago de <strong>${grupo}</strong> para el mes de <strong>${mes}</strong>?`;
     
-    const confirmado = await mostrarConfirmacion(mensajeHtml, titulo, icono);
+    const confirmado = await mostrarConfirmacionTabla({
+        titulo: titulo,
+        icono: icono,
+        mensaje: mensaje,
+        grupo: grupo,
+        mes: mes,
+        advertencia: "Esta acción modificará el registro de pagos."
+    });
     
     if (!confirmado) return;
     
@@ -164,7 +225,7 @@ async function handleStatusClick(e) {
         });
         
         saveDatabaseLocal();
-        window.showToast(`${nuevoEstado === "pagado" ? "✓ Pagado" : "✗ Pendiente"} - ${grupo} - ${mes}`, false);
+        mostrarToastExitoTabla(`${nuevoEstado === "pagado" ? "✓ Pagado" : "✗ Pendiente"} - ${grupo} - ${mes}`);
         
     } catch (error) {
         console.error("Error al guardar:", error);
@@ -172,7 +233,7 @@ async function handleStatusClick(e) {
         btn.classList.add(estadoActual === "pagado" ? "status-pagado" : "status-pendiente");
         btn.innerHTML = estadoActual === "pagado" ? "✓" : "✗";
         btn.dataset.estado = estadoActual;
-        window.showToast("❌ Error al guardar el cambio", true);
+        mostrarToastErrorTabla("❌ Error al guardar el cambio");
     } finally {
         btn.disabled = false;
     }
@@ -201,4 +262,52 @@ function initYearSelect() {
         sel.appendChild(o);
     }
     sel.value = anioSeleccionado;
+}
+
+// Agregar estilos para toasts si no existen
+if (!document.querySelector('#toastStylesTabla')) {
+    const style = document.createElement('style');
+    style.id = 'toastStylesTabla';
+    style.textContent = `
+        .toast-exito, .toast-error {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 13px;
+            z-index: 2001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .toast-exito {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        .toast-error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        .toast-exito.show, .toast-error.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .spinner-small {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
 }

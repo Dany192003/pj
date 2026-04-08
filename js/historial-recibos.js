@@ -10,6 +10,105 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Función para mostrar toast de éxito
+function mostrarToastExito(mensaje) {
+    const toast = document.createElement("div");
+    toast.className = "toast-exito";
+    toast.innerHTML = `<span class="toast-icon">✅</span><span>${mensaje}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Función para mostrar toast de error
+function mostrarToastError(mensaje) {
+    const toast = document.createElement("div");
+    toast.className = "toast-error";
+    toast.innerHTML = `<span class="toast-icon">❌</span><span>${mensaje}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Mostrar confirmación para eliminar comprobante
+async function mostrarConfirmacionEliminarComprobante(folio) {
+    return new Promise((resolve) => {
+        let modal = document.getElementById("modalConfirmacionComprobante");
+        
+        if (!modal) {
+            const modalHTML = `
+                <div id="modalConfirmacionComprobante" class="modal-confirmacion">
+                    <div class="modal-confirmacion-content">
+                        <div class="modal-confirmacion-header">
+                            <div class="modal-confirmacion-icon" style="font-size: 56px;">🧾</div>
+                            <h3 style="margin: 0; font-size: 22px;">Eliminar comprobante</h3>
+                        </div>
+                        <div class="modal-confirmacion-body">
+                            <p id="confirmacionComprobanteMensaje">¿Estás seguro de eliminar este comprobante?</p>
+                            <div id="comprobanteNombre" style="background: #f1f5f9; padding: 12px; border-radius: 16px; margin: 16px 0 8px; font-weight: 600; color: #0f172a;"></div>
+                            <p style="color: #ef4444; font-size: 13px;">⚠️ Esta acción no se puede deshacer.</p>
+                        </div>
+                        <div class="modal-confirmacion-footer">
+                            <button class="btn-confirmar-cancelar" id="btnComprobanteNo" style="flex: 1; padding: 12px; border-radius: 40px;">
+                                <span>✗</span> Cancelar
+                            </button>
+                            <button class="btn-confirmar-aceptar" id="btnComprobanteSi" style="flex: 1; padding: 12px; border-radius: 40px; background: linear-gradient(135deg, #ef4444, #dc2626);">
+                                <span>🗑️</span> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML("beforeend", modalHTML);
+            modal = document.getElementById("modalConfirmacionComprobante");
+        }
+        
+        const mensajeElem = document.getElementById("confirmacionComprobanteMensaje");
+        const nombreElem = document.getElementById("comprobanteNombre");
+        const btnSi = document.getElementById("btnComprobanteSi");
+        const btnNo = document.getElementById("btnComprobanteNo");
+        
+        mensajeElem.textContent = `¿Estás seguro de eliminar el comprobante?`;
+        nombreElem.textContent = `🧾 ${folio}`;
+        
+        const cerrar = (resultado) => {
+            modal.style.display = "none";
+            resolve(resultado);
+        };
+        
+        btnSi.onclick = () => cerrar(true);
+        btnNo.onclick = () => cerrar(false);
+        
+        modal.onclick = (e) => {
+            if (e.target === modal) cerrar(false);
+        };
+        
+        modal.style.display = "flex";
+    });
+}
+
+// Eliminar del historial (y de Cloudinary)
+async function eliminarReciboHistorial(id) {
+    try {
+        const doc = await coleccionHistorialRecibos.doc(id).get();
+        if (doc.exists) {
+            const data = doc.data();
+            if (data.public_id && typeof window.eliminarDeCloudinary === 'function') {
+                await window.eliminarDeCloudinary(data.public_id, 'image');
+            }
+        }
+    } catch (e) {
+        console.warn('⚠️ No se pudo eliminar de Cloudinary:', e);
+    }
+    await coleccionHistorialRecibos.doc(id).delete();
+}
+
 // Cargar historial desde Firestore
 async function cargarHistorialRecibos() {
     const tbody = document.getElementById('historialTableBody');
@@ -51,9 +150,9 @@ function renderizarHistorial() {
             <td>Q ${parseFloat(recibo.monto).toFixed(2)}<\/td>
             <td>${recibo.fecha}<br><small>${recibo.hora}<\/small><\/td>
             <td>
-                <a href="${recibo.url}" target="_blank" class="btn-ver" style="padding: 4px 8px; font-size: 11px; display: inline-block;">👁️ Ver</a>
+                <a href="${recibo.url}" target="_blank" class="btn-ver" style="padding: 4px 8px; font-size: 11px; display: inline-block; background: #0891b2; color: white; border-radius: 6px; text-decoration: none;">👁️ Ver</a>
                 <button class="btn-descargar-recibo" data-url="${recibo.url}" data-folio="REC-${recibo.numero}" style="background: #10b981; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-left: 5px;">⬇️</button>
-                <button class="btn-eliminar-recibo" data-id="${recibo.id}" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-left: 5px;">🗑️</button>
+                <button class="btn-eliminar-recibo" data-id="${recibo.id}" data-folio="REC-${recibo.numero}" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-left: 5px;">🗑️</button>
             <\/td>
         <\/tr>
     `).join("");
@@ -67,20 +166,45 @@ function renderizarHistorial() {
         };
     });
     
-    // Eventos de eliminar
+    // Eventos de eliminar con confirmación mejorada
     document.querySelectorAll('.btn-eliminar-recibo').forEach(btn => {
         btn.onclick = async () => {
             const id = btn.dataset.id;
-            if (confirm("¿Eliminar este comprobante del historial?")) {
+            const folio = btn.dataset.folio;
+            
+            const confirmado = await mostrarConfirmacionEliminarComprobante(folio);
+            if (!confirmado) return;
+            
+            try {
                 await eliminarReciboHistorial(id);
                 await cargarHistorialRecibos();
-                window.showToast("✓ Comprobante eliminado del historial", false);
+                mostrarToastExito("✓ Comprobante eliminado del historial");
+            } catch (error) {
+                mostrarToastError("❌ Error al eliminar el comprobante");
             }
         };
     });
 }
 
-// Guardar comprobante en historial (se llama después de generar un recibo)
+// Descargar comprobante
+async function descargarComprobante(url, folio) {
+    try {
+        mostrarToastExito(`📥 Descargando ${folio}...`);
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${folio}.png`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        mostrarToastExito(`✓ ${folio} descargado`);
+    } catch (error) {
+        console.error(error);
+        mostrarToastError("❌ Error al descargar");
+    }
+}
+
+// Guardar comprobante en historial
 async function guardarComprobanteHistorial(datos) {
     const recibo = {
         numero: datos.numero,
@@ -96,40 +220,6 @@ async function guardarComprobanteHistorial(datos) {
     
     await coleccionHistorialRecibos.add(recibo);
     console.log("✓ Comprobante guardado en historial");
-}
-
-// Descargar comprobante
-async function descargarComprobante(url, folio) {
-    try {
-        window.showToast(`📥 Descargando ${folio}...`, false);
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `${folio}.png`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-        window.showToast(`✓ ${folio} descargado`, false);
-    } catch (error) {
-        console.error(error);
-        window.showToast("❌ Error al descargar", true);
-    }
-}
-
-// Eliminar del historial (y de Cloudinary si tiene public_id)
-async function eliminarReciboHistorial(id) {
-    try {
-        const doc = await coleccionHistorialRecibos.doc(id).get();
-        if (doc.exists) {
-            const data = doc.data();
-            if (data.public_id && typeof window.eliminarDeCloudinary === 'function') {
-                await window.eliminarDeCloudinary(data.public_id, 'image');
-            }
-        }
-    } catch (e) {
-        console.warn('⚠️ No se pudo eliminar de Cloudinary:', e);
-    }
-    await coleccionHistorialRecibos.doc(id).delete();
 }
 
 // Filtrar historial
@@ -159,7 +249,7 @@ function filtrarHistorial() {
 // Exportar a Excel
 function exportarHistorialExcel() {
     if (recibosFiltrados.length === 0) {
-        window.showToast("❌ No hay datos para exportar", true);
+        mostrarToastError("❌ No hay datos para exportar");
         return;
     }
     
@@ -177,7 +267,7 @@ function exportarHistorialExcel() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    window.showToast("✓ Historial exportado", false);
+    mostrarToastExito("✓ Historial exportado");
 }
 
 // Eventos

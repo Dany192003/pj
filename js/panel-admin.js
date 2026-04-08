@@ -1,4 +1,4 @@
-// js/panel-admin.js - Panel administrativo
+// js/panel-admin.js - Panel administrativo completo
 
 window.showToast = function(message, isError = false) {
     const toast = document.getElementById('toast');
@@ -24,8 +24,105 @@ function formatearFechaAdmin(fechaISO) {
     });
 }
 
-// ── Eventos ───────────────────────────────────────────────────────────────────
+// ========== MODAL DE CONFIRMACIÓN MEJORADO ==========
+function mostrarConfirmacion(opciones) {
+    return new Promise((resolve) => {
+        let modal = document.getElementById("modalConfirmacion");
+        
+        if (!modal) {
+            const modalHTML = `
+                <div id="modalConfirmacion" class="modal-confirmacion">
+                    <div class="modal-confirmacion-content">
+                        <div class="modal-confirmacion-header">
+                            <div class="modal-confirmacion-icon" id="confirmacionIcono">⚠️</div>
+                            <h3 id="confirmacionTitulo">Confirmar acción</h3>
+                        </div>
+                        <div class="modal-confirmacion-body" id="confirmacionBody">
+                            <p id="confirmacionMensaje">¿Estás seguro de realizar esta acción?</p>
+                        </div>
+                        <div class="modal-confirmacion-footer">
+                            <button class="btn-confirmar-cancelar" id="btnConfirmarNo">
+                                <span>✗</span> Cancelar
+                            </button>
+                            <button class="btn-confirmar-aceptar" id="btnConfirmarSi">
+                                <span>✓</span> Confirmar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML("beforeend", modalHTML);
+            modal = document.getElementById("modalConfirmacion");
+        }
+        
+        const tituloElem = document.getElementById("confirmacionTitulo");
+        const mensajeElem = document.getElementById("confirmacionMensaje");
+        const iconoElem = document.getElementById("confirmacionIcono");
+        const bodyElem = document.getElementById("confirmacionBody");
+        const btnSi = document.getElementById("btnConfirmarSi");
+        const btnNo = document.getElementById("btnConfirmarNo");
+        
+        tituloElem.textContent = opciones.titulo || "Confirmar acción";
+        iconoElem.textContent = opciones.icono || "⚠️";
+        
+        const extras = bodyElem.querySelectorAll(".recurso-nombre, .comprobante-nombre, .advertencia-texto");
+        extras.forEach(el => el.remove());
+        
+        let mensajeHTML = `<p>${opciones.mensaje}</p>`;
+        
+        if (opciones.nombre) {
+            const claseNombre = opciones.tipo === "recurso" ? "recurso-nombre" : "comprobante-nombre";
+            mensajeHTML += `<div class="${claseNombre}">"${escapeHtml(opciones.nombre)}"</div>`;
+        }
+        
+        if (opciones.advertencia) {
+            mensajeHTML += `<p style="color: #f97316; font-size: 13px; margin-top: 12px;">⚠️ ${opciones.advertencia}</p>`;
+        }
+        
+        mensajeElem.innerHTML = mensajeHTML;
+        
+        const cerrar = (resultado) => {
+            modal.style.display = "none";
+            resolve(resultado);
+        };
+        
+        btnSi.onclick = () => cerrar(true);
+        btnNo.onclick = () => cerrar(false);
+        
+        modal.onclick = (e) => {
+            if (e.target === modal) cerrar(false);
+        };
+        
+        modal.style.display = "flex";
+    });
+}
 
+// ========== TOASTS MEJORADOS ==========
+function mostrarToastExito(mensaje) {
+    const toast = document.createElement("div");
+    toast.className = "toast-exito";
+    toast.innerHTML = `<span class="toast-icon">✅</span><span>${mensaje}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function mostrarToastError(mensaje) {
+    const toast = document.createElement("div");
+    toast.className = "toast-error";
+    toast.innerHTML = `<span class="toast-icon">❌</span><span>${mensaje}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ========== EVENTOS ADMIN ==========
 async function cargarEventosAdmin() {
     const eventosList = document.getElementById('eventosList');
     if (!eventosList) return;
@@ -52,15 +149,22 @@ async function cargarEventosAdmin() {
 
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.onclick = async () => {
-            await eliminarEvento(btn.dataset.id);
-            await cargarEventosAdmin();
-            window.showToast('✓ Actividad eliminada', false);
+            const confirmado = await mostrarConfirmacion({
+                titulo: "🗑️ Eliminar actividad",
+                icono: "⚠️",
+                mensaje: "¿Estás seguro de eliminar esta actividad?",
+                advertencia: "Esta acción no se puede deshacer."
+            });
+            if (confirmado) {
+                await eliminarEvento(btn.dataset.id);
+                await cargarEventosAdmin();
+                mostrarToastExito("✓ Actividad eliminada");
+            }
         };
     });
 }
 
-// ── Contraseñas ───────────────────────────────────────────────────────────────
-
+// ========== CONTRASEÑAS ==========
 async function cargarContraseñasAdmin() {
     const gruposPassList = document.getElementById('gruposPassList');
     if (!gruposPassList) return;
@@ -81,15 +185,17 @@ async function cargarContraseñasAdmin() {
         btn.onclick = async () => {
             const grupo = btn.dataset.grupo;
             const password = document.getElementById(`pass-${grupo}`).value.trim();
-            if (!password) { window.showToast('❌ Ingresa una contraseña', true); return; }
+            if (!password) { 
+                mostrarToastError("❌ Ingresa una contraseña"); 
+                return; 
+            }
             await guardarContraseñaGrupo(grupo, password);
-            window.showToast(`✓ Contraseña guardada para ${grupo}`, false);
+            mostrarToastExito(`✓ Contraseña guardada para ${grupo}`);
         };
     });
 }
 
-// ── Categorías ────────────────────────────────────────────────────────────────
-
+// ========== CATEGORÍAS ==========
 async function cargarSelectCategorias() {
     const select = document.getElementById('recursoCategoria');
     if (!select) return;
@@ -143,21 +249,29 @@ async function cargarListaCategoriasAdmin() {
                     await actualizarCategoria(btn.dataset.id, nuevoNombre.trim(), nuevoIcono || '📁');
                     await cargarListaCategoriasAdmin();
                     await cargarSelectCategorias();
-                    window.showToast('✓ Categoría actualizada', false);
+                    mostrarToastExito("✓ Categoría actualizada");
                 }
             };
         });
 
         document.querySelectorAll('.btn-eliminar-categoria-mini').forEach(btn => {
             btn.onclick = async () => {
-                if (confirm(`¿Eliminar la categoría "${btn.dataset.nombre}"?`)) {
+                const confirmado = await mostrarConfirmacion({
+                    titulo: "🗑️ Eliminar categoría",
+                    icono: "⚠️",
+                    mensaje: `¿Estás seguro de eliminar la categoría "${btn.dataset.nombre}"?`,
+                    nombre: btn.dataset.nombre,
+                    tipo: "categoria",
+                    advertencia: "Esta acción no se puede deshacer."
+                });
+                if (confirmado) {
                     try {
                         await eliminarCategoria(btn.dataset.id);
                         await cargarListaCategoriasAdmin();
                         await cargarSelectCategorias();
-                        window.showToast(`✓ Categoría "${btn.dataset.nombre}" eliminada`, false);
+                        mostrarToastExito(`✓ Categoría "${btn.dataset.nombre}" eliminada`);
                     } catch (error) {
-                        window.showToast(error.message, true);
+                        mostrarToastError(error.message);
                     }
                 }
             };
@@ -167,8 +281,7 @@ async function cargarListaCategoriasAdmin() {
     }
 }
 
-// ── Recursos biblioteca ───────────────────────────────────────────────────────
-
+// ========== RECURSOS BIBLIOTECA ==========
 async function cargarRecursosAdmin() {
     const recursosTableBody = document.getElementById('recursosTableBody');
     if (!recursosTableBody) return;
@@ -189,7 +302,7 @@ async function cargarRecursosAdmin() {
         lista.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
         if (lista.length === 0) {
-            recursosTableBody.innerHTML = '<td><td colspan="5" style="text-align:center;padding:40px;">📭 No hay recursos disponibles<\/td><\/tr>';
+            recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">📭 No hay recursos disponibles<\/td><\/tr>';
             return;
         }
 
@@ -207,7 +320,7 @@ async function cargarRecursosAdmin() {
                     <td><span style="font-size:12px;color:#64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}<\/span><\/td>
                     <td>
                         <a href="${recurso.url}" target="_blank" class="btn-ver">👁️ Ver<\/a>
-                        <button class="btn-eliminar-recurso" data-id="${recurso.id}">🗑️ Eliminar<\/button>
+                        <button class="btn-eliminar-recurso" data-id="${recurso.id}" data-titulo="${escapeHtml(recurso.titulo)}">🗑️ Eliminar<\/button>
                     <\/td>
                 <\/tr>
             `;
@@ -215,13 +328,23 @@ async function cargarRecursosAdmin() {
 
         document.querySelectorAll('.btn-eliminar-recurso').forEach(btn => {
             btn.onclick = async () => {
-                if (confirm('¿Eliminar este recurso permanentemente?')) {
+                const id = btn.dataset.id;
+                const titulo = btn.dataset.titulo;
+                
+                const confirmado = await mostrarConfirmacion({
+                    titulo: "🗑️ Eliminar recurso",
+                    icono: "⚠️",
+                    mensaje: "¿Estás seguro de eliminar este recurso permanentemente?",
+                    nombre: titulo,
+                    tipo: "recurso",
+                    advertencia: "Esta acción no se puede deshacer."
+                });
+                
+                if (confirmado) {
                     try {
-                        // Obtener datos del recurso antes de eliminar
-                        const docSnap = await coleccionRecursos.doc(btn.dataset.id).get();
+                        const docSnap = await coleccionRecursos.doc(id).get();
                         if (docSnap.exists) {
                             const recursoData = docSnap.data();
-                            // Eliminar de Cloudinary si tiene public_id
                             if (recursoData.public_id && typeof window.eliminarDeCloudinary === 'function') {
                                 await window.eliminarDeCloudinary(
                                     recursoData.public_id,
@@ -229,12 +352,12 @@ async function cargarRecursosAdmin() {
                                 );
                             }
                         }
-                        await eliminarRecursoCloud(btn.dataset.id);
+                        await eliminarRecursoCloud(id);
                         await cargarRecursosAdmin();
-                        window.showToast('✓ Recurso eliminado', false);
+                        mostrarToastExito("✓ Recurso eliminado");
                     } catch (e) {
                         console.error('Error al eliminar recurso:', e);
-                        window.showToast('❌ Error al eliminar el recurso', true);
+                        mostrarToastError("❌ Error al eliminar el recurso");
                     }
                 }
             };
@@ -244,8 +367,7 @@ async function cargarRecursosAdmin() {
     }
 }
 
-// ── Significados de colores (todos los colores predefinidos) ─────────────────
-
+// ========== SIGNIFICADOS DE COLORES ==========
 async function cargarSignificadosAdmin() {
     const significadosGrid = document.getElementById('significadoColoresGrid');
     if (!significadosGrid) return;
@@ -303,6 +425,7 @@ async function cargarSignificadosAdmin() {
                     badge.textContent = '✓ Activo';
                     badge.classList.remove('inactivo');
                 }
+                mostrarToastExito(`✓ Significado guardado para ${color}`);
             } else {
                 parent.classList.remove('tiene-significado');
                 const badge = parent.querySelector('.significado-badge');
@@ -310,16 +433,15 @@ async function cargarSignificadosAdmin() {
                     badge.textContent = '⚡ Sin significado';
                     badge.classList.add('inactivo');
                 }
+                mostrarToastExito(`✓ Significado eliminado para ${color}`);
             }
             
             await cargarSelectColoresActividades();
-            window.showToast(significado ? `✓ Significado guardado para ${color}` : `✓ Significado eliminado para ${color}`, false);
         };
     });
 }
 
-// ── Cargar selector de colores para actividades (solo colores con significado) ─
-
+// ========== CARGAR SELECTOR DE COLORES ==========
 async function cargarSelectColoresActividades() {
     const select = document.getElementById('eventoColor');
     if (!select) return;
@@ -357,8 +479,7 @@ async function cargarSelectColoresActividades() {
         ).join('');
 }
 
-// ── Modal de gestión de colores ──────────────────────────────────────────────
-
+// ========== MODAL DE GESTIÓN DE COLORES ==========
 function initModalColores() {
     const btnGestionarColores = document.getElementById('btnGestionarColores');
     const modalGestionColores = document.getElementById('modalGestionColores');
@@ -391,10 +512,11 @@ function initModalColores() {
     });
 }
 
-// ── Subir recurso ─────────────────────────────────────────────────────────────
-
-const btnSubirRecurso = document.getElementById('btnSubirRecurso');
-if (btnSubirRecurso) {
+// ========== SUBIR RECURSO ==========
+function initSubirRecurso() {
+    const btnSubirRecurso = document.getElementById('btnSubirRecurso');
+    if (!btnSubirRecurso) return;
+    
     const nuevoBtn = btnSubirRecurso.cloneNode(true);
     btnSubirRecurso.parentNode.replaceChild(nuevoBtn, btnSubirRecurso);
     
@@ -412,11 +534,11 @@ if (btnSubirRecurso) {
         const descripcion = document.getElementById('recursoDescripcion').value.trim();
         const archivo = document.getElementById('recursoArchivo').files[0];
 
-        if (!titulo) { window.showToast('❌ Ingresa un título', true); return; }
-        if (!archivo) { window.showToast('❌ Selecciona un archivo', true); return; }
-        if (!categoria) { window.showToast('❌ Selecciona una categoría', true); return; }
+        if (!titulo) { mostrarToastError('❌ Ingresa un título'); return; }
+        if (!archivo) { mostrarToastError('❌ Selecciona un archivo'); return; }
+        if (!categoria) { mostrarToastError('❌ Selecciona una categoría'); return; }
         if (archivo.size > 10 * 1024 * 1024) {
-            window.showToast('❌ El archivo es demasiado grande (máx 10MB)', true);
+            mostrarToastError('❌ El archivo es demasiado grande (máx 10MB)');
             return;
         }
 
@@ -424,7 +546,7 @@ if (btnSubirRecurso) {
         const textoOriginal = nuevoBtn.innerHTML;
         nuevoBtn.innerHTML = '<span class="spinner"></span> Subiendo...';
         
-        window.showToast('📤 Subiendo archivo...', false);
+        mostrarToastExito('📤 Subiendo archivo...');
 
         try {
             let nombreLimpio = titulo
@@ -471,11 +593,11 @@ if (btnSubirRecurso) {
             document.getElementById('previewArchivo').innerHTML = '';
             
             await cargarRecursosAdmin();
-            window.showToast('✓ Recurso subido exitosamente', false);
+            mostrarToastExito('✓ Recurso subido exitosamente');
             
         } catch (error) {
             console.error('Error:', error);
-            window.showToast('❌ Error al subir el recurso: ' + (error.message || 'Error desconocido'), true);
+            mostrarToastError('❌ Error al subir el recurso: ' + (error.message || 'Error desconocido'));
         } finally {
             nuevoBtn.disabled = false;
             nuevoBtn.innerHTML = textoOriginal;
@@ -483,26 +605,27 @@ if (btnSubirRecurso) {
     });
 }
 
-// Preview del archivo seleccionado
-document.getElementById('recursoArchivo')?.addEventListener('change', (e) => {
-    const previewDiv = document.getElementById('previewArchivo');
-    const file = e.target.files[0];
-    if (!file) { previewDiv.innerHTML = ''; return; }
+// ========== PREVIEW DEL ARCHIVO ==========
+function initPreviewArchivo() {
+    document.getElementById('recursoArchivo')?.addEventListener('change', (e) => {
+        const previewDiv = document.getElementById('previewArchivo');
+        const file = e.target.files[0];
+        if (!file) { previewDiv.innerHTML = ''; return; }
 
-    if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            previewDiv.innerHTML = `<img src="${ev.target.result}" style="max-width:100px;max-height:100px;border-radius:8px;">`;
-        };
-        reader.readAsDataURL(file);
-    } else {
-        const icon = file.type === 'application/pdf' ? '📄' : '📎';
-        previewDiv.innerHTML = `<div style="padding:10px;background:#f1f5f9;border-radius:8px;">${icon} ${file.name}</div>`;
-    }
-});
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                previewDiv.innerHTML = `<img src="${ev.target.result}" style="max-width:100px;max-height:100px;border-radius:8px;">`;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            const icon = file.type === 'application/pdf' ? '📄' : '📎';
+            previewDiv.innerHTML = `<div style="padding:10px;background:#f1f5f9;border-radius:8px;">${icon} ${file.name}</div>`;
+        }
+    });
+}
 
-// ── Inicialización ────────────────────────────────────────────────────────────
-
+// ========== INICIALIZACIÓN PRINCIPAL ==========
 document.addEventListener('DOMContentLoaded', async () => {
     if (!requireAuth()) return;
 
@@ -519,6 +642,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cargarListaCategoriasAdmin();
     await cargarSelectColoresActividades();
     initModalColores();
+    initSubirRecurso();
+    initPreviewArchivo();
 
     document.getElementById('btnVistaPrevia').onclick    = generarVistaPrevia;
     document.getElementById('btnConfirmarEnviar').onclick = subirYEnviar;
@@ -526,7 +651,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('grupo').onchange             = checkOtroGrupo;
     document.getElementById('selectAnioControl').onchange = cambiarAnioControl;
 
-    // ── Tabs ──────────────────────────────────────────────────────────────────
+    // ========== TABS ==========
     const tabs        = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -560,7 +685,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await activateTab('tab1');
 
-    // ── Selector de emojis ────────────────────────────────────────────────────
+    // ========== SELECTOR DE EMOJIS ==========
     const btnAbrirEmojis    = document.getElementById('btnAbrirEmojis');
     const emojiSelector     = document.getElementById('emojiSelector');
     const categoriaIconoInput = document.getElementById('categoriaIcono');
@@ -586,7 +711,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ── Agregar evento (con colores filtrados) ────────────────────────────────
+    // ========== AGREGAR EVENTO ==========
     document.getElementById('btnAgregarEvento')?.addEventListener('click', async () => {
         const fecha       = document.getElementById('eventoFecha').value;
         const titulo      = document.getElementById('eventoTitulo').value.trim();
@@ -594,9 +719,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const descripcion = document.getElementById('eventoDescripcion').value.trim();
         const color       = document.getElementById('eventoColor').value;
 
-        if (!fecha)  { window.showToast('❌ Selecciona una fecha', true); return; }
-        if (!titulo) { window.showToast('❌ Escribe un título', true); return; }
-        if (!color)  { window.showToast('❌ Selecciona un color para la actividad', true); return; }
+        if (!fecha)  { mostrarToastError('❌ Selecciona una fecha'); return; }
+        if (!titulo) { mostrarToastError('❌ Escribe un título'); return; }
+        if (!color)  { mostrarToastError('❌ Selecciona un color para la actividad'); return; }
 
         await agregarEvento(fecha, titulo, lugar, descripcion, color);
 
@@ -605,25 +730,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('eventoColor').value = '';
 
         await cargarEventosAdmin();
-        window.showToast('✓ Actividad agregada', false);
+        mostrarToastExito('✓ Actividad agregada');
     });
 
-    // ── Agregar categoría ─────────────────────────────────────────────────────
+    // ========== AGREGAR CATEGORÍA ==========
     document.getElementById('btnAgregarCategoria')?.addEventListener('click', async () => {
         const nombre = document.getElementById('categoriaNombre').value.trim();
         const icono  = document.getElementById('categoriaIcono').value.trim() || '📁';
 
-        if (!nombre) { window.showToast('❌ Ingresa un nombre para la categoría', true); return; }
+        if (!nombre) { mostrarToastError('❌ Ingresa un nombre para la categoría'); return; }
 
         await agregarCategoria(nombre, icono);
         document.getElementById('categoriaNombre').value = '';
         document.getElementById('categoriaIcono').value  = '';
         await cargarListaCategoriasAdmin();
         await cargarSelectCategorias();
-        window.showToast('✓ Categoría agregada', false);
+        mostrarToastExito('✓ Categoría agregada');
     });
 
-    // ── Modal Reset ───────────────────────────────────────────────────────────
+    // ========== MODAL RESET ==========
     const modalReset     = document.getElementById('modalReset');
     const btnReset       = document.getElementById('btnReset');
     const btnCancelReset = document.getElementById('btnCancelReset');
@@ -662,15 +787,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             if (!Object.values(opciones).some(Boolean)) {
-                window.showToast('❌ Selecciona al menos un elemento para reiniciar', true);
+                mostrarToastError('❌ Selecciona al menos un elemento para reiniciar');
                 return;
             }
 
-            if (modalReset) {
-                modalReset.style.display = 'none';
-                document.body.style.overflow = '';
+            const confirmado = await mostrarConfirmacion({
+                titulo: "⚠️ Reiniciar Sistema",
+                icono: "⚠️",
+                mensaje: "¿Estás seguro de reiniciar los elementos seleccionados?",
+                advertencia: "Esta acción NO se puede deshacer."
+            });
+
+            if (confirmado) {
+                if (modalReset) {
+                    modalReset.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+                await resetSistema(opciones);
             }
-            await resetSistema(opciones);
         };
     }
 
@@ -688,5 +822,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    window.showToast('✓ Panel administrativo listo', false);
+    mostrarToastExito('✓ Panel administrativo listo');
 });
