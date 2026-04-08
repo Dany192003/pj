@@ -319,7 +319,7 @@ async function cargarRecursosAdmin() {
                     <td><span style="font-size:12px;color:#64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}</span></td>
                     <td>
                         <a href="${recurso.url}" target="_blank" class="btn-ver" style="display:inline-block; background: #0891b2; color:white; border:none; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:11px; margin-right:5px;">👁️ Ver</a>
-                        <button class="btn-editar-recurso" data-id="${recurso.id}" style="background: #f59e0b; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; margin-right:5px;">✏️ Editar</button>
+                        <button class="btn-editar-recurso" data-id="${recurso.id}" style="background: #ff9100; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; margin-right:5px;">✏️ Editar</button>
                         <button class="btn-eliminar-recurso" data-id="${recurso.id}" data-titulo="${escapeHtml(recurso.titulo)}" style="background: #f50000; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px;">🗑️ Eliminar</button>
                     </td>
                 </tr>

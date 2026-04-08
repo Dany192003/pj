@@ -244,36 +244,63 @@
     color: var(--text-muted);
 }
 
-/* ---------- ACCIONES ---------- */
+/* ---------- ACCIONES (BOTONES MEJORADOS) ---------- */
 .recurso-actions {
     display: flex;
     gap: 10px;
     margin-top: 0;
 }
 
+/* Estilos base para los botones de acción */
 .recurso-actions .btn-ver,
 .recurso-actions .btn-descargar {
     flex: 1;
     text-align: center;
     padding: 8px 12px;
     font-size: 12px;
-}
-
-.btn-descargar {
-    background: var(--success);
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 20px;
-    font-size: 12px;
     font-weight: 600;
+    border-radius: 30px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
-.btn-descargar:hover {
-    background: var(--success-dark);
-    transform: scale(1.02);
+/* Botón VER */
+.recurso-actions .btn-ver {
+    background: linear-gradient(135deg, #0891b2, #0e7490);
+    color: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.recurso-actions .btn-ver:hover {
+    background: linear-gradient(135deg, #0e7490, #0f5c73);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(8, 145, 178, 0.2);
+}
+
+.recurso-actions .btn-ver:active {
+    transform: translateY(1px);
+}
+
+/* Botón DESCARGAR */
+.recurso-actions .btn-descargar {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.recurso-actions .btn-descargar:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+}
+
+.recurso-actions .btn-descargar:active {
+    transform: translateY(1px);
 }
 
 /* ---------- ESTADOS VACÍOS ---------- */
@@ -382,8 +409,6 @@
     .recurso-preview .file-icon {
         font-size: 48px;
     }
-    .btn-ver,
-    .btn-descargar,
     .recurso-actions .btn-ver,
     .recurso-actions .btn-descargar {
         padding: 6px 10px;
