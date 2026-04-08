@@ -94,41 +94,57 @@ function obtenerClaseExtension(extension) {
     return clases[extension] || clases['default'];
 }
 
-// Función para descargar un archivo con el nombre del título
+// Función para descargar un archivo directamente (SIN abrir ventanas de Cloudinary)
 async function descargarConNombrePersonalizado(url, titulo, extension) {
     try {
-        window.showToast(`📥 Preparando descarga: ${titulo}...`, false);
+        window.showToast(`📥 Descargando: ${titulo}...`, false);
         
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error('No se pudo obtener el archivo');
-        }
-        
-        const blob = await response.blob();
         const nombreArchivo = limpiarNombreArchivo(titulo, extension);
         
+        // Obtener el archivo como blob
+        const response = await fetch(url);
+        const blob = await response.blob();
+        
+        // Crear URL del blob (esto es local, NO va a Cloudinary)
+        const blobUrl = URL.createObjectURL(blob);
+        
+        // Crear enlace de descarga
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
+        link.href = blobUrl;
         link.download = nombreArchivo;
-        link.setAttribute('download', nombreArchivo);
         link.style.display = 'none';
         
+        // IMPORTANTE: No abrir en nueva pestaña, solo descargar
         document.body.appendChild(link);
         link.click();
         
+        // Limpiar después de la descarga
         setTimeout(() => {
-            URL.revokeObjectURL(link.href);
+            URL.revokeObjectURL(blobUrl);
             document.body.removeChild(link);
-        }, 100);
+        }, 2000);
         
         window.showToast(`✅ Descargado: ${nombreArchivo}`, false);
         
     } catch (error) {
         console.error('Error en descarga:', error);
-        window.showToast(`⚠️ Abriendo archivo en nueva pestaña...`, false);
-        window.open(url, '_blank');
+        
+        // Fallback: intentar con el método alternativo
+        try {
+            const nombreArchivo = limpiarNombreArchivo(titulo, extension);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = nombreArchivo;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => document.body.removeChild(link), 100);
+            window.showToast(`✅ ${nombreArchivo} descargado`, false);
+        } catch (e) {
+            window.showToast(`❌ Error al descargar`, true);
+        }
     }
-}
+} 
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadDatabase();
@@ -318,15 +334,25 @@ function abrirPreview(url, titulo) {
     
     if (!modal || !modalBody) return;
     
+    // Detectar si es dispositivo móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
     const esImagen = url && (url.includes('.jpg') || url.includes('.png') || url.includes('.jpeg') || url.includes('.webp'));
     
     if (esImagen) {
-        modalBody.innerHTML = `<img src="${url}" alt="${titulo}">`;
+        // Para imágenes, siempre mostrar preview
+        modalBody.innerHTML = `<img src="${url}" alt="${titulo}" style="max-width:100%;">`;
+        modal.style.display = "block";
+    } else if (isMobile) {
+        // En móviles, mejor descargar directamente en lugar de previsualizar PDF
+        const extension = obtenerExtension(url, 'pdf');
+        modal.style.display = "none";
+        descargarConNombrePersonalizado(url, titulo, extension);
     } else {
-        modalBody.innerHTML = `<iframe src="${url}" class="pdf-viewer" frameborder="0" title="${titulo}"></iframe>`;
+        // En desktop, mostrar preview en iframe
+        modalBody.innerHTML = `<iframe src="${url}" class="pdf-viewer" frameborder="0" title="${titulo}" style="width:100%; height:70vh;"></iframe>`;
+        modal.style.display = "block";
     }
-    
-    modal.style.display = "block";
 }
 
 function formatearFechaCompleta(fechaISO) {
