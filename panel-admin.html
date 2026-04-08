@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#0891b2">
-    <title>Admin | Pastoral Juvenil</title>
+    <title>Administrador | Pastoral Juvenil</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -45,6 +45,9 @@
         <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
             <span class="user-badge">👑 Administrador</span>
             <button class="reset-btn" id="btnReset">⚠️ Reiniciar Sistema</button>
+            <button class="force-update-btn" id="btnForzarActualizacion" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                🔄 Forzar actualización global
+            </button>
             <button class="logout-btn" id="btnLogout">🚪 Cerrar Sesión</button>
         </div>
     </div>
@@ -415,20 +418,16 @@
 <script src="js/biblioteca-admin.js"></script>
 <script src="js/historial-recibos.js"></script>
 <script src="js/panel-admin.js"></script>
+<script src="js/actualizacion.js"></script>
 
 <script>
-// Registrar Service Worker para PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log('Service Worker registrado:', registration);
-            })
-            .catch(error => {
-                console.log('Error al registrar Service Worker:', error);
-            });
-    });
-}
+// Evento del botón de forzar actualización (solo para admin)
+document.getElementById('btnForzarActualizacion')?.addEventListener('click', () => {
+    if (typeof forzarActualizacionGlobal === 'function') {
+        forzarActualizacionGlobal();
+    }
+});
 </script>
+
 </body>
 </html>

@@ -9,7 +9,7 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- Favicon para todos los dispositivos (iPad, iPhone, Android, Desktop) -->
+    <!-- Favicon para todos los dispositivos -->
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="48x48" href="img/favicon-48x48.png">
@@ -117,20 +117,7 @@
 <script src="js/autenticacion.js"></script>
 <script src="js/calendario.js"></script>
 <script src="js/aplicacion.js"></script>
+<script src="js/actualizacion.js"></script>
 
-<script>
-// Registrar Service Worker para PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log('Service Worker registrado:', registration);
-            })
-            .catch(error => {
-                console.log('Error al registrar Service Worker:', error);
-            });
-    });
-}
-</script>
 </body>
 </html>

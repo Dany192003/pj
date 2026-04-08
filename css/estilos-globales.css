@@ -711,3 +711,19 @@ textarea {
         padding: 0;
     }
 }
+
+/* Notificación de actualización */
+.toast-actualizacion {
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}

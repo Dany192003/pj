@@ -1,5 +1,8 @@
-// sw.js - Service Worker para Pastoral Juvenil
-const CACHE_NAME = 'pastoral-v1';
+// sw.js - Service Worker corregido
+const APP_VERSION = '1.0.0';
+const CACHE_NAME = `pastoral-${APP_VERSION}`;
+
+// Archivos estáticos para cachear (solo GET)
 const urlsToCache = [
   '/',
   '/index.html',
@@ -23,19 +26,23 @@ const urlsToCache = [
   '/js/whatsapp.js',
   '/js/consulta-pagos.js',
   '/js/biblioteca-usuario.js',
+  '/js/biblioteca-admin.js',
   '/js/historial-recibos.js',
   '/js/cloudinary-delete.js',
+  '/js/seguridad.js',
+  '/js/actualizacion.js',
   '/img/logo.jpg'
 ];
 
-// Instalación del Service Worker
+// Instalación
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Cache abierto');
+        console.log(`Cache ${CACHE_NAME} instalado`);
         return cache.addAll(urlsToCache);
       })
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -46,27 +53,40 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cache => {
           if (cache !== CACHE_NAME) {
+            console.log(`Eliminando cache antiguo: ${cache}`);
             return caches.delete(cache);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// Estrategia: Network First con fallback a caché
+// Estrategia: Solo cachear peticiones GET
 self.addEventListener('fetch', event => {
+  const request = event.request;
+  
+  // Solo cachear peticiones GET (ignorar POST, PUT, DELETE)
+  if (request.method !== 'GET') {
+    event.respondWith(fetch(request));
+    return;
+  }
+  
+  // Para peticiones GET: Network First con fallback a caché
   event.respondWith(
-    fetch(event.request)
+    fetch(request)
       .then(response => {
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseClone);
-        });
+        // Solo cachear respuestas exitosas
+        if (response && response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(request, responseClone);
+          });
+        }
         return response;
       })
       .catch(() => {
-        return caches.match(event.request);
+        return caches.match(request);
       })
   );
 });
