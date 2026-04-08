@@ -1,6 +1,6 @@
 // js/autenticacion.js - Autenticación de administrador
 
-const ADMIN_CREDENTIALS = { password: '321' };
+const ADMIN_CREDENTIALS = { password: 'admin123' };
 let sesionTimeout = null;
 
 function isAuthenticated() {
