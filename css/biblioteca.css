@@ -1,6 +1,8 @@
-/* css/biblioteca.css - Estilos de la biblioteca para usuarios */
+/* ========================================
+   BIBLIOTECA - Pastoral Juvenil
+   ======================================== */
 
-/* ========== HEADER ========== */
+/* ---------- HEADER ---------- */
 .header-biblioteca {
     text-align: center;
     margin-bottom: 30px;
@@ -8,14 +10,14 @@
 
 .header-biblioteca .hero-logo-img {
     width: 80px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     margin-bottom: 15px;
 }
 
 .header-biblioteca h1 {
     font-size: 28px;
     font-weight: 800;
-    background: linear-gradient(135deg, #0f172a, #0891b2);
+    background: linear-gradient(135deg, var(--dark), var(--primary));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -23,27 +25,10 @@
 }
 
 .header-biblioteca p {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
-.btn-back {
-    background: #64748b;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 30px;
-    cursor: pointer;
-    margin-top: 15px;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.btn-back:hover {
-    background: #475569;
-    transform: translateY(-2px);
-}
-
-/* ========== CATEGORÍAS ========== */
+/* ---------- CATEGORÍAS ---------- */
 .categorias-container {
     display: flex;
     flex-wrap: wrap;
@@ -53,7 +38,7 @@
 }
 
 .categoria-btn {
-    background: #f1f5f9;
+    background: var(--bg-gray);
     border: none;
     padding: 8px 20px;
     border-radius: 30px;
@@ -61,21 +46,21 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    color: #475569;
+    color: var(--text-main);
 }
 
 .categoria-btn:hover {
-    background: #e2e8f0;
+    background: var(--border);
     transform: translateY(-2px);
 }
 
 .categoria-btn.active {
-    background: linear-gradient(135deg, #0891b2, #3b82f6);
+    background: var(--primary-gradient);
     color: white;
     box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
 }
 
-/* ========== BUSCADOR ========== */
+/* ---------- BUSCADOR ---------- */
 .buscador-container {
     margin-bottom: 30px;
 }
@@ -87,7 +72,7 @@
     display: block;
     padding: 14px 20px;
     border-radius: 50px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     font-size: 15px;
     background: white;
     transition: all 0.3s;
@@ -95,11 +80,11 @@
 
 .buscador-input:focus {
     outline: none;
-    border-color: #0891b2;
+    border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
 }
 
-/* ========== GRID DE RECURSOS ========== */
+/* ---------- GRID DE RECURSOS ---------- */
 .recursos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -109,9 +94,9 @@
 
 .recurso-card {
     background: white;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-md);
     transition: all 0.3s ease;
     cursor: pointer;
     display: flex;
@@ -121,10 +106,10 @@
 
 .recurso-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-xl);
 }
 
-/* ========== PREVIEW DEL RECURSO ========== */
+/* ---------- PREVIEW DEL RECURSO ---------- */
 .recurso-preview {
     height: 160px;
     background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
@@ -146,12 +131,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    background: linear-gradient(135deg, var(--bg-gray) 0%, var(--border) 100%);
     width: 100%;
     height: 100%;
 }
 
-/* ========== INFO DEL RECURSO ========== */
+/* ---------- INFO DEL RECURSO ---------- */
 .recurso-info {
     padding: 14px 16px 16px 16px;
     display: flex;
@@ -162,7 +147,7 @@
 .recurso-categoria {
     display: inline-block;
     background: #e0f2fe;
-    color: #0891b2;
+    color: var(--primary);
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 10px;
@@ -174,14 +159,14 @@
 .recurso-titulo {
     font-size: 16px;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--dark);
     margin: 0 0 8px 0;
     line-height: 1.3;
 }
 
 .recurso-descripcion {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-muted);
     line-height: 1.4;
     margin: 0 0 12px 0;
 }
@@ -191,13 +176,13 @@
     margin: 0;
 }
 
-/* ========== FOOTER Y EXTENSIÓN ========== */
+/* ---------- FOOTER Y EXTENSIÓN ---------- */
 .recurso-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-top: 8px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
     flex-wrap: wrap;
     gap: 8px;
     margin-top: auto;
@@ -206,7 +191,7 @@
 
 .recurso-fecha {
     font-size: 11px;
-    color: #94a3b8;
+    color: var(--text-light);
     display: flex;
     align-items: center;
     gap: 4px;
@@ -236,7 +221,7 @@
 /* Colores por tipo de extensión */
 .extension-pdf {
     background: #fee2e2;
-    color: #dc2626;
+    color: var(--danger);
 }
 
 .extension-imagen {
@@ -255,11 +240,11 @@
 }
 
 .extension-default {
-    background: #f1f5f9;
-    color: #64748b;
+    background: var(--bg-gray);
+    color: var(--text-muted);
 }
 
-/* ========== ACCIONES DEL RECURSO ========== */
+/* ---------- ACCIONES ---------- */
 .recurso-actions {
     display: flex;
     gap: 10px;
@@ -274,25 +259,8 @@
     font-size: 12px;
 }
 
-.btn-ver {
-    background: #0891b2;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-ver:hover {
-    background: #0e7490;
-    transform: scale(1.02);
-}
-
 .btn-descargar {
-    background: #10b981;
+    background: var(--success);
     color: white;
     border: none;
     padding: 8px 12px;
@@ -304,24 +272,19 @@
 }
 
 .btn-descargar:hover {
-    background: #059669;
+    background: var(--success-dark);
     transform: scale(1.02);
 }
 
-/* ========== ESTADOS VACÍOS ========== */
-.loading-recursos {
-    text-align: center;
-    padding: 40px;
-    color: #64748b;
-}
-
+/* ---------- ESTADOS VACÍOS ---------- */
+.loading-recursos,
 .sin-recursos {
     text-align: center;
     padding: 60px;
-    color: #94a3b8;
+    color: var(--text-light);
 }
 
-/* ========== MODAL DE VISTA PREVIA ========== */
+/* ---------- MODAL PREVIEW ---------- */
 .modal-preview {
     display: none;
     position: fixed;
@@ -342,7 +305,7 @@
     max-width: 900px;
     max-height: 85vh;
     background: white;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     overflow: auto;
 }
 
@@ -365,7 +328,7 @@
 }
 
 .modal-preview-close:hover {
-    background: #ef4444;
+    background: var(--danger);
     color: white;
 }
 
@@ -385,55 +348,40 @@
     border: none;
 }
 
-/* ========== ANIMACIONES ========== */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* ========== RESPONSIVE ========== */
+/* ---------- RESPONSIVE ---------- */
 @media (max-width: 640px) {
     .recursos-grid {
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 16px;
     }
-
     .modal-preview-content {
         width: 95%;
         margin: 10% auto;
     }
-
     .categoria-btn {
         padding: 6px 14px;
         font-size: 12px;
     }
-
     .recurso-info {
         padding: 12px 14px 14px 14px;
     }
-
     .recurso-titulo {
         font-size: 15px;
     }
-
     .recurso-descripcion {
         font-size: 12px;
         margin-bottom: 10px;
     }
-
     .recurso-footer {
         margin-bottom: 10px;
     }
-    
     .extension-badge {
         font-size: 8px;
         padding: 2px 6px;
     }
-    
     .recurso-preview .file-icon {
         font-size: 48px;
     }
-
     .btn-ver,
     .btn-descargar,
     .recurso-actions .btn-ver,
@@ -443,7 +391,6 @@
     }
 }
 
-/* ========== RESPONSIVE PARA TABLETS ========== */
 @media (min-width: 641px) and (max-width: 1024px) {
     .recursos-grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

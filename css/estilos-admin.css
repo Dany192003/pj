@@ -1,6 +1,8 @@
-/* css/estilos-admin.css - Estilos panel administrativo */
+/* ========================================
+   PANEL ADMINISTRATIVO - Pastoral Juvenil
+   ======================================== */
 
-/* ========== HEADER ADMIN ========== */
+/* ---------- HEADER ADMIN ---------- */
 .admin-header {
     display: flex;
     justify-content: space-between;
@@ -19,47 +21,58 @@
 .admin-logo-img {
     width: 50px;
     height: 50px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     object-fit: cover;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .admin-header-logo h1 {
     font-size: 20px;
     margin: 0;
-    color: #0f172a;
+    color: var(--dark);
 }
 
 .admin-header-logo p {
     font-size: 11px;
-    color: #64748b;
+    color: var(--text-muted);
     margin: 0;
 }
 
-/* ========== BOTONES ========== */
-.logout-btn,
-.reset-btn {
+.user-badge {
+    background: var(--bg-gray);
+    padding: 8px 16px;
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* ---------- BOTONES ADMIN ---------- */
+.logout-btn {
+    background: var(--danger);
+    color: white;
+    border: none;
     padding: 10px 20px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: none;
-}
-
-.logout-btn {
-    background: #ef4444;
-    color: white;
 }
 
 .logout-btn:hover {
-    background: #dc2626;
+    background: var(--danger-dark);
     transform: scale(0.98);
 }
 
 .reset-btn {
     background: #00973a;
     color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .reset-btn:hover {
@@ -67,16 +80,7 @@
     transform: scale(0.98);
 }
 
-.user-badge {
-    background: #f1f5f9;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #0891b2;
-}
-
-/* ========== TABS ========== */
+/* ---------- TABS ---------- */
 .tabs-container {
     background: white;
     border-radius: 16px;
@@ -84,7 +88,7 @@
     margin-bottom: 24px;
     display: flex;
     gap: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
     flex-wrap: wrap;
 }
 
@@ -94,124 +98,52 @@
     background: transparent;
     border: none;
     padding: 12px 20px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-weight: 700;
     cursor: pointer;
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 14px;
     transition: all 0.3s ease;
     white-space: nowrap;
 }
 
 .tab-btn.active {
-    background: linear-gradient(135deg, #0891b2, #3b82f6);
+    background: var(--primary-gradient);
     color: white;
 }
 
-/* ========== CARDS Y GRID ========== */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ---------- GRID ADMIN ---------- */
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
 }
 
-.card {
-    background: white;
-    border-radius: 24px;
-    padding: 25px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-.section-title {
-    font-size: 18px;
-    font-weight: 800;
-    margin-bottom: 20px;
-    color: #0f172a;
-    border-left: 4px solid #0891b2;
-    padding-left: 12px;
-}
-
-/* ========== FORMULARIOS ========== */
-.row {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.field {
-    flex: 1;
-    margin-bottom: 15px;
-}
-
-.field label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #0891b2;
-    display: block;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.field input,
-.field select,
-textarea {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #cbd5e1;
-    background: #f8fafc;
-    font-family: inherit;
-    font-size: 14px;
-}
-
-.field input:focus,
-.field select:focus,
-textarea:focus {
-    outline: none;
-    border-color: #0891b2;
-    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
-}
-
-textarea {
-    resize: vertical;
-}
-
-/* ========== BOTONES PRINCIPALES ========== */
-.btn-main {
-    background: linear-gradient(135deg, #0891b2, #3b82f6);
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.3s;
-}
-
-.btn-main:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.05);
-}
-
-/* ========== TICKET / COMPROBANTE ========== */
+/* ---------- TICKET / COMPROBANTE ---------- */
 .preview {
     margin-top: 20px;
 }
 
 .ticket {
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
     background: white;
     max-width: 420px;
     margin: 0 auto;
-    box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-xl);
 }
 
 .ticket-header {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
     padding: 20px;
     text-align: center;
 }
@@ -222,6 +154,7 @@ textarea {
 
 .logo-icon {
     font-size: 42px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .ticket-title {
@@ -233,20 +166,20 @@ textarea {
 
 .ticket-subtitle {
     font-size: 10px;
-    color: rgba(255,255,255,0.7);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .ticket-receipt-number {
-    background: #f8fafc;
+    background: var(--bg-light);
     padding: 12px 16px;
     text-align: center;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
 }
 
 .receipt-label {
     font-size: 10px;
     font-weight: 700;
-    color: #0891b2;
+    color: var(--primary);
     text-transform: uppercase;
     display: block;
 }
@@ -254,7 +187,7 @@ textarea {
 .receipt-number {
     font-size: 22px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--dark);
     font-family: 'Courier New', monospace;
 }
 
@@ -266,20 +199,20 @@ textarea {
     display: flex;
     justify-content: space-between;
     padding: 10px 0;
-    border-bottom: 1px dashed #e2e8f0;
+    border-bottom: 1px dashed var(--border);
 }
 
 .info-label {
     font-size: 10px;
     font-weight: 700;
-    color: #64748b;
+    color: var(--text-muted);
     text-transform: uppercase;
 }
 
 .info-value {
     font-size: 13px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--dark-light);
     text-align: right;
 }
 
@@ -301,7 +234,7 @@ textarea {
 .amount-value {
     font-size: 28px;
     font-weight: 900;
-    color: #0f172a;
+    color: var(--dark);
 }
 
 .amount-value::before {
@@ -310,7 +243,7 @@ textarea {
 }
 
 .ticket-footer {
-    background: #f1f5f9;
+    background: var(--bg-gray);
     padding: 12px 16px;
     text-align: center;
 }
@@ -318,67 +251,24 @@ textarea {
 .footer-text {
     font-size: 11px;
     font-weight: 600;
-    color: #334155;
+    color: var(--text-main);
 }
 
-/* ========== TABLA DE CONTROL ========== */
-.excel-container {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    overflow-x: auto;
+.footer-note {
+    font-size: 8px;
+    font-weight: 400;
+    color: var(--text-light);
+    text-transform: uppercase;
 }
 
-.excel-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    min-width: 600px;
-}
-
-.excel-table th {
-    background: #f8fafc;
-    padding: 12px 8px;
-    color: #0891b2;
-    font-weight: 700;
-    text-align: center;
-}
-
-.excel-table td {
-    padding: 10px 8px;
-    border-bottom: 1px solid #f1f5f9;
-    text-align: center;
-}
-
-.status-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s;
-}
-
-.status-pagado {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.status-pendiente {
-    background: #fef9c3;
-    color: #854d0e;
-}
-
-/* ========== EVENTOS Y CONTRASEÑAS ========== */
-.evento-item,
-.grupo-pass-item {
+/* ---------- EVENTOS ---------- */
+.evento-item {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     padding: 15px;
-    background: #f8fafc;
-    border-radius: 12px;
+    background: var(--bg-light);
+    border-radius: var(--radius-md);
     margin-bottom: 10px;
     flex-wrap: wrap;
     gap: 10px;
@@ -386,309 +276,102 @@ textarea {
 
 .evento-fecha {
     font-weight: 700;
-    color: #0891b2;
+    color: var(--primary);
     font-size: 12px;
 }
 
 .evento-titulo {
     font-weight: 700;
-    color: #0f172a;
+    color: var(--dark);
     margin: 5px 0;
 }
 
 .delete-btn {
-    background: #ef4444;
+    background: var(--danger);
     color: white;
     border: none;
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .delete-btn:hover {
-    background: #dc2626;
+    background: var(--danger-dark);
     transform: scale(0.98);
+}
+
+/* ---------- CONTRASEÑAS ---------- */
+.grupo-pass-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: var(--bg-light);
+    border-radius: var(--radius-md);
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .grupo-pass-item input {
     width: 180px;
     padding: 8px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-dark);
 }
 
 .save-pass-btn {
-    background: #0891b2;
+    background: var(--primary);
     color: white;
     border: none;
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     margin-left: 10px;
 }
 
-/* ========== BIBLIOTECA ADMIN ========== */
+/* ---------- CATEGORÍAS ---------- */
 .categoria-badge {
     background: #e0f2fe;
-    color: #0891b2;
+    color: var(--primary);
     padding: 4px 10px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     font-size: 11px;
     font-weight: 600;
     display: inline-block;
 }
 
-.btn-ver {
-    display: inline-block;
-    padding: 6px 12px;
-    background: #0891b2;
+.btn-editar-recurso {
+    background: var(--warning);
     color: white;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 12px;
+    border: none;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 11px;
     margin-right: 5px;
 }
 
-.btn-eliminar-recurso,
-.btn-eliminar-recibo {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+.btn-eliminar-recurso,.btn-eliminar-recibo {
+    background: linear-gradient(135deg, var(--danger), var(--danger-dark));
     color: white;
     border: none;
     padding: 6px 12px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     font-size: 12px;
     font-weight: 600;
-    transition: all 0.2s;
+   
 }
 
-.btn-eliminar-recurso:hover,
-.btn-eliminar-recibo:hover {
+.btn-eliminar-recurso:hover, .btn-eliminar-recibo:hover ,.btn-ver:hover , .btn-editar-recurso:hover {
     transform: translateY(-2px);
     filter: brightness(1.05);
-    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
 }
 
-/* ========== MODAL DE CONFIRMACIÓN MEJORADO ========== */
-.modal-confirmacion {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    animation: fadeIn 0.3s ease;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-confirmacion-content {
-    background: white;
-    margin: 0 auto;
-    padding: 0;
-    border-radius: 32px;
-    width: 90%;
-    max-width: 420px;
-    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
-}
-
-.modal-confirmacion-header {
-    padding: 28px 24px 16px;
-    text-align: center;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-}
-
-.modal-confirmacion-icon {
-    font-size: 56px;
-    display: inline-block;
-    margin-bottom: 12px;
-    animation: bounce 0.5s ease;
-}
-
-.modal-confirmacion-header h3 {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 800;
-    color: #0f172a;
-}
-
-.modal-confirmacion-body {
-    padding: 24px;
-    text-align: center;
-}
-
-.modal-confirmacion-body p {
-    margin: 0;
-    color: #475569;
-    font-size: 15px;
-    line-height: 1.6;
-}
-
-.modal-confirmacion-body p strong {
-    color: #0891b2;
-    font-weight: 700;
-    background: #e0f2fe;
-    padding: 2px 8px;
-    border-radius: 12px;
-    display: inline-block;
-}
-
-.modal-confirmacion-body .recurso-nombre,
-.modal-confirmacion-body .comprobante-nombre {
-    background: #f1f5f9;
-    padding: 12px;
-    border-radius: 16px;
-    margin: 16px 0 8px;
-    font-weight: 600;
-    color: #0f172a;
-    word-break: break-word;
-}
-
-.modal-confirmacion-body .recurso-nombre::before {
-    content: "📄 ";
-}
-
-.modal-confirmacion-body .comprobante-nombre::before {
-    content: "🧾 ";
-}
-
-.modal-confirmacion-footer {
-    padding: 20px 24px 24px;
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    border-top: 1px solid #e2e8f0;
-    background: #f8fafc;
-}
-
-.btn-confirmar-cancelar,
-.btn-confirmar-aceptar {
-    flex: 1;
-    padding: 12px 20px;
-    border-radius: 40px;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-confirmar-cancelar {
-    background: #f1f5f9;
-    color: #475569;
-    border: 1px solid #e2e8f0;
-}
-
-.btn-confirmar-cancelar:hover {
-    background: #e2e8f0;
-    transform: translateY(-2px);
-}
-
-.btn-confirmar-aceptar {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-.btn-confirmar-aceptar:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.05);
-    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-}
-
-/* ========== TOASTS ========== */
-.toast-exito, .toast-error {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    padding: 14px 24px;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 14px;
-    z-index: 2001;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
-}
-
-.toast-exito {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-}
-
-.toast-error {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: white;
-}
-
-.toast-exito.show, .toast-error.show {
-    transform: translateX(-50%) translateY(0);
-}
-
-/* ========== MODAL RESET ========== */
-.modal-reset {
-    display: none;
-    position: fixed;
-    z-index: 1001;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    animation: fadeIn 0.3s ease;
-}
-
-.modal-reset-content {
-    background: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 25px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 450px;
-    text-align: center;
-    animation: slideUp 0.3s ease;
-    max-height: 85vh;
-    overflow-y: auto;
-}
-
-.btn-confirm-reset {
-    background: #ef4444;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.btn-cancel-reset {
-    background: #cbd5e1;
-    color: #334155;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-/* ========== SIGNIFICADOS DE COLORES ========== */
+/* ---------- SIGNIFICADOS DE COLORES ---------- */
 .significado-colores-grid {
     display: flex;
     flex-direction: column;
@@ -700,8 +383,8 @@ textarea {
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background: #f8fafc;
-    border-radius: 12px;
+    background: var(--bg-light);
+    border-radius: var(--radius-md);
     flex-wrap: wrap;
     gap: 10px;
 }
@@ -729,11 +412,11 @@ textarea {
     flex: 1;
     padding: 10px;
     border-radius: 10px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border-dark);
 }
 
 .btn-guardar-significado {
-    background: #0891b2;
+    background: var(--primary);
     color: white;
     border: none;
     padding: 10px 18px;
@@ -741,7 +424,18 @@ textarea {
     cursor: pointer;
 }
 
-/* ========== MODAL GESTIÓN COLORES ========== */
+.btn-gestionar-colores {
+    margin-top: 8px;
+    background: #146b60;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    width: 100%;
+}
+
+/* ---------- MODAL GESTIÓN COLORES ---------- */
 .modal-gestion-colores {
     display: none;
     position: fixed;
@@ -758,7 +452,7 @@ textarea {
 
 .modal-gestion-colores-content {
     background: white;
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     width: 90%;
     max-width: 700px;
     max-height: 85vh;
@@ -770,7 +464,7 @@ textarea {
     justify-content: space-between;
     align-items: center;
     padding: 20px 24px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
 }
 
 .close-modal-colores {
@@ -783,106 +477,57 @@ textarea {
     overflow-y: auto;
 }
 
-.btn-gestionar-colores {
-    margin-top: 8px;
-    background: #146b60;
+/* ---------- MODAL RESET ---------- */
+.modal-reset {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-reset-content {
+    background: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 25px;
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    animation: slideUp 0.3s ease;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.btn-confirm-reset {
+    background: var(--danger);
     color: white;
     border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 10px;
     cursor: pointer;
-    width: 100%;
+    font-weight: 600;
 }
 
-/* ========== ANIMACIONES ========== */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.btn-cancel-reset {
+    background: var(--border-dark);
+    color: var(--text-main);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-left: 10px;
 }
 
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* ========== RESPONSIVE ========== */
-@media (max-width: 768px) {
-    .grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .card {
-        padding: 20px;
-    }
-    
-    .row {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .tab-btn {
-        font-size: 12px;
-        padding: 8px 12px;
-    }
-    
-    .admin-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .admin-header-logo {
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 480px) {
-    .modal-confirmacion-content {
-        width: 95%;
-        margin: 0 auto;
-    }
-    
-    .modal-confirmacion-header {
-        padding: 20px 20px 12px;
-    }
-    
-    .modal-confirmacion-body {
-        padding: 20px;
-    }
-    
-    .modal-confirmacion-footer {
-        padding: 16px 20px 20px;
-    }
-    
-    .btn-confirmar-cancelar,
-    .btn-confirmar-aceptar {
-        padding: 10px 16px;
-        font-size: 13px;
-    }
-    
-    .toast-exito, .toast-error {
-        padding: 10px 18px;
-        font-size: 12px;
-        bottom: 20px;
-    }
-}
-/* ── Modal Editar Recurso ─────────────────────────────────────────────────── */
-
+/* ---------- MODAL EDITAR RECURSO ---------- */
 .modal-editar-recurso {
     display: none;
     position: fixed;
@@ -896,8 +541,8 @@ textarea {
 
 .modal-editar-recurso-content {
     background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
     width: 100%;
     max-width: 480px;
     overflow: hidden;
@@ -906,7 +551,7 @@ textarea {
 
 @keyframes slideUpModal {
     from { opacity: 0; transform: translateY(24px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .modal-editar-recurso-header {
@@ -914,7 +559,7 @@ textarea {
     align-items: center;
     gap: 10px;
     padding: 20px 24px 16px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
     background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
 }
 
@@ -937,13 +582,13 @@ textarea {
     color: #92400e;
     cursor: pointer;
     padding: 4px 6px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     line-height: 1;
     transition: background 0.15s;
 }
 
 .modal-editar-recurso-close:hover {
-    background: rgba(0,0,0,0.08);
+    background: rgba(0, 0, 0, 0.08);
 }
 
 .modal-editar-recurso-body {
@@ -962,16 +607,16 @@ textarea {
 .form-editar-label {
     font-size: 13px;
     font-weight: 600;
-    color: #475569;
+    color: var(--text-main);
 }
 
 .form-editar-input {
     padding: 10px 14px;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid var(--border);
     border-radius: 10px;
     font-size: 14px;
-    color: #0f172a;
-    background: #f8fafc;
+    color: var(--dark);
+    background: var(--bg-light);
     transition: border-color 0.18s, box-shadow 0.18s;
     outline: none;
     font-family: inherit;
@@ -980,19 +625,9 @@ textarea {
 }
 
 .form-editar-input:focus {
-    border-color: #f59e0b;
+    border-color: var(--warning);
     box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
     background: #ffffff;
-}
-
-.form-editar-select {
-    cursor: pointer;
-    appearance: auto;
-}
-
-.form-editar-textarea {
-    resize: vertical;
-    min-height: 76px;
 }
 
 .modal-editar-recurso-footer {
@@ -1000,14 +635,14 @@ textarea {
     gap: 10px;
     justify-content: flex-end;
     padding: 16px 24px 20px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
 }
 
 .btn-editar-cancelar {
     padding: 10px 20px;
-    border: 1.5 px solid #e2e8f0;
+    border: 1px solid var(--border);
     background: #ffffff;
-    color: #64748b;
+    color: var(--text-muted);
     border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
@@ -1016,8 +651,8 @@ textarea {
 }
 
 .btn-editar-cancelar:hover {
-    background: #f1f5f9;
-    color: #0f172a;
+    background: var(--bg-gray);
+    color: var(--dark);
 }
 
 .btn-editar-guardar {
@@ -1042,6 +677,32 @@ textarea {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+}
+
+/* ---------- RESPONSIVE ADMIN ---------- */
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .card {
+        padding: 20px;
+    }
+    .row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .tab-btn {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+    .admin-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    .admin-header-logo {
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 480px) {

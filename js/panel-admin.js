@@ -24,6 +24,31 @@ function formatearFechaAdmin(fechaISO) {
     });
 }
 
+// ========== TOASTS MEJORADOS ==========
+function mostrarToastExito(mensaje) {
+    const toast = document.createElement("div");
+    toast.className = "toast-exito";
+    toast.innerHTML = `<span class="toast-icon">✅</span><span>${mensaje}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function mostrarToastError(mensaje) {
+    const toast = document.createElement("div");
+    toast.className = "toast-error";
+    toast.innerHTML = `<span class="toast-icon">❌</span><span>${mensaje}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
 // ========== MODAL DE CONFIRMACIÓN MEJORADO ==========
 function mostrarConfirmacion(opciones) {
     return new Promise((resolve) => {
@@ -95,31 +120,6 @@ function mostrarConfirmacion(opciones) {
         
         modal.style.display = "flex";
     });
-}
-
-// ========== TOASTS MEJORADOS ==========
-function mostrarToastExito(mensaje) {
-    const toast = document.createElement("div");
-    toast.className = "toast-exito";
-    toast.innerHTML = `<span class="toast-icon">✅</span><span>${mensaje}</span>`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.classList.add("show"), 10);
-    setTimeout(() => {
-        toast.classList.remove("show");
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-function mostrarToastError(mensaje) {
-    const toast = document.createElement("div");
-    toast.className = "toast-error";
-    toast.innerHTML = `<span class="toast-icon">❌</span><span>${mensaje}</span>`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.classList.add("show"), 10);
-    setTimeout(() => {
-        toast.classList.remove("show");
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
 }
 
 // ========== EVENTOS ADMIN ==========
@@ -281,7 +281,6 @@ async function cargarListaCategoriasAdmin() {
     }
 }
 
-// ========== RECURSOS BIBLIOTECA ==========
 async function cargarRecursosAdmin() {
     const recursosTableBody = document.getElementById('recursosTableBody');
     if (!recursosTableBody) return;
@@ -302,11 +301,9 @@ async function cargarRecursosAdmin() {
         lista.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
         if (lista.length === 0) {
-            recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">📭 No hay recursos disponibles<\/td><\/tr>';
+            recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">📭 No hay recursos disponibles</td></tr>';
             return;
         }
-
-        console.log('[Biblioteca] Renderizando', lista.length, 'recursos en tabla...');
 
         recursosTableBody.innerHTML = lista.map(recurso => {
             const cat = categoriasMap[recurso.categoria];
@@ -314,34 +311,29 @@ async function cargarRecursosAdmin() {
             const desc = recurso.descripcion
                 ? escapeHtml(recurso.descripcion.substring(0, 60)) + (recurso.descripcion.length > 60 ? '...' : '')
                 : '-';
-            console.log('[Biblioteca] Recurso renderizado:', recurso.id, recurso.titulo);
             return `
                 <tr>
-                    <td><strong>${escapeHtml(recurso.titulo)}<\/strong><\/td>
-                    <td><span class="categoria-badge">${catDisplay}<\/span><\/td>
-                    <td>${desc}<\/td>
-                    <td><span style="font-size:12px;color:#64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}<\/span><\/td>
+                    <td><strong>${escapeHtml(recurso.titulo)}</strong></td>
+                    <td><span class="categoria-badge">${catDisplay}</span></td>
+                    <td>${desc}</td>
+                    <td><span style="font-size:12px;color:#64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}</span></td>
                     <td>
-                        <a href="${recurso.url}" target="_blank" class="btn-ver">👁️ Ver<\/a>
-                        <button class="btn-editar-recurso" data-id="${recurso.id}" style="background:#f59e0b;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;margin-left:5px;font-size:11px;">✏️ Editar<\/button>
-                        <button class="btn-eliminar-recurso" data-id="${recurso.id}" data-titulo="${escapeHtml(recurso.titulo)}">🗑️ Eliminar<\/button>
-                    <\/td>
-                <\/tr>
+                        <a href="${recurso.url}" target="_blank" class="btn-ver" style="display:inline-block; background: #0891b2; color:white; border:none; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:11px; margin-right:5px;">👁️ Ver</a>
+                        <button class="btn-editar-recurso" data-id="${recurso.id}" style="background: #f59e0b; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; margin-right:5px;">✏️ Editar</button>
+                        <button class="btn-eliminar-recurso" data-id="${recurso.id}" data-titulo="${escapeHtml(recurso.titulo)}" style="background: #f50000; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px;">🗑️ Eliminar</button>
+                    </td>
+                </tr>
             `;
         }).join('');
 
-        console.log('[Biblioteca] HTML insertado. Buscando botones editar...');
-        const botonesEditar = document.querySelectorAll('.btn-editar-recurso');
-        console.log('[Biblioteca] Botones editar encontrados:', botonesEditar.length);
-
-        botonesEditar.forEach(btn => {
-            console.log('[Biblioteca] Asignando onclick a botón editar, id:', btn.dataset.id);
+        // Eventos editar
+        document.querySelectorAll('.btn-editar-recurso').forEach(btn => {
             btn.onclick = () => {
-                console.log('[Biblioteca] Click en editar recurso id:', btn.dataset.id);
                 abrirModalEditarRecursoAdmin(btn.dataset.id);
             };
         });
 
+        // Eventos eliminar
         document.querySelectorAll('.btn-eliminar-recurso').forEach(btn => {
             btn.onclick = async () => {
                 const id = btn.dataset.id;
@@ -379,27 +371,23 @@ async function cargarRecursosAdmin() {
             };
         });
     } catch (error) {
-        recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos<\/td><\/tr>';
+        console.error('Error cargando recursos:', error);
+        recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos</td></tr>';
     }
 }
 
 // ========== EDITAR RECURSO MODAL ==========
 async function abrirModalEditarRecursoAdmin(recursoId) {
-    console.log('[EditarRecurso] Abriendo modal para recurso id:', recursoId);
-
     // Cargar datos del recurso
     let recursoData;
     try {
         const docSnap = await coleccionRecursos.doc(recursoId).get();
         if (!docSnap.exists) {
-            console.error('[EditarRecurso] Recurso no encontrado:', recursoId);
             mostrarToastError("❌ Recurso no encontrado");
             return;
         }
         recursoData = { id: docSnap.id, ...docSnap.data() };
-        console.log('[EditarRecurso] Datos cargados:', recursoData);
     } catch (e) {
-        console.error('[EditarRecurso] Error al cargar recurso:', e);
         mostrarToastError("❌ Error al cargar el recurso");
         return;
     }
@@ -410,10 +398,7 @@ async function abrirModalEditarRecursoAdmin(recursoId) {
         const snap = await coleccionCategorias.get();
         snap.forEach(doc => categorias.push({ id: doc.id, ...doc.data() }));
         categorias.sort((a, b) => a.nombre.localeCompare(b.nombre));
-        console.log('[EditarRecurso] Categorías cargadas:', categorias.length);
-    } catch (e) {
-        console.warn('[EditarRecurso] Error cargando categorías:', e);
-    }
+    } catch (e) { }
 
     const opcionesCategoria = categorias.map(cat =>
         `<option value="${cat.id}" ${recursoData.categoria === cat.id ? 'selected' : ''}>${escapeHtml(cat.icono || '📁')} ${escapeHtml(cat.nombre)}</option>`
@@ -422,7 +407,6 @@ async function abrirModalEditarRecursoAdmin(recursoId) {
     // Crear modal si no existe
     let modal = document.getElementById('modalEditarRecursoAdmin');
     if (!modal) {
-        console.log('[EditarRecurso] Creando modal por primera vez...');
         document.body.insertAdjacentHTML('beforeend', `
             <div id="modalEditarRecursoAdmin" class="modal-editar-recurso">
                 <div class="modal-editar-recurso-content">
@@ -457,22 +441,15 @@ async function abrirModalEditarRecursoAdmin(recursoId) {
         `);
         modal = document.getElementById('modalEditarRecursoAdmin');
 
-        document.getElementById('btnCerrarEditarRecursoAdmin').onclick = () => {
-            console.log('[EditarRecurso] Modal cerrado');
-            modal.style.display = 'none';
-        };
-        document.getElementById('btnEditarRecursoAdminCancelar').onclick = () => {
-            modal.style.display = 'none';
-        };
+        document.getElementById('btnCerrarEditarRecursoAdmin').onclick = () => modal.style.display = 'none';
+        document.getElementById('btnEditarRecursoAdminCancelar').onclick = () => modal.style.display = 'none';
         modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 
         document.getElementById('btnEditarRecursoAdminGuardar').onclick = async () => {
-            const id     = document.getElementById('editarRecursoAdminId').value;
+            const id = document.getElementById('editarRecursoAdminId').value;
             const titulo = document.getElementById('editarRecursoAdminTitulo').value.trim();
-            const catId  = document.getElementById('editarRecursoAdminCategoria').value;
-            const desc   = document.getElementById('editarRecursoAdminDescripcion').value.trim();
-
-            console.log('[EditarRecurso] Guardando:', { id, titulo, catId, desc });
+            const catId = document.getElementById('editarRecursoAdminCategoria').value;
+            const desc = document.getElementById('editarRecursoAdminDescripcion').value.trim();
 
             if (!titulo) { mostrarToastError("❌ El título es obligatorio"); return; }
 
@@ -488,10 +465,8 @@ async function abrirModalEditarRecursoAdmin(recursoId) {
                 });
                 modal.style.display = 'none';
                 mostrarToastExito('✓ Recurso actualizado correctamente');
-                console.log('[EditarRecurso] Guardado correctamente, recargando tabla...');
                 await cargarRecursosAdmin();
             } catch (err) {
-                console.error('[EditarRecurso] Error al guardar:', err);
                 mostrarToastError('❌ Error al guardar los cambios');
             } finally {
                 btnGuardar.disabled = false;
@@ -509,7 +484,6 @@ async function abrirModalEditarRecursoAdmin(recursoId) {
     selectCat.innerHTML = `<option value="">— Sin categoría —</option>${opcionesCategoria}`;
     selectCat.value = recursoData.categoria || '';
 
-    console.log('[EditarRecurso] Mostrando modal...');
     modal.style.display = 'flex';
 }
 
@@ -587,7 +561,6 @@ async function cargarSignificadosAdmin() {
     });
 }
 
-// ========== CARGAR SELECTOR DE COLORES ==========
 async function cargarSelectColoresActividades() {
     const select = document.getElementById('eventoColor');
     if (!select) return;
@@ -625,7 +598,6 @@ async function cargarSelectColoresActividades() {
         ).join('');
 }
 
-// ========== MODAL DE GESTIÓN DE COLORES ==========
 function initModalColores() {
     const btnGestionarColores = document.getElementById('btnGestionarColores');
     const modalGestionColores = document.getElementById('modalGestionColores');
@@ -671,7 +643,6 @@ function initSubirRecurso() {
         e.stopPropagation();
         
         if (nuevoBtn.disabled) {
-            console.log("⚠️ Subida ya en proceso, espera...");
             return;
         }
         
@@ -751,7 +722,6 @@ function initSubirRecurso() {
     });
 }
 
-// ========== PREVIEW DEL ARCHIVO ==========
 function initPreviewArchivo() {
     document.getElementById('recursoArchivo')?.addEventListener('change', (e) => {
         const previewDiv = document.getElementById('previewArchivo');
@@ -956,13 +926,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.addEventListener('click', (e) => {
         if (e.target === modalReset) {
-            modalReset.style.display = 'none';
-            document.body.style.overflow = '';
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modalReset && modalReset.style.display === 'flex') {
             modalReset.style.display = 'none';
             document.body.style.overflow = '';
         }

@@ -1,10 +1,13 @@
-/* css/estilos-consulta-pagos.css - Estilos consulta de pagos */
+/* ========================================
+   CONSULTA DE PAGOS - Pastoral Juvenil
+   ======================================== */
 
 .consulta-container {
     max-width: 100%;
     margin: 0 auto;
 }
 
+/* ---------- GRID DE GRUPOS ---------- */
 .grupos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -14,9 +17,9 @@
 
 .grupo-card {
     background: white;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     padding: 25px 20px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
     cursor: pointer;
     transition: all 0.3s ease;
     border: 2px solid transparent;
@@ -25,26 +28,27 @@
 
 .grupo-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-    border-color: #0891b2;
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
     background: #f0f9ff;
 }
 
 .grupo-nombre {
     font-size: 18px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--dark);
     margin-bottom: 8px;
 }
 
 .grupo-info {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
+/* ---------- SELECTOR DE AÑO ---------- */
 .year-selector {
     background: white;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     padding: 15px 20px;
     margin-bottom: 20px;
     display: flex;
@@ -52,24 +56,25 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 15px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
 }
 
 .year-selector select {
     padding: 10px 15px;
     border-radius: 10px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border-dark);
     font-size: 16px;
     font-weight: 600;
-    background: #f8fafc;
+    background: var(--bg-light);
 }
 
+/* ---------- TABLA DE PAGOS ---------- */
 .pagos-table-container {
     background: white;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     padding: 20px;
     overflow-x: auto;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
 }
 
 .pagos-table {
@@ -82,42 +87,16 @@
 .pagos-table td {
     padding: 12px;
     text-align: center;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
 }
 
 .pagos-table th {
-    background: #f8fafc;
-    color: #0891b2;
+    background: var(--bg-light);
+    color: var(--primary);
     font-weight: 700;
 }
 
-.status-pagado {
-    color: #15803d;
-    font-weight: 700;
-    background: #dcfce7;
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-}
-
-.status-pendiente {
-    color: #f97316;
-    font-weight: 700;
-    background: #fef9c3;
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-}
-
-.back-btn {
-    background: #64748b;
-    margin-bottom: 20px;
-    width: auto;
-    padding: 8px 20px;
-}
-
+/* ---------- RESUMEN ---------- */
 .resumen-pagos {
     margin-top: 15px;
     padding: 10px;
@@ -127,38 +106,14 @@
     text-align: center;
 }
 
-/* Modal (override local para consulta-pagos) */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+.back-btn {
+    background: var(--text-muted);
+    margin-bottom: 20px;
+    width: auto;
+    padding: 8px 20px;
 }
 
-.modal-content {
-    background-color: white;
-    margin: 15% auto;
-    padding: 25px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 350px;
-    text-align: center;
-    position: relative;
-}
-
-.close {
-    position: absolute;
-    right: 15px;
-    top: 10px;
-    font-size: 28px;
-    cursor: pointer;
-}
-
+/* ---------- RESPONSIVE ---------- */
 @media (max-width: 640px) {
     .grupos-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
