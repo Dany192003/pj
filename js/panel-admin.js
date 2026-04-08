@@ -306,12 +306,15 @@ async function cargarRecursosAdmin() {
             return;
         }
 
+        console.log('[Biblioteca] Renderizando', lista.length, 'recursos en tabla...');
+
         recursosTableBody.innerHTML = lista.map(recurso => {
             const cat = categoriasMap[recurso.categoria];
             const catDisplay = cat ? `${cat.icono} ${cat.nombre}` : '📁 Sin categoría';
             const desc = recurso.descripcion
                 ? escapeHtml(recurso.descripcion.substring(0, 60)) + (recurso.descripcion.length > 60 ? '...' : '')
                 : '-';
+            console.log('[Biblioteca] Recurso renderizado:', recurso.id, recurso.titulo);
             return `
                 <tr>
                     <td><strong>${escapeHtml(recurso.titulo)}<\/strong><\/td>
@@ -320,11 +323,24 @@ async function cargarRecursosAdmin() {
                     <td><span style="font-size:12px;color:#64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}<\/span><\/td>
                     <td>
                         <a href="${recurso.url}" target="_blank" class="btn-ver">👁️ Ver<\/a>
+                        <button class="btn-editar-recurso" data-id="${recurso.id}" style="background:#f59e0b;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;margin-left:5px;font-size:11px;">✏️ Editar<\/button>
                         <button class="btn-eliminar-recurso" data-id="${recurso.id}" data-titulo="${escapeHtml(recurso.titulo)}">🗑️ Eliminar<\/button>
                     <\/td>
                 <\/tr>
             `;
         }).join('');
+
+        console.log('[Biblioteca] HTML insertado. Buscando botones editar...');
+        const botonesEditar = document.querySelectorAll('.btn-editar-recurso');
+        console.log('[Biblioteca] Botones editar encontrados:', botonesEditar.length);
+
+        botonesEditar.forEach(btn => {
+            console.log('[Biblioteca] Asignando onclick a botón editar, id:', btn.dataset.id);
+            btn.onclick = () => {
+                console.log('[Biblioteca] Click en editar recurso id:', btn.dataset.id);
+                abrirModalEditarRecursoAdmin(btn.dataset.id);
+            };
+        });
 
         document.querySelectorAll('.btn-eliminar-recurso').forEach(btn => {
             btn.onclick = async () => {
@@ -365,6 +381,136 @@ async function cargarRecursosAdmin() {
     } catch (error) {
         recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos<\/td><\/tr>';
     }
+}
+
+// ========== EDITAR RECURSO MODAL ==========
+async function abrirModalEditarRecursoAdmin(recursoId) {
+    console.log('[EditarRecurso] Abriendo modal para recurso id:', recursoId);
+
+    // Cargar datos del recurso
+    let recursoData;
+    try {
+        const docSnap = await coleccionRecursos.doc(recursoId).get();
+        if (!docSnap.exists) {
+            console.error('[EditarRecurso] Recurso no encontrado:', recursoId);
+            mostrarToastError("❌ Recurso no encontrado");
+            return;
+        }
+        recursoData = { id: docSnap.id, ...docSnap.data() };
+        console.log('[EditarRecurso] Datos cargados:', recursoData);
+    } catch (e) {
+        console.error('[EditarRecurso] Error al cargar recurso:', e);
+        mostrarToastError("❌ Error al cargar el recurso");
+        return;
+    }
+
+    // Cargar categorías
+    let categorias = [];
+    try {
+        const snap = await coleccionCategorias.get();
+        snap.forEach(doc => categorias.push({ id: doc.id, ...doc.data() }));
+        categorias.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        console.log('[EditarRecurso] Categorías cargadas:', categorias.length);
+    } catch (e) {
+        console.warn('[EditarRecurso] Error cargando categorías:', e);
+    }
+
+    const opcionesCategoria = categorias.map(cat =>
+        `<option value="${cat.id}" ${recursoData.categoria === cat.id ? 'selected' : ''}>${escapeHtml(cat.icono || '📁')} ${escapeHtml(cat.nombre)}</option>`
+    ).join('');
+
+    // Crear modal si no existe
+    let modal = document.getElementById('modalEditarRecursoAdmin');
+    if (!modal) {
+        console.log('[EditarRecurso] Creando modal por primera vez...');
+        document.body.insertAdjacentHTML('beforeend', `
+            <div id="modalEditarRecursoAdmin" class="modal-editar-recurso">
+                <div class="modal-editar-recurso-content">
+                    <div class="modal-editar-recurso-header">
+                        <span class="modal-editar-recurso-icon">✏️</span>
+                        <h3>Editar Recurso</h3>
+                        <button class="modal-editar-recurso-close" id="btnCerrarEditarRecursoAdmin">✕</button>
+                    </div>
+                    <div class="modal-editar-recurso-body">
+                        <input type="hidden" id="editarRecursoAdminId" />
+                        <div class="form-editar-grupo">
+                            <label class="form-editar-label" for="editarRecursoAdminTitulo">📝 Título</label>
+                            <input type="text" id="editarRecursoAdminTitulo" class="form-editar-input" placeholder="Título del recurso" maxlength="200" />
+                        </div>
+                        <div class="form-editar-grupo">
+                            <label class="form-editar-label" for="editarRecursoAdminCategoria">🗂️ Categoría</label>
+                            <select id="editarRecursoAdminCategoria" class="form-editar-input form-editar-select">
+                                <option value="">— Sin categoría —</option>
+                            </select>
+                        </div>
+                        <div class="form-editar-grupo">
+                            <label class="form-editar-label" for="editarRecursoAdminDescripcion">📄 Descripción</label>
+                            <textarea id="editarRecursoAdminDescripcion" class="form-editar-input form-editar-textarea" placeholder="Descripción del recurso (opcional)" maxlength="500" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-editar-recurso-footer">
+                        <button class="btn-editar-cancelar" id="btnEditarRecursoAdminCancelar">✗ Cancelar</button>
+                        <button class="btn-editar-guardar" id="btnEditarRecursoAdminGuardar">💾 Guardar cambios</button>
+                    </div>
+                </div>
+            </div>
+        `);
+        modal = document.getElementById('modalEditarRecursoAdmin');
+
+        document.getElementById('btnCerrarEditarRecursoAdmin').onclick = () => {
+            console.log('[EditarRecurso] Modal cerrado');
+            modal.style.display = 'none';
+        };
+        document.getElementById('btnEditarRecursoAdminCancelar').onclick = () => {
+            modal.style.display = 'none';
+        };
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+        document.getElementById('btnEditarRecursoAdminGuardar').onclick = async () => {
+            const id     = document.getElementById('editarRecursoAdminId').value;
+            const titulo = document.getElementById('editarRecursoAdminTitulo').value.trim();
+            const catId  = document.getElementById('editarRecursoAdminCategoria').value;
+            const desc   = document.getElementById('editarRecursoAdminDescripcion').value.trim();
+
+            console.log('[EditarRecurso] Guardando:', { id, titulo, catId, desc });
+
+            if (!titulo) { mostrarToastError("❌ El título es obligatorio"); return; }
+
+            const btnGuardar = document.getElementById('btnEditarRecursoAdminGuardar');
+            btnGuardar.disabled = true;
+            btnGuardar.textContent = '⏳ Guardando...';
+
+            try {
+                await coleccionRecursos.doc(id).update({
+                    titulo,
+                    categoria: catId || null,
+                    descripcion: desc
+                });
+                modal.style.display = 'none';
+                mostrarToastExito('✓ Recurso actualizado correctamente');
+                console.log('[EditarRecurso] Guardado correctamente, recargando tabla...');
+                await cargarRecursosAdmin();
+            } catch (err) {
+                console.error('[EditarRecurso] Error al guardar:', err);
+                mostrarToastError('❌ Error al guardar los cambios');
+            } finally {
+                btnGuardar.disabled = false;
+                btnGuardar.textContent = '💾 Guardar cambios';
+            }
+        };
+    }
+
+    // Rellenar datos actuales
+    document.getElementById('editarRecursoAdminId').value = recursoData.id;
+    document.getElementById('editarRecursoAdminTitulo').value = recursoData.titulo || '';
+    document.getElementById('editarRecursoAdminDescripcion').value = recursoData.descripcion || '';
+
+    const selectCat = document.getElementById('editarRecursoAdminCategoria');
+    selectCat.innerHTML = `<option value="">— Sin categoría —</option>${opcionesCategoria}`;
+    selectCat.value = recursoData.categoria || '';
+
+    console.log('[EditarRecurso] Mostrando modal...');
+    modal.style.display = 'flex';
 }
 
 // ========== SIGNIFICADOS DE COLORES ==========

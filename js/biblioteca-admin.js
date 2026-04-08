@@ -185,12 +185,17 @@ async function cargarRecursosAdmin() {
                     <td><span style="font-size: 12px; color: #64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}<\/span><\/td>
                     <td>
                         <a href="${recurso.url}" target="_blank" class="btn-ver" style="display: inline-block; padding: 4px 8px; background: #0891b2; color: white; border-radius: 6px; text-decoration: none; font-size: 11px;">👁️ Ver</a>
+                        <button class="btn-editar-recurso" data-id="${recurso.id}" style="background: #f59e0b; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-left: 5px; font-size: 11px;">✏️ Editar</button>
                         <button class="btn-eliminar-recurso" data-id="${recurso.id}" data-titulo="${escapeHtml(recurso.titulo)}" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-left: 5px;">🗑️ Eliminar</button>
                     <\/td>
                 <\/tr>
             `;
         }).join("");
         
+        document.querySelectorAll('.btn-editar-recurso').forEach(btn => {
+            btn.onclick = () => abrirModalEditarRecurso(btn.dataset.id);
+        });
+
         document.querySelectorAll('.btn-eliminar-recurso').forEach(btn => {
             btn.onclick = async () => {
                 const id = btn.dataset.id;
@@ -208,6 +213,118 @@ async function cargarRecursosAdmin() {
     }
 }
 
+// ── Modal de edición de recurso ───────────────────────────────────────────────
+
+async function abrirModalEditarRecurso(recursoId) {
+    // Obtener datos del recurso
+    let recursoData;
+    try {
+        const docSnap = await coleccionRecursos.doc(recursoId).get();
+        if (!docSnap.exists) { mostrarToastError("❌ Recurso no encontrado"); return; }
+        recursoData = { id: docSnap.id, ...docSnap.data() };
+    } catch (e) {
+        mostrarToastError("❌ Error al cargar el recurso"); return;
+    }
+
+    // Obtener categorías
+    let categorias = [];
+    try {
+        const snap = await coleccionCategorias.get();
+        snap.forEach(doc => categorias.push({ id: doc.id, ...doc.data() }));
+        categorias.sort((a, b) => a.nombre.localeCompare(b.nombre));
+    } catch (e) { /* sin categorías */ }
+
+    // Construir opciones del select
+    const opcionesCategoria = categorias.map(cat =>
+        `<option value="${cat.id}" ${recursoData.categoria === cat.id ? 'selected' : ''}>${escapeHtml(cat.icono || '📁')} ${escapeHtml(cat.nombre)}</option>`
+    ).join('');
+
+    // Crear modal si no existe
+    let modal = document.getElementById("modalEditarRecurso");
+    if (!modal) {
+        const modalHTML = `
+            <div id="modalEditarRecurso" class="modal-editar-recurso">
+                <div class="modal-editar-recurso-content">
+                    <div class="modal-editar-recurso-header">
+                        <span class="modal-editar-recurso-icon">✏️</span>
+                        <h3>Editar Recurso</h3>
+                        <button class="modal-editar-recurso-close" id="btnCerrarEditarRecurso">✕</button>
+                    </div>
+                    <div class="modal-editar-recurso-body">
+                        <input type="hidden" id="editarRecursoId" />
+                        <div class="form-editar-grupo">
+                            <label class="form-editar-label" for="editarRecursoTitulo">📝 tytytytTítulo</label>
+                            <input type="text" id="editarRecursoTitulo" class="form-editar-input" placeholder="Título del recurso" maxlength="200" />
+                        </div>
+                        <div class="form-editar-grupo">
+                            <label class="form-editar-label" for="editarRecursoCategoria">🗂️ Categoría</label>
+                            <select id="editarRecursoCategoria" class="form-editar-input form-editar-select">
+                                <option value="">— Sin categoría —</option>
+                            </select>
+                        </div>
+                        <div class="form-editar-grupo">
+                            <label class="form-editar-label" for="editarRecursoDescripcion">📄 Descripción</label>
+                            <textarea id="editarRecursoDescripcion" class="form-editar-input form-editar-textarea" placeholder="Descripción del recurso (opcional)" maxlength="500" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-editar-recurso-footer">
+                        <button class="btn-editar-cancelar" id="btnEditarRecursoCancelar">✗ Cancelar</button>
+                        <button class="btn-editar-guardar" id="btnEditarRecursoGuardar">💾 Guardar cambios</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML("beforeend", modalHTML);
+        modal = document.getElementById("modalEditarRecurso");
+
+        document.getElementById("btnCerrarEditarRecurso").onclick = () => modal.style.display = "none";
+        document.getElementById("btnEditarRecursoCancelar").onclick = () => modal.style.display = "none";
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+
+        document.getElementById("btnEditarRecursoGuardar").onclick = async () => {
+            const id      = document.getElementById("editarRecursoId").value;
+            const titulo  = document.getElementById("editarRecursoTitulo").value.trim();
+            const catId   = document.getElementById("editarRecursoCategoria").value;
+            const desc    = document.getElementById("editarRecursoDescripcion").value.trim();
+
+            if (!titulo) { mostrarToastError("❌ El título es obligatorio"); return; }
+
+            const btn = document.getElementById("btnEditarRecursoGuardar");
+            btn.disabled = true;
+            btn.textContent = "⏳ Guardando...";
+
+            try {
+                await coleccionRecursos.doc(id).update({
+                    titulo,
+                    categoria: catId || null,
+                    descripcion: desc
+                });
+                modal.style.display = "none";
+                mostrarToastExito("✓ Recurso actualizado correctamente");
+                await cargarRecursosAdmin();
+            } catch (err) {
+                console.error("Error al actualizar:", err);
+                mostrarToastError("❌ Error al guardar los cambios");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "💾 Guardar cambios";
+            }
+        };
+    }
+
+    // Rellenar datos actuales
+    document.getElementById("editarRecursoId").value = recursoData.id;
+    document.getElementById("editarRecursoTitulo").value = recursoData.titulo || '';
+    document.getElementById("editarRecursoDescripcion").value = recursoData.descripcion || '';
+
+    const selectCat = document.getElementById("editarRecursoCategoria");
+    selectCat.innerHTML = `<option value="">— Sin categoría —</option>${opcionesCategoria}`;
+    selectCat.value = recursoData.categoria || '';
+
+    modal.style.display = "flex";
+}
+
 // Exportar funciones
 window.cargarRecursosAdmin = cargarRecursosAdmin;
 window.eliminarRecursoConConfirmacion = eliminarRecursoConConfirmacion;
+window.abrirModalEditarRecurso = abrirModalEditarRecurso;
