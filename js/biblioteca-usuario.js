@@ -94,57 +94,61 @@ function obtenerClaseExtension(extension) {
     return clases[extension] || clases['default'];
 }
 
-// Función para descargar un archivo directamente (SIN abrir ventanas de Cloudinary)
-async function descargarConNombrePersonalizado(url, titulo, extension) {
-    try {
-        window.showToast(`📥 Descargando: ${titulo}...`, false);
-        
-        const nombreArchivo = limpiarNombreArchivo(titulo, extension);
-        
-        // Obtener el archivo como blob
-        const response = await fetch(url);
-        const blob = await response.blob();
-        
-        // Crear URL del blob (esto es local, NO va a Cloudinary)
-        const blobUrl = URL.createObjectURL(blob);
-        
-        // Crear enlace de descarga
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = nombreArchivo;
-        link.style.display = 'none';
-        
-        // IMPORTANTE: No abrir en nueva pestaña, solo descargar
-        document.body.appendChild(link);
-        link.click();
-        
-        // Limpiar después de la descarga
-        setTimeout(() => {
-            URL.revokeObjectURL(blobUrl);
-            document.body.removeChild(link);
-        }, 2000);
-        
-        window.showToast(`✅ Descargado: ${nombreArchivo}`, false);
-        
-    } catch (error) {
-        console.error('Error en descarga:', error);
-        
-        // Fallback: intentar con el método alternativo
-        try {
-            const nombreArchivo = limpiarNombreArchivo(titulo, extension);
+// Función para descargar un archivo OBLIGATORIAMENTE (compatible con Android)
+function descargarConNombrePersonalizado(url, titulo, extension) {
+    window.showToast(`📥 Descargando: ${titulo}...`, false);
+    
+    const nombreArchivo = limpiarNombreArchivo(titulo, extension);
+    
+    // Usar XMLHttpRequest para forzar la descarga (más confiable que fetch)
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'blob';
+    
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            // Crear blob a partir de la respuesta
+            const blob = xhr.response;
+            
+            // Crear URL del blob local
+            const blobUrl = URL.createObjectURL(blob);
+            
+            // Crear enlace de descarga
             const link = document.createElement('a');
-            link.href = url;
+            link.href = blobUrl;
             link.download = nombreArchivo;
             link.style.display = 'none';
             document.body.appendChild(link);
+            
+            // Forzar click
             link.click();
-            setTimeout(() => document.body.removeChild(link), 100);
-            window.showToast(`✅ ${nombreArchivo} descargado`, false);
-        } catch (e) {
-            window.showToast(`❌ Error al descargar`, true);
+            
+            // Limpiar después de la descarga
+            setTimeout(() => {
+                URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(link);
+                window.showToast(`✅ ${nombreArchivo} descargado`, false);
+            }, 2000);
+        } else {
+            window.showToast(`❌ Error ${xhr.status}`, true);
         }
-    }
-} 
+    };
+    
+    xhr.onerror = function() {
+        window.showToast(`❌ Error de conexión`, true);
+    };
+    
+    xhr.onprogress = function(event) {
+        if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            if (percent % 25 === 0) {
+                window.showToast(`📥 Descargando... ${percent}%`, false);
+            }
+        }
+    };
+    
+    xhr.send();
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadDatabase();
