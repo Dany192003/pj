@@ -150,8 +150,8 @@ function renderizarHistorial() {
             <td>Q ${parseFloat(recibo.monto).toFixed(2)}<\/td>
             <td>${recibo.fecha}<br><small>${recibo.hora}<\/small><\/td>
             <td>
-                <a href="${recibo.url}" target="_blank" class="btn-ver" style="padding: 4px 8px; font-size: 11px; display: inline-block; background: #0891b2; color: white; border-radius: 6px; text-decoration: none;">👁️ Ver</a>
-                <button class="btn-descargar-recibo" data-url="${recibo.url}" data-folio="REC-${recibo.numero}" style="background: #10b981; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-left: 5px;">⬇️</button>
+                <a href="${recibo.url}" target="_blank" class="btn-ver" style="padding: 4px 8px; font-size: 11px; display: inline-block; background: #0891b2; color: white; border-radius: 6px; text-decoration: none;"> 👀 Ver</a>
+                <button class="btn-descargar-recibo" data-url="${recibo.url}" data-folio="REC-${recibo.numero}" style="background: #10b981; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-left: 5px;">⬇</button>
                 <button class="btn-eliminar-recibo" data-id="${recibo.id}" data-folio="REC-${recibo.numero}" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-left: 5px;">🗑️</button>
             <\/td>
         <\/tr>

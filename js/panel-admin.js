@@ -495,16 +495,17 @@ async function cargarSignificadosAdmin() {
     const significados = await cargarSignificadosColores();
     
     const colores = [
-        { codigo: '#0891b2', nombre: 'Azul', icono: '🔵', default: '' },
-        { codigo: '#ef4444', nombre: 'Rojo', icono: '🔴', default: '' },
-        { codigo: '#f97316', nombre: 'Naranja', icono: '🟠', default: '' },
-        { codigo: '#eab308', nombre: 'Amarillo', icono: '🟡', default: '' },
-        { codigo: '#10b981', nombre: 'Verde', icono: '🟢', default: '' },
-        { codigo: '#8b5cf6', nombre: 'Morado', icono: '🟣', default: '' },
-        { codigo: '#ec4899', nombre: 'Rosa', icono: '🩷', default: '' },
-        { codigo: '#06b6d4', nombre: 'Cian', icono: '💙', default: '' },
-        { codigo: '#f59e0b', nombre: 'Ámbar', icono: '🟧', default: '' },
-        { codigo: '#6366f1', nombre: 'Índigo', icono: '🔮', default: '' }
+        { codigo: '#0891b2', nombre: 'Azul', default: '' },
+        { codigo: '#ef4444', nombre: 'Rojo',  default: '' },
+        { codigo: '#f97316', nombre: 'Naranja', default: '' },
+        { codigo: '#eab308', nombre: 'Amarillo', default: '' },
+        { codigo: '#10b981', nombre: 'Verde', default: '' },
+        { codigo: '#8b5cf6', nombre: 'Morado', default: '' },
+        { codigo: '#ec4899', nombre: 'Rosa', default: '' },
+        { codigo: '#06b6d4', nombre: 'Cian', default: '' },
+        { codigo: '#f59e0b', nombre: 'Ámbar', default: '' },
+        { codigo: '#6366f1', nombre: 'Índigo', default: '' },
+        { codigo: '#616163', nombre: 'Gris', default: '' }
     ];
     
     significadosGrid.innerHTML = colores.map(color => {
@@ -515,7 +516,7 @@ async function cargarSignificadosAdmin() {
             <div class="significado-item ${tieneSignificado ? 'tiene-significado' : ''}" data-color="${color.codigo}">
                 <div class="significado-info">
                     <div class="significado-color" style="background-color: ${color.codigo};"></div>
-                    <span class="significado-nombre">${color.icono} ${color.nombre}</span>
+                    <span class="significado-nombre">${color.nombre}</span>
                     ${tieneSignificado ? '<span class="significado-badge">✓ Activo</span>' : '<span class="significado-badge inactivo">⚡ Sin significado</span>'}
                 </div>
                 <div class="significado-input-group">
@@ -580,6 +581,7 @@ async function cargarSelectColoresActividades() {
         { codigo: '#6366f1', nombre: 'Índigo', icono: '🔮' }
     ];
     
+    // Filtrar solo colores que tienen significado
     const coloresConSignificado = coloresPredeterminados.filter(color => {
         const significado = significados[color.codigo];
         return significado && significado.trim() !== '';
@@ -592,10 +594,18 @@ async function cargarSelectColoresActividades() {
     }
     
     select.disabled = false;
+    
+    // Generar opciones con significado
     select.innerHTML = '<option value="" disabled selected>-- Seleccione un color --</option>' +
-        coloresConSignificado.map(color => 
-            `<option value="${color.codigo}" style="background-color: ${color.codigo}; color: white; padding: 5px;">${color.icono} ${color.nombre}</option>`
-        ).join('');
+        coloresConSignificado.map(color => {
+            const significado = significados[color.codigo] || '';
+            // Limitar el significado a 50 caracteres para no alargar demasiado el select
+            const significadoCorto = significado.length > 50 ? significado.substring(0, 47) + '...' : significado;
+            
+            return `<option value="${color.codigo}" style="background-color: ${color.codigo}; color: white; padding: 5px;">
+                        ${color.icono} ${color.nombre} - ${significadoCorto}
+                    </option>`;
+        }).join('');
 }
 
 function initModalColores() {
@@ -828,26 +838,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ========== AGREGAR EVENTO ==========
-    document.getElementById('btnAgregarEvento')?.addEventListener('click', async () => {
-        const fecha       = document.getElementById('eventoFecha').value;
-        const titulo      = document.getElementById('eventoTitulo').value.trim();
-        const lugar       = document.getElementById('eventoLugar').value.trim();
-        const descripcion = document.getElementById('eventoDescripcion').value.trim();
-        const color       = document.getElementById('eventoColor').value;
+// ========== AGREGAR EVENTO ==========
+document.getElementById('btnAgregarEvento')?.addEventListener('click', async () => {
+    const fecha       = document.getElementById('eventoFecha').value;
+    const titulo      = document.getElementById('eventoTitulo').value.trim();
+    const lugar       = document.getElementById('eventoLugar').value.trim();
+    const descripcion = document.getElementById('eventoDescripcion').value.trim();
+    const color       = document.getElementById('eventoColor').value;
 
-        if (!fecha)  { mostrarToastError('❌ Selecciona una fecha'); return; }
-        if (!titulo) { mostrarToastError('❌ Escribe un título'); return; }
-        if (!color)  { mostrarToastError('❌ Selecciona un color para la actividad'); return; }
+    if (!fecha)  { mostrarToastError('❌ Selecciona una fecha'); return; }
+    // ❌ ELIMINADA la validación del título
+    if (!color)  { mostrarToastError('❌ Selecciona un color para la actividad'); return; }
 
-        await agregarEvento(fecha, titulo, lugar, descripcion, color);
+    // Si el título está vacío, usar un valor por defecto
+    const tituloFinal = titulo || ' ';
 
-        ['eventoFecha', 'eventoTitulo', 'eventoLugar', 'eventoDescripcion']
-            .forEach(id => { document.getElementById(id).value = ''; });
-        document.getElementById('eventoColor').value = '';
+    await agregarEvento(fecha, tituloFinal, lugar, descripcion, color);
 
-        await cargarEventosAdmin();
-        mostrarToastExito('✓ Actividad agregada');
-    });
+    ['eventoFecha', 'eventoTitulo', 'eventoLugar', 'eventoDescripcion']
+        .forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('eventoColor').value = '';
+
+    await cargarEventosAdmin();
+    mostrarToastExito('✓ Actividad agregada');
+});
 
     // ========== AGREGAR CATEGORÍA ==========
     document.getElementById('btnAgregarCategoria')?.addEventListener('click', async () => {

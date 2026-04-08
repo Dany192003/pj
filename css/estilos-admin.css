@@ -364,7 +364,7 @@
     margin-right: 5px;
 }
 
-.btn-eliminar-recurso,.btn-eliminar-recibo ,.btn-ver,.btn-editar-recurso{
+.btn-eliminar-recurso,.btn-eliminar-recibo ,.btn-ver,.btn-editar-recurso,.btn-descargar-recibo {
     background: linear-gradient(135deg, var(--danger), var(--danger-dark));
     color: white;
     border: none;
@@ -376,7 +376,7 @@
     transition: all 0.2s;
 }
 
-.btn-eliminar-recurso:hover, .btn-eliminar-recibo:hover,.btn-ver:hover,.btn-editar-recurso:hover {
+.btn-eliminar-recurso:hover, .btn-eliminar-recibo:hover,.btn-ver:hover,.btn-editar-recurso:hover ,.btn-descargar-recibo:hover {
     transform: translateY(-2px);
     filter: brightness(1.05);
     box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);

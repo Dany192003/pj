@@ -138,16 +138,17 @@ async function generarLeyendaColores() {
     leyendaContainer.style.display = 'block';
     
     const nombresColores = {
-        '#0891b2': '🔵 Azul',
-        '#ef4444': '🔴 Rojo',
-        '#f97316': '🟠 Naranja',
-        '#eab308': '🟡 Amarillo',
-        '#10b981': '🟢 Verde',
-        '#8b5cf6': '🟣 Morado',
-        '#ec4899': '🩷 Rosa',
-        '#06b6d4': '💙 Cian',
-        '#f59e0b': '🟧 Ámbar',
-        '#6366f1': '🔮 Índigo'
+        '#0891b2': 'Azul',
+        '#ef4444': 'Rojo',
+        '#f97316': 'Naranja',
+        '#eab308': 'Amarillo',
+        '#10b981': 'Verde',
+        '#8b5cf6': 'Morado',
+        '#ec4899': 'Rosa',
+        '#06b6d4': 'Cian',
+        '#f59e0b': 'Ámbar',
+        '#6366f1': 'Índigo',
+        '#696969': 'Gris'
     };
     
     leyendaGrid.innerHTML = Array.from(coloresUnicos.entries()).map(([color, info]) => {
