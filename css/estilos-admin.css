@@ -46,7 +46,99 @@
     font-weight: 600;
     color: var(--primary);
 }
+/* ========== BOTONES ADMIN (reorganizados y con nuevos colores) ========== */
+.admin-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
 
+.user-badge {
+    background: linear-gradient(135deg, #0891b2, #3b82f6);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.admin-btn {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+.admin-btn:active {
+    transform: translateY(1px);
+}
+
+/* Botón Forzar Actualización (Amarillo/Naranja) */
+.admin-btn-update {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+/* Botón Reiniciar Sistema (Rojo) */
+.admin-btn-reset {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+/* Botón Cerrar Sesión (Gris oscuro) */
+.admin-btn-logout {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: white;
+}
+
+/* Responsive para botones admin */
+@media (max-width: 768px) {
+    .admin-actions {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .admin-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+    
+    .user-badge {
+        padding: 6px 14px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .admin-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .user-badge {
+        width: 100%;
+        text-align: center;
+    }
+}
 /* ---------- BOTONES ADMIN ---------- */
 .logout-btn {
     background: var(--danger);

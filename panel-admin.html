@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#0891b2">
-    <title>Administrador | Pastoral Juvenil</title>
+    <title>Admin | Pastoral Juvenil</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -34,6 +34,7 @@
 <body>
 
 <div class="app">
+    <!-- HEADER ADMINISTRADOR REORGANIZADO -->
     <div class="admin-header">
         <div class="admin-header-logo">
             <img src="img/logo.jpg" alt="Logo" class="admin-logo-img">
@@ -42,13 +43,22 @@
                 <p>Panel de Administración - Parroquia San Agustín Sumpango</p>
             </div>
         </div>
-        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+        
+        <!-- BOTONES ADMIN (agrupados y con nuevos colores) -->
+        <div class="admin-actions">
             <span class="user-badge">👑 Administrador</span>
-            <button class="reset-btn" id="btnReset">⚠️ Reiniciar Sistema</button>
-            <button class="force-update-btn" id="btnForzarActualizacion" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                🔄 Forzar actualización global
+            
+            <button class="admin-btn admin-btn-update" id="btnForzarActualizacion">
+                🔄 Forzar actualización
             </button>
-            <button class="logout-btn" id="btnLogout">🚪 Cerrar Sesión</button>
+            
+            <button class="admin-btn admin-btn-reset" id="btnReset">
+                ⚠️ Reiniciar Sistema
+            </button>
+            
+            <button class="admin-btn admin-btn-logout" id="btnLogout">
+                🚪 Cerrar Sesión
+            </button>
         </div>
     </div>
 
@@ -428,6 +438,5 @@ document.getElementById('btnForzarActualizacion')?.addEventListener('click', () 
     }
 });
 </script>
-
 </body>
 </html>
