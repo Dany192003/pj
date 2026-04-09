@@ -91,17 +91,18 @@
         </div>
     </div>
 
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
-            <h3>Acceso Administrador</h3>
-            <p style="color: #64748b; font-size: 13px; margin-bottom: 24px;">Ingresa tu contraseña para continuar</p>
-            <input type="password" id="adminPassword" placeholder="Contraseña" class="modal-input">
-            <button id="btnLogin" class="btn-main">Ingresar al Panel</button>
-            <p class="error-msg" id="loginError"></p>
-        </div>
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+        <h3>Acceso Administrador</h3>
+        <p style="color: #64748b; font-size: 13px; margin-bottom: 24px;">Ingresa tus credenciales</p>
+        <input type="email" id="adminEmail" placeholder="Correo electrónico" class="modal-input" value="admin@pastoral.com">
+        <input type="password" id="adminPassword" placeholder="Contraseña" class="modal-input">
+        <button id="btnLogin" class="btn-main">Ingresar al Panel</button>
+        <p class="error-msg" id="loginError"></p>
     </div>
+</div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -112,6 +113,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="js/inicio-firebase.js"></script>
 <script src="js/base-datos-nube.js"></script>
 <script src="js/autenticacion.js"></script>

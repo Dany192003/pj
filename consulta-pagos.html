@@ -92,99 +92,11 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="js/inicio-firebase.js"></script>
 <script src="js/base-datos-nube.js"></script>
 <script src="js/consulta-pagos.js"></script>
+<script src="js/actualizacion.js"></script>
 
-<script>
-// ========== SISTEMA DE ACTUALIZACIÓN AUTOMÁTICA ==========
-const APP_VERSION = '1.0.0';
-
-async function verificarActualizacion() {
-    try {
-        const response = await fetch('/version.json?v=' + Date.now());
-        const versionData = await response.json();
-        const versionLocal = localStorage.getItem('app_version');
-        
-        if (!versionLocal || versionLocal !== versionData.version) {
-            console.log('🔄 Nueva versión disponible en Consulta de Pagos!');
-            mostrarNotificacionActualizacion(versionData);
-            localStorage.setItem('app_version', versionData.version);
-            localStorage.setItem('app_last_update', versionData.lastUpdate);
-            
-            if ('serviceWorker' in navigator) {
-                const registrations = await navigator.serviceWorker.getRegistrations();
-                for (let registration of registrations) {
-                    await registration.update();
-                }
-            }
-            return true;
-        }
-        return false;
-    } catch (error) {
-        console.log('Error verificando actualización:', error);
-        return false;
-    }
-}
-
-function mostrarNotificacionActualizacion(versionData) {
-    // Eliminar toast existente si hay
-    const existingToast = document.querySelector('.toast-actualizacion');
-    if (existingToast) existingToast.remove();
-    
-    const toast = document.createElement('div');
-    toast.className = 'toast-actualizacion';
-    toast.innerHTML = `
-        <div style="background: linear-gradient(135deg, #0891b2, #3b82f6); color: white; padding: 12px 20px; border-radius: 50px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-            <span>🔄</span>
-            <span><strong>Nueva versión ${versionData.version}</strong><br><small>${versionData.changes || 'Mejoras y correcciones'}</small></span>
-            <button id="btnRecargar" style="background: white; border: none; padding: 6px 12px; border-radius: 30px; cursor: pointer; font-weight: bold;">Actualizar</button>
-        </div>
-    `;
-    toast.style.position = 'fixed';
-    toast.style.bottom = '80px';
-    toast.style.left = '50%';
-    toast.style.transform = 'translateX(-50%)';
-    toast.style.zIndex = '9999';
-    toast.style.animation = 'slideUp 0.3s ease';
-    document.body.appendChild(toast);
-    
-    document.getElementById('btnRecargar').onclick = () => {
-        window.location.reload();
-    };
-    
-    setTimeout(() => {
-        if (toast) toast.remove();
-    }, 10000);
-}
-
-// Verificar actualizaciones periódicamente (cada hora)
-setInterval(() => verificarActualizacion(), 3600000);
-
-// Verificar al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(verificarActualizacion, 2000);
-});
-
-// Registrar Service Worker
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=' + Date.now())
-            .then(registration => {
-                console.log('Service Worker registrado en Consulta de Pagos:', registration);
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log('Nueva versión disponible en Consulta de Pagos');
-                            verificarActualizacion();
-                        }
-                    });
-                });
-            })
-            .catch(error => console.log('Error al registrar Service Worker:', error));
-    });
-}
-</script>
 </body>
 </html>

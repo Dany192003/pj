@@ -1,5 +1,12 @@
 // js/panel-admin.js - Panel administrativo completo
+// js/panel-admin.js - Panel administrativo completo
+// Primero verificar autenticación
+if (!requireAuth()) {
+    // No continuar si no está autenticado
+    throw new Error('No autorizado');
+}
 
+// El resto del código normal...
 window.showToast = function(message, isError = false) {
     const toast = document.getElementById('toast');
     if (!toast) return;

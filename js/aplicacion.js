@@ -44,14 +44,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.target === modal) cerrarModal(); 
     });
 
-    btnLogin?.addEventListener('click', () => {
-        if (login(adminPassword.value)) {
-            modal.style.display = 'none';
-            window.location.href = 'panel-admin.html';
-        } else {
-            loginError.textContent = 'Contraseña incorrecta';
-        }
-    });
+// En aplicacion.js, modifica el login
+btnLogin?.addEventListener('click', async () => {
+    const email = document.getElementById('adminEmail').value.trim();
+    const password = adminPassword.value;
+    
+    if (!email) {
+        loginError.textContent = 'Ingresa el correo electrónico';
+        return;
+    }
+    if (!password) {
+        loginError.textContent = 'Ingresa la contraseña';
+        return;
+    }
+    
+    // Mostrar loading
+    btnLogin.disabled = true;
+    btnLogin.innerHTML = '<span class="spinner"></span> Verificando...';
+    
+    const result = await login(email, password);
+    
+    if (result.success) {
+        // Limpiar modal
+        modal.style.display = 'none';
+        loginError.textContent = '';
+        adminPassword.value = '';
+        // Redirigir directamente
+        window.location.href = 'panel-admin.html';
+    } else {
+        loginError.textContent = result.message || 'Credenciales incorrectas';
+        btnLogin.disabled = false;
+        btnLogin.innerHTML = 'Ingresar al Panel';
+    }
+});
 
     adminPassword?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') btnLogin.click();
