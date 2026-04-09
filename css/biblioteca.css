@@ -374,7 +374,37 @@
     height: 70vh;
     border: none;
 }
+/* Mejorar visor de PDF */
+.pdf-viewer {
+    width: 100%;
+    height: 70vh;
+    border: none;
+    border-radius: 12px;
+}
 
+/* Mejorar preview de archivos PDF */
+.recurso-preview .file-icon {
+    font-size: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg-gray) 0%, var(--border) 100%);
+    width: 100%;
+    height: 100%;
+}
+
+/* Modal preview mejorado */
+.modal-preview-body iframe,
+.modal-preview-body img {
+    width: 100%;
+    border-radius: 12px;
+}
+
+.modal-preview-body .pdf-viewer {
+    width: 100%;
+    height: 70vh;
+    border: none;
+}
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 640px) {
     .recursos-grid {

@@ -104,7 +104,10 @@ function cargarListaGrupos() {
         card.addEventListener('click', () => {
             grupoSeleccionado = card.dataset.grupo;
             const modal = document.getElementById("passwordModal");
-            if (modal) modal.style.display = "block";
+            if (modal) {
+                // CORREGIDO: usar 'flex' en lugar de 'block' para centrar
+                modal.style.display = "flex";
+            }
         });
     });
 }

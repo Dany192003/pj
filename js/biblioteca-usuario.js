@@ -94,7 +94,7 @@ function obtenerClaseExtension(extension) {
     return clases[extension] || clases['default'];
 }
 
-// Función para descargar un archivo OBLIGATORIAMENTE (compatible con Android)
+// Función para descargar un archivo (VERSIÓN DEFINITIVA - FUNCIONA EN ANDROID)
 function descargarConNombrePersonalizado(url, titulo, extension) {
     window.showToast(`📥 Descargando: ${titulo}...`, false);
     
@@ -107,23 +107,15 @@ function descargarConNombrePersonalizado(url, titulo, extension) {
     
     xhr.onload = function() {
         if (xhr.status === 200) {
-            // Crear blob a partir de la respuesta
             const blob = xhr.response;
-            
-            // Crear URL del blob local
             const blobUrl = URL.createObjectURL(blob);
-            
-            // Crear enlace de descarga
             const link = document.createElement('a');
             link.href = blobUrl;
             link.download = nombreArchivo;
             link.style.display = 'none';
             document.body.appendChild(link);
-            
-            // Forzar click
             link.click();
             
-            // Limpiar después de la descarga
             setTimeout(() => {
                 URL.revokeObjectURL(blobUrl);
                 document.body.removeChild(link);
@@ -138,16 +130,76 @@ function descargarConNombrePersonalizado(url, titulo, extension) {
         window.showToast(`❌ Error de conexión`, true);
     };
     
-    xhr.onprogress = function(event) {
-        if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 100);
-            if (percent % 25 === 0) {
-                window.showToast(`📥 Descargando... ${percent}%`, false);
-            }
-        }
-    };
-    
     xhr.send();
+}
+
+// Función para abrir preview de archivos (PDF e imágenes)
+function abrirPreview(url, titulo, tipo) {
+    const modal = document.getElementById("modalPreview");
+    const modalBody = document.getElementById("modalPreviewBody");
+    
+    if (!modal || !modalBody) return;
+    
+    const isMobileDevice = isMobile();
+    
+    // Si es imagen
+    if (tipo === 'image' || url.match(/\.(jpg|jpeg|png|gif|webp)(\?|$)/i)) {
+        modalBody.innerHTML = `<img src="${url}" alt="${titulo}" style="width:100%; border-radius:10px;">`;
+        modal.style.display = "block";
+        return;
+    }
+    
+    // Si es PDF
+    if (tipo === 'pdf' || url.match(/\.pdf(\?|$)/i)) {
+        // En móviles pequeños, mostrar opción de descarga o vista
+        if (isMobileDevice) {
+            modalBody.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">📄</div>
+                    <h3 style="margin-bottom: 15px;">${escapeHtml(titulo)}</h3>
+                    <p style="margin-bottom: 20px; color: #64748b;">El visor de PDF puede no funcionar correctamente en dispositivos móviles.</p>
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button id="previewDownloadBtn" style="background: #0891b2; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer;">⬇️ Descargar</button>
+                        <button id="previewViewBtn" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer;">👁️ Ver en navegador</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('previewDownloadBtn')?.addEventListener('click', () => {
+                modal.style.display = "none";
+                const extension = 'pdf';
+                descargarConNombrePersonalizado(url, titulo, extension);
+            });
+            
+            document.getElementById('previewViewBtn')?.addEventListener('click', () => {
+                window.open(url, '_blank');
+                modal.style.display = "none";
+            });
+        } else {
+            // En desktop/tablet, mostrar PDF embebido
+            modalBody.innerHTML = `<iframe src="${url}" class="pdf-viewer" frameborder="0" title="${titulo}" style="width:100%; height:70vh; border:none; border-radius:12px;"></iframe>`;
+        }
+        modal.style.display = "block";
+        return;
+    }
+    
+    // Otros tipos de archivo
+    modalBody.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+            <div style="font-size: 64px; margin-bottom: 20px;">📎</div>
+            <h3>${escapeHtml(titulo)}</h3>
+            <p>No es posible previsualizar este tipo de archivo.</p>
+            <button id="previewFallbackDownload" class="btn-main" style="margin-top: 20px; background: #0891b2; padding: 10px 20px; border-radius: 30px;">⬇️ Descargar archivo</button>
+        </div>
+    `;
+    
+    document.getElementById('previewFallbackDownload')?.addEventListener('click', () => {
+        const extension = 'archivo';
+        descargarConNombrePersonalizado(url, titulo, extension);
+        modal.style.display = "none";
+    });
+    
+    modal.style.display = "block";
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -271,13 +323,19 @@ async function renderizarRecursos(recursos) {
         
         const extension = obtenerExtension(recurso.url, recurso.tipo);
         const esImagen = extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif' || extension === 'webp';
+        const esPdf = extension === 'pdf';
         
         const iconoArchivo = obtenerIconoArchivo(extension);
         const claseExtension = obtenerClaseExtension(extension);
         
-        const previewHtml = esImagen 
-            ? `<img src="${recurso.url}" alt="${recurso.titulo}" loading="lazy">`
-            : `<div class="file-icon">${iconoArchivo}</div>`;
+        let previewHtml = '';
+        if (esImagen) {
+            previewHtml = `<img src="${recurso.url}" alt="${recurso.titulo}" loading="lazy">`;
+        } else if (esPdf) {
+            previewHtml = `<div class="file-icon" style="background: linear-gradient(135deg, #fee2e2, #ffc4c4);">📄</div>`;
+        } else {
+            previewHtml = `<div class="file-icon">${iconoArchivo}</div>`;
+        }
         
         const fechaFormateada = formatearFechaCompleta(recurso.fecha);
         
@@ -285,6 +343,8 @@ async function renderizarRecursos(recursos) {
         const descripcionHtml = tieneDescripcion 
             ? `<div class="recurso-descripcion">${escapeHtml(recurso.descripcion)}</div>`
             : '';
+        
+        const tipoArchivo = esImagen ? 'image' : (esPdf ? 'pdf' : 'other');
         
         return `
             <div class="recurso-card">
@@ -304,23 +364,26 @@ async function renderizarRecursos(recursos) {
                         </div>
                     </div>
                     <div class="recurso-actions">
-                        <button class="btn-ver" data-url="${recurso.url}" data-titulo="${recurso.titulo}">Ver</button>
-                        <button class="btn-descargar" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-extension="${extension}">⬇Descargar</button>
+                        <button class="btn-ver" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-tipo="${tipoArchivo}">👁️ Ver</button>
+                        <button class="btn-descargar" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-extension="${extension}">⬇️ Descargar</button>
                     </div>
                 </div>
             </div>
         `;
     }).join("");
     
+    // Evento para botones Ver
     document.querySelectorAll('.btn-ver').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const url = btn.dataset.url;
             const titulo = btn.dataset.titulo;
-            abrirPreview(url, titulo);
+            const tipo = btn.dataset.tipo || 'other';
+            abrirPreview(url, titulo, tipo);
         });
     });
     
+    // Evento para botones Descargar
     document.querySelectorAll('.btn-descargar').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -330,33 +393,6 @@ async function renderizarRecursos(recursos) {
             descargarConNombrePersonalizado(url, titulo, extension);
         });
     });
-}
-
-function abrirPreview(url, titulo) {
-    const modal = document.getElementById("modalPreview");
-    const modalBody = document.getElementById("modalPreviewBody");
-    
-    if (!modal || !modalBody) return;
-    
-    // Detectar si es dispositivo móvil
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    const esImagen = url && (url.includes('.jpg') || url.includes('.png') || url.includes('.jpeg') || url.includes('.webp'));
-    
-    if (esImagen) {
-        // Para imágenes, siempre mostrar preview
-        modalBody.innerHTML = `<img src="${url}" alt="${titulo}" style="max-width:100%;">`;
-        modal.style.display = "block";
-    } else if (isMobile) {
-        // En móviles, mejor descargar directamente en lugar de previsualizar PDF
-        const extension = obtenerExtension(url, 'pdf');
-        modal.style.display = "none";
-        descargarConNombrePersonalizado(url, titulo, extension);
-    } else {
-        // En desktop, mostrar preview en iframe
-        modalBody.innerHTML = `<iframe src="${url}" class="pdf-viewer" frameborder="0" title="${titulo}" style="width:100%; height:70vh;"></iframe>`;
-        modal.style.display = "block";
-    }
 }
 
 function formatearFechaCompleta(fechaISO) {
