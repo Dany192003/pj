@@ -134,7 +134,7 @@
     transform: scale(1.02);
 }
 
-/* ---------- MODAL ACTIVIDAD ---------- */
+/* ---------- MODAL ACTIVIDAD (centrado - sin movimiento) ---------- */
 .modal-actividad {
     display: none;
     position: fixed;
@@ -145,18 +145,19 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-actividad-content {
     background: white;
-    margin: 12% auto;
+    margin: 0;
     padding: 28px;
     border-radius: 32px;
     width: 90%;
     max-width: 480px;
-    animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    box-shadow: var(--shadow-xl);
+    box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
 }
 
 .modal-actividad-header {
@@ -188,6 +189,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    transition: all 0.2s;
 }
 
 .close-actividad:hover {
@@ -247,11 +249,19 @@
     cursor: pointer;
     font-weight: 600;
     transition: all 0.2s;
+    width: 100%;
 }
 
 .btn-cerrar-modal:hover {
     transform: translateY(-2px);
     filter: brightness(1.05);
+}
+
+/* ---------- FOOTER MODAL ---------- */
+.modal-actividad-footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
 }
 
 /* ---------- LEYENDA DE COLORES ---------- */
@@ -336,7 +346,7 @@
         font-size: 12px;
     }
     .modal-actividad-content {
-        margin: 25% auto;
+        margin: 0;
         padding: 20px;
         width: 92%;
     }
@@ -366,5 +376,11 @@
     .leyenda-color {
         width: 18px;
         height: 18px;
+    }
+    .modal-actividad-content {
+        padding: 16px;
+    }
+    .actividad-item {
+        padding: 12px;
     }
 }

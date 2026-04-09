@@ -202,7 +202,10 @@ function crearModalActividad() {
     if (closeBtn) closeBtn.onclick = () => modal.style.display = "none";
     if (cerrarBtn) cerrarBtn.onclick = () => modal.style.display = "none";
     
-    window.onclick = (event) => { if (event.target === modal) modal.style.display = "none"; };
+    // Cerrar al hacer clic fuera del contenido
+    window.onclick = (event) => { 
+        if (event.target === modal) modal.style.display = "none"; 
+    };
 }
 
 function mostrarDetalleActividad(eventos, dia) {
@@ -255,7 +258,14 @@ function mostrarDetalleActividad(eventos, dia) {
         body.innerHTML = `<div class="actividades-lista">${actividadesHtml}</div>`;
     }
     
-    modal.style.display = "block";
+    // Forzar centrado - eliminar cualquier estilo inline
+    modal.style.display = "flex";
+    modal.style.alignItems = "center";
+    modal.style.justifyContent = "center";
+    modal.style.left = "0";
+    modal.style.top = "0";
+    modal.style.right = "0";
+    modal.style.bottom = "0";
 }
 
 function mostrarSinActividades(dia) {
@@ -277,5 +287,12 @@ function mostrarSinActividades(dia) {
         </div>
     `;
     
-    modal.style.display = "block";
+    // Forzar centrado
+    modal.style.display = "flex";
+    modal.style.alignItems = "center";
+    modal.style.justifyContent = "center";
+    modal.style.left = "0";
+    modal.style.top = "0";
+    modal.style.right = "0";
+    modal.style.bottom = "0";
 }

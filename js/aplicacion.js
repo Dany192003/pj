@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const adminPassword = document.getElementById('adminPassword');
     const loginError    = document.getElementById('loginError');
 
+    // Botones de navegación
     document.getElementById('btnConsultaPagos')?.addEventListener('click', () => {
         window.location.href = 'consulta-pagos.html';
     });
@@ -33,9 +34,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (adminPassword) adminPassword.value = '';
     };
 
-    btnAdminLogin?.addEventListener('click', () => { modal.style.display = 'block'; });
+    // CORREGIDO: usar 'flex' en lugar de 'block' para centrar
+    btnAdminLogin?.addEventListener('click', () => { 
+        modal.style.display = 'flex'; 
+    });
+    
     closeBtn?.addEventListener('click', cerrarModal);
-    window.addEventListener('click', (e) => { if (e.target === modal) cerrarModal(); });
+    window.addEventListener('click', (e) => { 
+        if (e.target === modal) cerrarModal(); 
+    });
 
     btnLogin?.addEventListener('click', () => {
         if (login(adminPassword.value)) {
@@ -51,5 +58,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     redirectIfAuthenticated();
-    
 });

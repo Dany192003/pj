@@ -376,7 +376,7 @@ textarea {
     transform: translateX(-50%) translateY(0);
 }
 
-/* ---------- MODALES ---------- */
+/* ---------- MODAL GENERAL (centrado) ---------- */
 .modal {
     display: none;
     position: fixed;
@@ -387,19 +387,20 @@ textarea {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
-    animation: fadeIn 0.3s ease;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-content {
     background-color: white;
-    margin: 20% auto;
-    padding: 20px;
-    border-radius: var(--radius-lg);
+    margin: 0;
+    padding: 32px;
+    border-radius: 32px;
     width: 90%;
-    max-width: 350px;
+    max-width: 380px;
     text-align: center;
-    animation: slideUp 0.3s ease;
     position: relative;
+    box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
 }
 
 .modal-input {
@@ -450,19 +451,17 @@ textarea {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(8px);
-    animation: fadeIn 0.3s ease;
     align-items: center;
     justify-content: center;
 }
 
 .modal-confirmacion-content {
     background: white;
-    margin: 0 auto;
+    margin: 0;
     padding: 0;
     border-radius: 32px;
     width: 90%;
     max-width: 420px;
-    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     box-shadow: var(--shadow-xl);
 }
@@ -477,7 +476,6 @@ textarea {
     font-size: 56px;
     display: inline-block;
     margin-bottom: 12px;
-    animation: bounce 0.5s ease;
 }
 
 .modal-confirmacion-header h3 {
@@ -591,13 +589,13 @@ textarea {
     }
 }
 
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* Notificación de actualización */
+.toast-actualizacion {
+    animation: slideUp 0.3s ease;
 }
 
 /* ---------- RESPONSIVE ---------- */
@@ -619,7 +617,7 @@ textarea {
         padding: 25px;
     }
     .modal-content {
-        margin: 10% auto;
+        margin: 0;
     }
     .excel-container {
         padding: 20px;
@@ -635,8 +633,7 @@ textarea {
         padding: 10px 14px;
     }
     .modal-content {
-        margin: 30% auto;
-        padding: 16px;
+        padding: 24px;
     }
     .modal-input {
         padding: 10px;
@@ -709,21 +706,5 @@ textarea {
     body {
         background: white;
         padding: 0;
-    }
-}
-
-/* Notificación de actualización */
-.toast-actualizacion {
-    animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
     }
 }

@@ -96,6 +96,27 @@
     font-weight: 700;
 }
 
+/* ---------- ESTADOS ---------- */
+.status-pagado {
+    color: #15803d;
+    font-weight: 700;
+    background: #dcfce7;
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.status-pendiente {
+    color: #f97316;
+    font-weight: 700;
+    background: #fef9c3;
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
 /* ---------- RESUMEN ---------- */
 .resumen-pagos {
     margin-top: 15px;
@@ -113,10 +134,61 @@
     padding: 8px 20px;
 }
 
+/* ---------- MODAL CONTRASEÑA (centrado) ---------- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 0;
+    padding: 25px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--text-light);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.close:hover {
+    color: var(--danger);
+    background: #fef2f2;
+}
+
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 640px) {
     .grupos-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 15px;
+    }
+    .modal-content {
+        padding: 20px;
     }
 }

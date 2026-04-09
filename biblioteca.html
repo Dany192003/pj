@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#0891b2">
-    <title>Consultar Pagos | Pastoral Juvenil</title>
+    <title>Biblioteca | Pastoral Juvenil</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -21,7 +21,7 @@
     <!-- iOS soporte -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Pastoral Juvenil">
+    <meta name="apple-mobile-web-app-title" content="Biblioteca Pastoral">
     
     <!-- Android soporte -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -29,73 +29,71 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/estilos-globales.css">
-    <link rel="stylesheet" href="css/estilos-consulta-pagos.css">
+    <link rel="stylesheet" href="css/biblioteca.css">
 </head>
 <body>
 
 <div class="app">
-    <div class="header">
-        <div class="hero-logo" style="margin-bottom: 10px;">
-            <img src="img/logo.jpg" alt="Logo" style="width: 60px; border-radius: 15px;">
+    <!-- Header -->
+    <div class="header-biblioteca">
+        <div class="hero-logo">
+            <img src="img/logo.jpg" alt="Parroquia San Agustín Sumpango" class="hero-logo-img">
         </div>
-        <h1>🏛️ Pastoral Juvenil</h1>
-        <p>Consulta de Pagos por Grupo - Parroquia San Agustín Sumpango</p>
-        <button class="btn-main back-btn" id="btnVolver">← Volver al Calendario</button>
+        <h1>📚 Biblioteca Juvenil</h1>
+        <p>Materiales de formación y recursos para jóvenes</p>
+        <button class="btn-back" id="btnVolver">← Volver al Calendario</button>
     </div>
 
-    <div class="consulta-container">
-        <div id="gruposList" class="grupos-grid"></div>
+    <!-- Categorías -->
+    <div class="categorias-container">
+        <button class="categoria-btn active" data-categoria="todos">📌 Todos</button>
+        <div id="categoriasList"></div>
+    </div>
 
-        <div id="passwordModal" class="modal">
-            <div class="modal-content">
-                <span class="close" id="closePasswordModal">&times;</span>
-                <h3>🔐 Ingrese la contraseña del grupo</h3>
-                <input type="password" id="grupoPassword" placeholder="Contraseña" class="modal-input">
-                <button id="btnVerificarPassword" class="btn-main">Verificar</button>
-                <p class="error-msg" id="passwordError"></p>
-            </div>
-        </div>
+    <!-- Buscador -->
+    <div class="buscador-container">
+        <input type="text" id="buscadorInput" placeholder="🔍 Buscar recursos por título o descripción..." class="buscador-input">
+    </div>
 
-        <div id="pagosView" style="display: none;">
-            <div class="year-selector">
-                <label>📅 Seleccionar Año:</label>
-                <select id="anioSelector">
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                    <option value="2026" selected>2026</option>
-                    <option value="2027">2027</option>
-                    <option value="2028">2028</option>
-                    <option value="2029">2029</option>
-                    <option value="2030">2030</option>
-                </select>
-            </div>
-            <div class="pagos-table-container">
-                <h3 id="grupoSeleccionadoTitle" style="margin-bottom: 15px;"></h3>
-                <table class="pagos-table">
-                    <thead>
-                        <tr><th>Mes</th><th>Estado</th></tr>
-                    </thead>
-                    <tbody id="pagosTableBody"></tbody>
-                </table>
-                <div class="resumen-pagos" id="resumenPagos"></div>
-            </div>
-            <button class="btn-main" id="btnBackToGroups" style="margin-top: 20px; background: #64748b;">← Volver a Grupos</button>
+    <!-- Grid de recursos -->
+    <div class="recursos-grid" id="recursosGrid">
+        <div class="loading-recursos">📚 Cargando recursos...</div>
+    </div>
+</div>
+
+<!-- Modal de vista previa -->
+<div id="modalPreview" class="modal-preview">
+    <div class="modal-preview-content">
+        <span class="modal-preview-close">&times;</span>
+        <div class="modal-preview-body" id="modalPreviewBody">
+            <div style="text-align: center; padding: 40px;">Cargando vista previa...</div>
         </div>
     </div>
 </div>
 
 <div id="toast" class="toast"></div>
+
 <div id="syncStatusLabel" style="position: fixed; bottom: 15px; left: 15px; background: #f1f5f9; padding: 6px 12px; border-radius: 20px; font-size: 11px; color: #0891b2; display: flex; align-items: center; gap: 6px; z-index: 999; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
     <span id="syncIcon">🔄</span>
-    <span id="syncText">Sincronizando.....</span>
+    <span id="syncText">Sincronizando...</span>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script src="js/inicio-firebase.js"></script>
 <script src="js/base-datos-nube.js"></script>
-<script src="js/consulta-pagos.js"></script>
+<script src="js/biblioteca-usuario.js"></script>
 <script src="js/actualizacion.js"></script>
+
+<script>
+    // Verificar que el archivo se cargó correctamente
+    console.log('📚 Biblioteca - Página cargada correctamente');
+    
+    // Forzar recarga si es necesario
+    if (window.location.href.includes('consulta-pagos')) {
+        console.warn('⚠️ Error: Se cargó el archivo incorrecto');
+    }
+</script>
 
 </body>
 </html>
