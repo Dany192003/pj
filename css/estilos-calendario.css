@@ -1,5 +1,6 @@
 /* ========================================
    CALENDARIO - Pastoral Juvenil
+   Con animaciones y mejoras visuales
    ======================================== */
 
 /* ---------- CONTENEDOR ---------- */
@@ -10,7 +11,11 @@
     margin-bottom: 0;
     box-shadow: var(--shadow-xl);
     border: 1px solid rgba(226, 232, 240, 0.6);
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.calendar-container:hover {
+    box-shadow: var(--shadow-hover);
 }
 
 /* ---------- HEADER CALENDARIO ---------- */
@@ -40,14 +45,19 @@
     border-radius: 40px;
     font-size: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 600;
     color: var(--primary);
 }
 
 .calendar-nav:hover {
     background: var(--border);
-    transform: scale(1.02);
+    transform: scale(1.05);
+    box-shadow: var(--shadow-sm);
+}
+
+.calendar-nav:active {
+    transform: scale(0.98);
 }
 
 /* ---------- DÍAS DE LA SEMANA ---------- */
@@ -74,19 +84,21 @@
     border-radius: 14px;
     padding: clamp(8px, 3vw, 14px) clamp(4px, 2vw, 8px);
     text-align: center;
-    transition: all 0.25s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: clamp(60px, 16vw, 85px);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     font-weight: 500;
     cursor: pointer;
+    border: 1px solid transparent;
 }
 
 .calendar-day:hover {
-    background: var(--border);
-    transform: translateY(-3px);
+    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+    transform: translateY(-4px);
     box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
 }
 
 .calendar-day.empty {
@@ -100,6 +112,7 @@
     background: linear-gradient(135deg, #fef9c3 0%, #fde047 100%);
     font-weight: 700;
     box-shadow: 0 2px 8px rgba(250, 204, 21, 0.3);
+    border-color: #eab308;
 }
 
 .calendar-day.has-event {
@@ -115,6 +128,7 @@
 
 .calendar-day.has-event .day-number {
     color: #ffffff;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
 
 .day-event {
@@ -130,11 +144,11 @@
 }
 
 .day-event:hover {
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.45);
     transform: scale(1.02);
 }
 
-/* ---------- MODAL ACTIVIDAD (centrado - sin movimiento) ---------- */
+/* ---------- MODAL ACTIVIDAD (centrado) ---------- */
 .modal-actividad {
     display: none;
     position: fixed;
@@ -158,6 +172,7 @@
     max-width: 480px;
     position: relative;
     box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
+    animation: modalFadeIn 0.25s ease-out;
 }
 
 .modal-actividad-header {
@@ -195,6 +210,7 @@
 .close-actividad:hover {
     color: var(--danger);
     background: #fef2f2;
+    transform: rotate(90deg);
 }
 
 /* ---------- ACTIVIDAD ITEM ---------- */
@@ -203,6 +219,13 @@
     padding: 16px;
     background: var(--bg-light);
     border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
+}
+
+.actividad-item:hover {
+    background: linear-gradient(90deg, #f8fafc, #f1f5f9);
+    transform: translateX(5px);
+    box-shadow: var(--shadow-sm);
 }
 
 .actividad-titulo {
@@ -255,6 +278,7 @@
 .btn-cerrar-modal:hover {
     transform: translateY(-2px);
     filter: brightness(1.05);
+    box-shadow: var(--shadow-md);
 }
 
 /* ---------- FOOTER MODAL ---------- */
@@ -312,9 +336,9 @@
 }
 
 .leyenda-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
-    background: var(--bg-gray);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
 }
 
 .leyenda-color {
@@ -346,7 +370,6 @@
         font-size: 12px;
     }
     .modal-actividad-content {
-        margin: 0;
         padding: 20px;
         width: 92%;
     }
@@ -359,7 +382,6 @@
     .day-event {
         font-size: 7px;
         padding: 1px 2px;
-        display: none;
     }
     .leyenda-container {
         padding: 16px;

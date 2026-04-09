@@ -1,5 +1,6 @@
 /* ========================================
    GLOBALES - Pastoral Juvenil
+   Con degradados, animaciones y mejoras visuales
    ======================================== */
 
 /* ---------- VARIABLES ---------- */
@@ -33,6 +34,7 @@
     --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05);
     --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1);
     --shadow-xl: 0 20px 35px -12px rgba(0,0,0,0.15);
+    --shadow-hover: 0 20px 25px -5px rgba(8, 145, 178, 0.15);
 }
 
 /* ---------- RESET ---------- */
@@ -43,7 +45,7 @@
 
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    background: var(--bg-gray);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     margin: 0;
     padding: 16px;
     color: var(--text-main);
@@ -72,7 +74,10 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
     font-size: clamp(22px, 6vw, 32px);
     font-weight: 800;
-    color: var(--primary-dark);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .header p {
@@ -98,11 +103,12 @@ h1, h2, h3, h4, h5, h6 {
     height: auto;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .hero-logo-img:hover {
     transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
 }
 
 .hero h1 {
@@ -113,12 +119,14 @@ h1, h2, h3, h4, h5, h6 {
     background-clip: text;
     color: transparent;
     margin-bottom: 8px;
+    animation: fadeInDown 0.6s ease;
 }
 
 .hero h2 {
     font-size: clamp(18px, 5vw, 24px);
     font-weight: 600;
     color: var(--primary);
+    animation: fadeInUp 0.6s ease;
 }
 
 .hero p {
@@ -126,6 +134,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 14px;
     max-width: 450px;
     margin: 0 auto;
+    animation: fadeInUp 0.6s ease 0.1s both;
 }
 
 /* ---------- BOTONES ---------- */
@@ -138,20 +147,40 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     cursor: pointer;
     width: 100%;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-main::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-main:hover::before {
+    width: 300px;
+    height: 300px;
 }
 
 .btn-main:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.05);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-main:active {
-    transform: scale(0.98);
+    transform: translateY(1px);
 }
 
 .btn-wa {
-    background: #25D366;
+    background: linear-gradient(135deg, #25D366, #128C7E);
     color: white;
     display: flex;
     align-items: center;
@@ -167,7 +196,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-wa:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
     filter: brightness(1.05);
 }
 
@@ -179,12 +209,13 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: var(--radius-full);
     cursor: pointer;
     font-weight: 600;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
 }
 
 .btn-back:hover {
     background: var(--text-main);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-group {
@@ -209,6 +240,13 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: var(--shadow-md);
     width: 100%;
     overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
 }
 
 .card h3, .card .section-title {
@@ -254,6 +292,7 @@ textarea:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+    transform: translateY(-1px);
 }
 
 textarea {
@@ -274,6 +313,7 @@ textarea {
     border: 1px solid var(--border);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    box-shadow: var(--shadow-sm);
 }
 
 .excel-table {
@@ -284,28 +324,36 @@ textarea {
 }
 
 .excel-table th {
-    background: var(--bg-light);
-    padding: 10px 6px;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    padding: 12px 8px;
     color: var(--primary);
     text-align: center;
     font-weight: 700;
+    border-bottom: 2px solid var(--border);
 }
 
 .excel-table td {
-    padding: 8px 4px;
+    padding: 10px 6px;
     border-bottom: 1px solid var(--bg-gray);
     text-align: center;
+    transition: background 0.2s ease;
+}
+
+.excel-table tr:hover td {
+    background: linear-gradient(90deg, #f0fdf4, #ffffff);
 }
 
 /* ---------- ESTADOS ---------- */
 .status-pagado {
-    background: #dcfce7;
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
     color: #15803d;
+    transition: all 0.2s ease;
 }
 
 .status-pendiente {
-    background: #fef9c3;
+    background: linear-gradient(135deg, #fef9c3, #fde68a);
     color: #854d0e;
+    transition: all 0.2s ease;
 }
 
 .status-btn {
@@ -315,7 +363,13 @@ textarea {
     border: none;
     cursor: pointer;
     font-size: clamp(14px, 4vw, 18px);
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 700;
+}
+
+.status-btn:hover {
+    transform: scale(1.08);
+    filter: brightness(0.95);
 }
 
 .status-btn:active {
@@ -326,10 +380,10 @@ textarea {
 .toast {
     visibility: hidden;
     min-width: 200px;
-    background-color: #333;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
     color: #fff;
     text-align: center;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     padding: 12px 16px;
     position: fixed;
     bottom: 20px;
@@ -338,11 +392,12 @@ textarea {
     z-index: 1000;
     font-size: 14px;
     white-space: nowrap;
+    box-shadow: var(--shadow-lg);
 }
 
 .toast.show {
     visibility: visible;
-    animation: fadeInOut 2s ease-in-out;
+    animation: fadeInOut 2.5s ease-in-out;
 }
 
 .toast-exito, .toast-error {
@@ -359,7 +414,7 @@ textarea {
     align-items: center;
     gap: 12px;
     box-shadow: var(--shadow-lg);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .toast-exito {
@@ -376,7 +431,7 @@ textarea {
     transform: translateX(-50%) translateY(0);
 }
 
-/* ---------- MODAL GENERAL (centrado) ---------- */
+/* ---------- MODALES ---------- */
 .modal {
     display: none;
     position: fixed;
@@ -401,6 +456,18 @@ textarea {
     text-align: center;
     position: relative;
     box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
+    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .modal-input {
@@ -410,6 +477,13 @@ textarea {
     border: 1px solid var(--border-dark);
     margin-bottom: 15px;
     font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
 }
 
 .close {
@@ -432,6 +506,7 @@ textarea {
 .close:hover {
     color: var(--danger);
     background: #fef2f2;
+    transform: rotate(90deg);
 }
 
 .error-msg {
@@ -464,18 +539,25 @@ textarea {
     max-width: 420px;
     overflow: hidden;
     box-shadow: var(--shadow-xl);
+    animation: modalFadeIn 0.3s ease;
 }
 
 .modal-confirmacion-header {
     padding: 28px 24px 16px;
     text-align: center;
-    background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-gray) 100%);
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
 }
 
 .modal-confirmacion-icon {
     font-size: 56px;
     display: inline-block;
     margin-bottom: 12px;
+    animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 .modal-confirmacion-header h3 {
@@ -503,7 +585,7 @@ textarea {
     gap: 12px;
     justify-content: center;
     border-top: 1px solid var(--border);
-    background: var(--bg-light);
+    background: #f8fafc;
 }
 
 .btn-confirmar-cancelar,
@@ -523,18 +605,18 @@ textarea {
 }
 
 .btn-confirmar-cancelar {
-    background: var(--bg-gray);
+    background: #f1f5f9;
     color: var(--text-main);
     border: 1px solid var(--border);
 }
 
 .btn-confirmar-cancelar:hover {
-    background: var(--border);
+    background: #e2e8f0;
     transform: translateY(-2px);
 }
 
 .btn-confirmar-aceptar {
-    background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
+    background: linear-gradient(135deg, var(--danger), var(--danger-dark));
     color: white;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
@@ -569,6 +651,28 @@ textarea {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes fadeInOut {
@@ -615,9 +719,6 @@ textarea {
     }
     .card {
         padding: 25px;
-    }
-    .modal-content {
-        margin: 0;
     }
     .excel-container {
         padding: 20px;

@@ -1,5 +1,7 @@
 /* ========================================
    PANEL ADMINISTRATIVO - Pastoral Juvenil
+   Paleta: Azules, Cyan, Menta
+   User Badge separado, botón cerrar en menta
    ======================================== */
 
 /* ---------- HEADER ADMIN ---------- */
@@ -10,6 +12,10 @@
     margin-bottom: 20px;
     flex-wrap: wrap;
     gap: 15px;
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    padding: 15px 20px;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
 }
 
 .admin-header-logo {
@@ -24,6 +30,11 @@
     border-radius: var(--radius-md);
     object-fit: cover;
     box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease;
+}
+
+.admin-logo-img:hover {
+    transform: scale(1.05);
 }
 
 .admin-header-logo h1 {
@@ -38,17 +49,40 @@
     margin: 0;
 }
 
-.user-badge {
-    background: linear-gradient(135deg, #0891b2, #3b82f6);
-    color: white;
-    padding: 8px 18px;
-    border-radius: 40px;
-    font-size: 13px;
-    font-weight: 600;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+/* ---------- USER BADGE (separado, arriba a la derecha) ---------- */
+.user-badge-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
 }
 
-/* ---------- BOTONES ADMIN ---------- */
+.user-badge {
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
+    color: white;
+    padding: 8px 22px;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-badge::before {
+    content: '👑';
+    font-size: 14px;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+}
+
+.user-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    filter: brightness(1.05);
+}
+
+/* ---------- BOTONES ADMIN (reorganizados) ---------- */
 .admin-actions {
     display: flex;
     gap: 12px;
@@ -62,43 +96,65 @@
     border-radius: 40px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 13px;
     display: inline-flex;
     align-items: center;
     gap: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.admin-btn:hover::before {
+    width: 200px;
+    height: 200px;
 }
 
 .admin-btn:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     filter: brightness(1.05);
+    box-shadow: var(--shadow-lg);
 }
 
 .admin-btn:active {
     transform: translateY(1px);
 }
 
-/* Botón Forzar Actualización */
+/* Botón Forzar Actualización - Cyan */
 .admin-btn-update {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
     color: white;
 }
 
-/* Botón Reiniciar Sistema */
+/* Botón Reiniciar Sistema - Rojo (para acciones peligrosas) */
 .admin-btn-reset {
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
 }
 
-/* Botón Cerrar Sesión */
+/* Botón Cerrar Sesión - Menta/Verde Azulado */
 .admin-btn-logout {
-    background: linear-gradient(135deg, #475569, #334155);
+    background: linear-gradient(135deg, #14b8a6, #0d9488);
     color: white;
 }
 
+/* Botones legacy (por compatibilidad) */
 .logout-btn {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, #14b8a6, #0d9488);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -111,6 +167,7 @@
 .logout-btn:hover {
     transform: translateY(-2px);
     filter: brightness(1.05);
+    box-shadow: var(--shadow-md);
 }
 
 .reset-btn {
@@ -127,18 +184,20 @@
 .reset-btn:hover {
     transform: translateY(-2px);
     filter: brightness(1.05);
+    box-shadow: var(--shadow-md);
 }
 
 /* ---------- TABS ---------- */
 .tabs-container {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 8px;
     margin-bottom: 24px;
     display: flex;
     gap: 8px;
     box-shadow: var(--shadow-sm);
     flex-wrap: wrap;
+    border: 1px solid var(--border);
 }
 
 .tab-btn {
@@ -154,11 +213,34 @@
     font-size: 14px;
     transition: all 0.3s ease;
     white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0891b2, #06b6d4);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.tab-btn:hover::after {
+    width: 60%;
 }
 
 .tab-btn.active {
-    background: var(--primary-gradient);
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
     color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-btn.active::after {
+    display: none;
 }
 
 .tab-content {
@@ -177,6 +259,33 @@
     gap: 30px;
 }
 
+/* ---------- CARD ---------- */
+.card {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    width: 100%;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: #06b6d4;
+}
+
+.card .section-title {
+    font-size: clamp(16px, 4.5vw, 18px);
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: var(--dark);
+    border-left: 4px solid #0891b2;
+    padding-left: 12px;
+}
+
 /* ---------- TICKET / COMPROBANTE ---------- */
 .preview {
     margin-top: 20px;
@@ -189,10 +298,15 @@
     max-width: 420px;
     margin: 0 auto;
     box-shadow: var(--shadow-xl);
+    transition: transform 0.3s ease;
+}
+
+.ticket:hover {
+    transform: translateY(-5px);
 }
 
 .ticket-header {
-    background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     padding: 20px;
     text-align: center;
 }
@@ -219,7 +333,7 @@
 }
 
 .ticket-receipt-number {
-    background: var(--bg-light);
+    background: #f8fafc;
     padding: 12px 16px;
     text-align: center;
     border-bottom: 1px solid var(--border);
@@ -228,7 +342,7 @@
 .receipt-label {
     font-size: 10px;
     font-weight: 700;
-    color: var(--primary);
+    color: #0891b2;
     text-transform: uppercase;
     display: block;
 }
@@ -236,7 +350,7 @@
 .receipt-number {
     font-size: 22px;
     font-weight: 800;
-    color: var(--dark);
+    color: #0f172a;
     font-family: 'Courier New', monospace;
 }
 
@@ -254,19 +368,19 @@
 .info-label {
     font-size: 10px;
     font-weight: 700;
-    color: var(--text-muted);
+    color: #64748b;
     text-transform: uppercase;
 }
 
 .info-value {
     font-size: 13px;
     font-weight: 600;
-    color: var(--dark-light);
+    color: #1e293b;
     text-align: right;
 }
 
 .ticket-amount {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
     margin: 0 16px 16px 16px;
     padding: 16px;
     text-align: center;
@@ -283,7 +397,7 @@
 .amount-value {
     font-size: 28px;
     font-weight: 900;
-    color: var(--dark);
+    color: #0f172a;
 }
 
 .amount-value::before {
@@ -292,7 +406,7 @@
 }
 
 .ticket-footer {
-    background: var(--bg-gray);
+    background: #f1f5f9;
     padding: 12px 16px;
     text-align: center;
 }
@@ -300,32 +414,40 @@
 .footer-text {
     font-size: 11px;
     font-weight: 600;
-    color: var(--text-main);
+    color: #334155;
 }
 
 .footer-note {
     font-size: 8px;
     font-weight: 400;
-    color: var(--text-light);
+    color: #94a3b8;
     text-transform: uppercase;
 }
 
-/* ---------- BOTONES TABLA (Ver, Editar, Eliminar) ---------- */
+/* ---------- BOTONES TABLA ---------- */
+/* Botón VER - Azul */
 .btn-ver {
     display: inline-block;
     padding: 6px 12px;
-    background: var(--primary);
+    background: linear-gradient(135deg, #0891b2, #0e7490);
     color: white;
     border-radius: var(--radius-sm);
     text-decoration: none;
-    font-size: 12px;
+    font-size: 11px;
     margin-right: 5px;
     border: none;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
+.btn-ver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(8, 145, 178, 0.3);
+}
+
+/* Botón EDITAR - Naranja */
 .btn-editar-recurso {
-    background: var(--warning);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border: none;
     padding: 6px 12px;
@@ -333,38 +455,59 @@
     cursor: pointer;
     font-size: 11px;
     margin-right: 5px;
+    transition: all 0.2s ease;
 }
 
+.btn-editar-recurso:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+}
+
+/* Botón ELIMINAR - Rojo */
 .btn-eliminar-recurso,
 .btn-eliminar-recibo {
-    background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+    background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
     border: none;
     padding: 6px 12px;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
+    transition: all 0.2s ease;
 }
 
+.btn-eliminar-recurso:hover,
+.btn-eliminar-recibo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Botón DESCARGAR - Verde */
 .btn-descargar-recibo {
-    background: var(--success);
+    background: linear-gradient(135deg, #10b981, #059669);
     color: white;
     border: none;
     padding: 6px 12px;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
+    transition: all 0.2s ease;
 }
 
-/* Hover simple y uniforme para todos los botones de tabla */
+.btn-descargar-recibo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Hover base */
 .btn-ver:hover,
 .btn-editar-recurso:hover,
 .btn-eliminar-recurso:hover,
 .btn-eliminar-recibo:hover,
 .btn-descargar-recibo:hover {
-    opacity: 0.85;
+    filter: brightness(1.05);
 }
 
 /* ---------- EVENTOS ---------- */
@@ -373,38 +516,45 @@
     justify-content: space-between;
     align-items: flex-start;
     padding: 15px;
-    background: var(--bg-light);
+    background: #f8fafc;
     border-radius: var(--radius-md);
     margin-bottom: 10px;
     flex-wrap: wrap;
     gap: 10px;
+    transition: all 0.2s ease;
+}
+
+.evento-item:hover {
+    background: linear-gradient(90deg, #f8fafc, #e0f2fe);
+    transform: translateX(5px);
+    box-shadow: var(--shadow-sm);
 }
 
 .evento-fecha {
     font-weight: 700;
-    color: var(--primary);
+    color: #0891b2;
     font-size: 12px;
 }
 
 .evento-titulo {
     font-weight: 700;
-    color: var(--dark);
+    color: #0f172a;
     margin: 5px 0;
 }
 
 .delete-btn {
-    background: var(--danger);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
     border: none;
     padding: 8px 16px;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
 .delete-btn:hover {
-    background: var(--danger-dark);
     transform: scale(0.98);
+    filter: brightness(1.05);
 }
 
 /* ---------- CONTRASEÑAS ---------- */
@@ -413,11 +563,17 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px;
-    background: var(--bg-light);
+    background: #f8fafc;
     border-radius: var(--radius-md);
     margin-bottom: 10px;
     flex-wrap: wrap;
     gap: 10px;
+    transition: all 0.2s ease;
+}
+
+.grupo-pass-item:hover {
+    background: #f0fdf4;
+    transform: translateX(5px);
 }
 
 .grupo-pass-item input {
@@ -425,27 +581,45 @@
     padding: 8px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-dark);
+    transition: all 0.2s ease;
+}
+
+.grupo-pass-item input:focus {
+    outline: none;
+    border-color: #0891b2;
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
 }
 
 .save-pass-btn {
-    background: var(--primary);
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
     color: white;
     border: none;
     padding: 8px 16px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     margin-left: 10px;
+    transition: all 0.2s ease;
+}
+
+.save-pass-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(8, 145, 178, 0.3);
 }
 
 /* ---------- CATEGORÍAS ---------- */
 .categoria-badge {
-    background: #e0f2fe;
-    color: var(--primary);
+    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+    color: #0891b2;
     padding: 4px 10px;
     border-radius: var(--radius-lg);
     font-size: 11px;
     font-weight: 600;
     display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.categoria-badge:hover {
+    transform: scale(1.05);
 }
 
 /* ---------- MODAL RESET ---------- */
@@ -459,7 +633,6 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
-    animation: fadeIn 0.3s ease;
     align-items: center;
     justify-content: center;
 }
@@ -475,27 +648,39 @@
     animation: slideUp 0.3s ease;
     max-height: 85vh;
     overflow-y: auto;
-    box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-xl);
 }
 
 .btn-confirm-reset {
-    background: var(--danger);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 10px;
     cursor: pointer;
     font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-confirm-reset:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
 }
 
 .btn-cancel-reset {
-    background: var(--border-dark);
-    color: var(--text-main);
+    background: #e2e8f0;
+    color: #334155;
     border: none;
     padding: 10px 20px;
     border-radius: 10px;
     cursor: pointer;
     margin-left: 10px;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel-reset:hover {
+    background: #cbd5e1;
+    transform: translateY(-2px);
 }
 
 /* ---------- MODAL EDITAR RECURSO ---------- */
@@ -560,6 +745,7 @@
 
 .modal-editar-recurso-close:hover {
     background: rgba(0, 0, 0, 0.08);
+    transform: rotate(90deg);
 }
 
 .modal-editar-recurso-body {
@@ -578,7 +764,7 @@
 .form-editar-label {
     font-size: 13px;
     font-weight: 600;
-    color: var(--text-main);
+    color: #334155;
 }
 
 .form-editar-input {
@@ -586,8 +772,8 @@
     border: 1.5px solid var(--border);
     border-radius: 10px;
     font-size: 14px;
-    color: var(--dark);
-    background: var(--bg-light);
+    color: #0f172a;
+    background: #f8fafc;
     transition: border-color 0.18s, box-shadow 0.18s;
     outline: none;
     font-family: inherit;
@@ -596,7 +782,7 @@
 }
 
 .form-editar-input:focus {
-    border-color: var(--warning);
+    border-color: #f59e0b;
     box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
     background: #ffffff;
 }
@@ -613,7 +799,7 @@
     padding: 10px 20px;
     border: 1px solid var(--border);
     background: #ffffff;
-    color: var(--text-muted);
+    color: #64748b;
     border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
@@ -622,13 +808,14 @@
 }
 
 .btn-editar-cancelar:hover {
-    background: var(--bg-gray);
-    color: var(--dark);
+    background: #f1f5f9;
+    color: #0f172a;
+    transform: translateY(-2px);
 }
 
 .btn-editar-guardar {
     padding: 10px 22px;
-    background: linear-gradient(135deg, #000000, #d97706);
+    background: linear-gradient(135deg, #d97706, #b45309);
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -641,7 +828,7 @@
 
 .btn-editar-guardar:hover {
     opacity: 0.9;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
 }
 
 .btn-editar-guardar:disabled {
@@ -662,11 +849,16 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background: var(--bg-light);
+    background: #f8fafc;
     border-radius: 16px;
     flex-wrap: wrap;
     gap: 12px;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+}
+
+.significado-item:hover {
+    background: #f0fdf4;
+    transform: translateX(5px);
 }
 
 .significado-info {
@@ -680,13 +872,18 @@
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease;
+}
+
+.significado-color:hover {
+    transform: scale(1.1);
 }
 
 .significado-nombre {
     font-weight: 600;
     font-size: 14px;
-    color: var(--dark);
+    color: #0f172a;
     min-width: 70px;
 }
 
@@ -715,20 +912,20 @@
     flex: 1;
     padding: 10px 14px;
     border-radius: 12px;
-    border: 1px solid var(--border-dark);
+    border: 1px solid #cbd5e1;
     font-size: 13px;
     background: white;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
 .significado-input:focus {
     outline: none;
-    border-color: var(--primary);
+    border-color: #0891b2;
     box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
 }
 
 .btn-guardar-significado {
-    background: var(--primary);
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
     color: white;
     border: none;
     padding: 10px 18px;
@@ -736,27 +933,33 @@
     cursor: pointer;
     font-weight: 600;
     font-size: 13px;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     white-space: nowrap;
 }
 
 .btn-guardar-significado:hover {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(8, 145, 178, 0.3);
 }
 
 .btn-gestionar-colores {
     margin-top: 8px;
-    background: #146b60;
+    background: linear-gradient(135deg, #0d9488, #0f766e);
     color: white;
     border: none;
     padding: 8px 12px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     width: 100%;
+    transition: all 0.2s ease;
 }
 
-/* ========== MODAL GESTIÓN COLORES (responsive con scroll) ========== */
+.btn-gestionar-colores:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+/* ========== MODAL GESTIÓN COLORES ========== */
 .modal-gestion-colores {
     display: none;
     position: fixed;
@@ -784,7 +987,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-xl);
     animation: slideUp 0.3s ease;
 }
 
@@ -802,13 +1005,13 @@
     margin: 0;
     font-size: 18px;
     font-weight: 700;
-    color: var(--dark);
+    color: #0f172a;
 }
 
 .close-modal-colores {
     font-size: 28px;
     cursor: pointer;
-    color: var(--text-muted);
+    color: #64748b;
     width: 36px;
     height: 36px;
     display: flex;
@@ -820,7 +1023,8 @@
 
 .close-modal-colores:hover {
     background: #fef2f2;
-    color: var(--danger);
+    color: #ef4444;
+    transform: rotate(90deg);
 }
 
 .modal-gestion-colores-body {
@@ -829,34 +1033,33 @@
     flex: 1;
 }
 
-/* Scroll personalizado para el body */
 .modal-gestion-colores-body::-webkit-scrollbar {
     width: 6px;
 }
 
 .modal-gestion-colores-body::-webkit-scrollbar-track {
-    background: var(--bg-gray);
+    background: #f1f5f9;
     border-radius: 10px;
 }
 
 .modal-gestion-colores-body::-webkit-scrollbar-thumb {
-    background: var(--border-dark);
+    background: #cbd5e1;
     border-radius: 10px;
 }
 
 .modal-gestion-colores-body::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
+    background: #64748b;
 }
 
 .modal-gestion-colores-footer {
     padding: 16px 24px 20px;
     border-top: 1px solid var(--border);
-    background: var(--bg-light);
+    background: #f8fafc;
     flex-shrink: 0;
 }
 
 .btn-cerrar-modal-colores {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -864,7 +1067,7 @@
     cursor: pointer;
     font-weight: 600;
     width: 100%;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
 .btn-cerrar-modal-colores:hover {
@@ -872,7 +1075,7 @@
     filter: brightness(1.05);
 }
 
-/* ========== BARRA DE PROGRESO PARA SUBIDA DE RECIBOS ========== */
+/* ========== BARRA DE PROGRESO ========== */
 .barra-progreso-container {
     position: fixed;
     bottom: 30px;
@@ -888,7 +1091,7 @@
     background: white;
     border-radius: 20px;
     padding: 16px 20px;
-    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-xl);
     border: 1px solid var(--border);
 }
 
@@ -905,14 +1108,14 @@
 
 .barra-progreso-header span:last-child {
     font-weight: 600;
-    color: var(--dark);
+    color: #0f172a;
     font-size: 14px;
 }
 
 .barra-progreso-barra {
     width: 100%;
     height: 8px;
-    background: var(--bg-gray);
+    background: #f1f5f9;
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -920,7 +1123,7 @@
 
 .barra-progreso-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    background: linear-gradient(90deg, #0891b2, #06b6d4);
     border-radius: 10px;
     transition: width 0.3s ease;
     width: 0%;
@@ -931,12 +1134,12 @@
     justify-content: space-between;
     align-items: center;
     font-size: 11px;
-    color: var(--text-muted);
+    color: #64748b;
 }
 
 .barra-progreso-porcentaje {
     font-weight: 700;
-    color: var(--primary);
+    color: #0891b2;
     font-size: 13px;
 }
 
@@ -946,7 +1149,6 @@
     gap: 6px;
 }
 
-/* ========== ANIMACIONES ========== */
 @keyframes slideUpProgress {
     from {
         opacity: 0;
@@ -958,6 +1160,7 @@
     }
 }
 
+/* ========== ANIMACIONES ========== */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -1006,9 +1209,8 @@
         padding: 8px 16px;
         font-size: 12px;
     }
-    .user-badge {
-        padding: 6px 14px;
-        font-size: 12px;
+    .user-badge-wrapper {
+        justify-content: center;
     }
     .barra-progreso-container {
         width: 95%;
@@ -1033,7 +1235,7 @@
     }
     .user-badge {
         width: 100%;
-        text-align: center;
+        justify-content: center;
     }
     .modal-editar-recurso-content {
         border-radius: 16px;
