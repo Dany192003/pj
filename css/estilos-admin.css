@@ -39,22 +39,6 @@
 }
 
 .user-badge {
-    background: var(--bg-gray);
-    padding: 8px 16px;
-    border-radius: var(--radius-lg);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--primary);
-}
-/* ========== BOTONES ADMIN (reorganizados y con nuevos colores) ========== */
-.admin-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.user-badge {
     background: linear-gradient(135deg, #0891b2, #3b82f6);
     color: white;
     padding: 8px 18px;
@@ -62,6 +46,14 @@
     font-size: 13px;
     font-weight: 600;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* ---------- BOTONES ADMIN ---------- */
+.admin-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .admin-btn {
@@ -87,89 +79,54 @@
     transform: translateY(1px);
 }
 
-/* Botón Forzar Actualización (Amarillo/Naranja) */
+/* Botón Forzar Actualización */
 .admin-btn-update {
     background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
 }
 
-/* Botón Reiniciar Sistema (Rojo) */
+/* Botón Reiniciar Sistema */
 .admin-btn-reset {
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
 }
 
-/* Botón Cerrar Sesión (Gris oscuro) */
+/* Botón Cerrar Sesión */
 .admin-btn-logout {
     background: linear-gradient(135deg, #475569, #334155);
     color: white;
 }
 
-/* Responsive para botones admin */
-@media (max-width: 768px) {
-    .admin-actions {
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .admin-btn {
-        padding: 8px 16px;
-        font-size: 12px;
-    }
-    
-    .user-badge {
-        padding: 6px 14px;
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .admin-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .admin-btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .user-badge {
-        width: 100%;
-        text-align: center;
-    }
-}
-/* ---------- BOTONES ADMIN ---------- */
 .logout-btn {
-    background: var(--danger);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: var(--radius-md);
+    border-radius: 40px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
-    background: var(--danger-dark);
-    transform: scale(0.98);
+    transform: translateY(-2px);
+    filter: brightness(1.05);
 }
 
 .reset-btn {
-    background: #00973a;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: var(--radius-md);
+    border-radius: 40px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .reset-btn:hover {
-    background: #239c47;
-    transform: scale(0.98);
+    transform: translateY(-2px);
+    filter: brightness(1.05);
 }
 
 /* ---------- TABS ---------- */
@@ -503,14 +460,13 @@
     background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
     animation: fadeIn 0.3s ease;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-reset-content {
     background: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin: 0;
     padding: 25px;
     border-radius: var(--radius-lg);
     width: 90%;
@@ -519,6 +475,7 @@
     animation: slideUp 0.3s ease;
     max-height: 85vh;
     overflow-y: auto;
+    box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
 }
 
 .btn-confirm-reset {
@@ -915,7 +872,109 @@
     filter: brightness(1.05);
 }
 
-/* ========== RESPONSIVE PARA MÓVILES ========== */
+/* ========== BARRA DE PROGRESO PARA SUBIDA DE RECIBOS ========== */
+.barra-progreso-container {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    animation: slideUpProgress 0.3s ease;
+    width: 90%;
+    max-width: 400px;
+}
+
+.barra-progreso-content {
+    background: white;
+    border-radius: 20px;
+    padding: 16px 20px;
+    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+}
+
+.barra-progreso-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.barra-progreso-icon {
+    font-size: 28px;
+}
+
+.barra-progreso-header span:last-child {
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 14px;
+}
+
+.barra-progreso-barra {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-gray);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.barra-progreso-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.barra-progreso-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.barra-progreso-porcentaje {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 13px;
+}
+
+.barra-progreso-estado {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ========== ANIMACIONES ========== */
+@keyframes slideUpProgress {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== RESPONSIVE ADMIN ========== */
 @media (max-width: 768px) {
     .grid {
         grid-template-columns: 1fr;
@@ -939,67 +998,71 @@
     .admin-header-logo {
         flex-direction: column;
     }
+    .admin-actions {
+        justify-content: center;
+        width: 100%;
+    }
+    .admin-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+    .user-badge {
+        padding: 6px 14px;
+        font-size: 12px;
+    }
+    .barra-progreso-container {
+        width: 95%;
+        bottom: 20px;
+    }
+    .barra-progreso-content {
+        padding: 12px 16px;
+    }
+    .barra-progreso-icon {
+        font-size: 24px;
+    }
 }
 
-@media (max-width: 640px) {
-    .modal-gestion-colores {
-        padding: 10px;
-        align-items: center;
-    }
-    
-    .modal-gestion-colores-content {
-        max-height: calc(100vh - 20px);
-        border-radius: 20px;
-    }
-    
-    .modal-gestion-colores-header {
-        padding: 16px 20px;
-    }
-    
-    .modal-gestion-colores-header h3 {
-        font-size: 16px;
-    }
-    
-    .modal-gestion-colores-body {
-        padding: 16px;
-    }
-    
-    .significado-item {
+@media (max-width: 480px) {
+    .admin-actions {
         flex-direction: column;
-        align-items: stretch;
-        padding: 12px;
-    }
-    
-    .significado-info {
-        justify-content: space-between;
         width: 100%;
     }
-    
-    .significado-input-group {
+    .admin-btn {
         width: 100%;
+        justify-content: center;
+    }
+    .user-badge {
+        width: 100%;
+        text-align: center;
+    }
+    .modal-editar-recurso-content {
+        border-radius: 16px;
+    }
+    .modal-editar-recurso-header,
+    .modal-editar-recurso-body,
+    .modal-editar-recurso-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .modal-editar-recurso-footer {
         flex-direction: column;
     }
-    
-    .significado-input {
+    .btn-editar-cancelar,
+    .btn-editar-guardar {
         width: 100%;
-        padding: 10px 12px;
-        font-size: 14px;
+        text-align: center;
     }
-    
-    .btn-guardar-significado {
-        width: 100%;
-        padding: 10px;
-        font-size: 13px;
+    .barra-progreso-header span:last-child {
+        font-size: 12px;
     }
-    
-    .modal-gestion-colores-footer {
-        padding: 12px 20px 16px;
+    .barra-progreso-footer {
+        font-size: 10px;
     }
-    
-    .btn-cerrar-modal-colores {
-        padding: 10px 20px;
+    .barra-progreso-porcentaje {
+        font-size: 11px;
     }
 }
+
 /* ========== MODAL ADMIN (centrado) ========== */
 .modal {
     display: none;
@@ -1025,49 +1088,4 @@
     text-align: center;
     position: relative;
     box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
-}
-@media (max-width: 480px) {
-    .modal-editar-recurso-content {
-        border-radius: 16px;
-    }
-    .modal-editar-recurso-header,
-    .modal-editar-recurso-body,
-    .modal-editar-recurso-footer {
-        padding-left: 16px;
-        padding-right: 16px;
-    }
-    .modal-editar-recurso-footer {
-        flex-direction: column;
-    }
-    .btn-editar-cancelar,
-    .btn-editar-guardar {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-/* Para pantallas muy pequeñas (menos de 380px) */
-@media (max-width: 380px) {
-    .modal-gestion-colores-header {
-        padding: 12px 16px;
-    }
-    
-    .modal-gestion-colores-body {
-        padding: 12px;
-    }
-    
-    .significado-info {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    
-    .significado-nombre {
-        font-size: 13px;
-        min-width: auto;
-    }
-    
-    .significado-badge {
-        font-size: 9px;
-        padding: 3px 8px;
-    }
 }
