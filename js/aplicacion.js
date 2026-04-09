@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnAdminLogin = document.getElementById('btnAdminLogin');
     const closeBtn      = document.querySelector('.close');
     const btnLogin      = document.getElementById('btnLogin');
+    const adminEmail    = document.getElementById('adminEmail');
     const adminPassword = document.getElementById('adminPassword');
     const loginError    = document.getElementById('loginError');
 
@@ -34,7 +35,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (adminPassword) adminPassword.value = '';
     };
 
-    // CORREGIDO: usar 'flex' en lugar de 'block' para centrar
     btnAdminLogin?.addEventListener('click', () => { 
         modal.style.display = 'flex'; 
     });
@@ -44,43 +44,59 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.target === modal) cerrarModal(); 
     });
 
-// En aplicacion.js, modifica el login
-btnLogin?.addEventListener('click', async () => {
-    const email = document.getElementById('adminEmail').value.trim();
-    const password = adminPassword.value;
-    
-    if (!email) {
-        loginError.textContent = 'Ingresa el correo electrónico';
-        return;
-    }
-    if (!password) {
-        loginError.textContent = 'Ingresa la contraseña';
-        return;
-    }
-    
-    // Mostrar loading
-    btnLogin.disabled = true;
-    btnLogin.innerHTML = '<span class="spinner"></span> Verificando...';
-    
-    const result = await login(email, password);
-    
-    if (result.success) {
-        // Limpiar modal
-        modal.style.display = 'none';
-        loginError.textContent = '';
-        adminPassword.value = '';
-        // Redirigir directamente
-        window.location.href = 'panel-admin.html';
-    } else {
-        loginError.textContent = result.message || 'Credenciales incorrectas';
-        btnLogin.disabled = false;
-        btnLogin.innerHTML = 'Ingresar al Panel';
-    }
-});
+    // Login con Firebase Auth
+    btnLogin?.addEventListener('click', async () => {
+        const email = adminEmail?.value.trim() || 'admin@pastoral.com';
+        const password = adminPassword.value;
+        
+        if (!password) {
+            loginError.textContent = 'Ingresa la contraseña';
+            return;
+        }
+        
+        btnLogin.disabled = true;
+        btnLogin.innerHTML = '<span class="spinner"></span> Verificando...';
+        
+        const result = await login(email, password);
+        
+        if (result.success) {
+            modal.style.display = 'none';
+            loginError.textContent = '';
+            adminPassword.value = '';
+            window.location.href = 'panel-admin.html';
+        } else {
+            loginError.textContent = result.message || 'Credenciales incorrectas';
+            btnLogin.disabled = false;
+            btnLogin.innerHTML = 'Ingresar al Panel';
+        }
+    });
 
     adminPassword?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') btnLogin.click();
     });
 
     redirectIfAuthenticated();
+
+    // ========== MODAL DESARROLLADOR ==========
+    const btnDesarrollador = document.getElementById('btnDesarrollador');
+    const modalDesarrollador = document.getElementById('modalDesarrollador');
+    const closeDesarrollador = document.querySelector('.close-desarrollador');
+
+    if (btnDesarrollador && modalDesarrollador) {
+        btnDesarrollador.addEventListener('click', () => {
+            modalDesarrollador.style.display = 'flex';
+        });
+        
+        if (closeDesarrollador) {
+            closeDesarrollador.addEventListener('click', () => {
+                modalDesarrollador.style.display = 'none';
+            });
+        }
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === modalDesarrollador) {
+                modalDesarrollador.style.display = 'none';
+            }
+        });
+    }
 });

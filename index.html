@@ -79,30 +79,73 @@
         <div class="leyenda-grid" id="leyendaColores"></div>
     </div>
 
-    <div class="footer">
-        <div class="footer-text">
-            📌 Actividades programadas por la Pastoral Juvenil - Parroquia San Agustín Sumpango
+    <!-- FOOTER: ÍCONOS ARRIBA, TEXTO ABAJO -->
+    <div class="footer-info">
+        <div class="footer-icons">
+            <button class="icon-btn admin-icon" id="btnAdminLogin" title="Acceso administrador">🔐</button>
+            <button class="icon-btn dev-icon" id="btnDesarrollador" title="Desarrollador">💻</button>
         </div>
-        <div class="footer-links">
-            <button class="footer-link admin-link" id="btnAdminLogin">
-                <span>🔐</span>
-                <span>Acceso administrador</span>
-            </button>
+        <div class="footer-copyright">
+            © 2026 Pastoral Juvenil - Todos los derechos reservados
         </div>
     </div>
 
-<div id="loginModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
-        <h3>Acceso Administrador</h3>
-        <p style="color: #64748b; font-size: 13px; margin-bottom: 24px;">Ingresa tus credenciales</p>
-        <input type="email" id="adminEmail" placeholder="Correo electrónico" class="modal-input" value="admin@pastoral.com">
-        <input type="password" id="adminPassword" placeholder="Contraseña" class="modal-input">
-        <button id="btnLogin" class="btn-main">Ingresar al Panel</button>
-        <p class="error-msg" id="loginError"></p>
+    <!-- Modal Login Administrador -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+            <h3>Acceso Administrador</h3>
+            <p style="color: #64748b; font-size: 13px; margin-bottom: 24px;">Ingresa tus credenciales</p>
+            <input type="email" id="adminEmail" placeholder="Correo electrónico" class="modal-input" value="admin@pastoral.com">
+            <input type="password" id="adminPassword" placeholder="Contraseña" class="modal-input">
+            <button id="btnLogin" class="btn-main">Ingresar al Panel</button>
+            <p class="error-msg" id="loginError"></p>
+        </div>
     </div>
-</div>
+
+    <!-- Modal Desarrollador -->
+    <div id="modalDesarrollador" class="modal-desarrollador">
+        <div class="modal-desarrollador-content">
+            <div class="modal-desarrollador-header">
+                <div class="dev-icon">💻</div>
+                <button class="close-desarrollador">&times;</button>
+            </div>
+            <div class="modal-desarrollador-body">
+                <div class="dev-avatar">
+                    <span>👨‍💻</span>
+                </div>
+                <h2>Carlos René Pérez</h2>
+                <p class="dev-title">Desarrollador Full Stack</p>
+                <div class="dev-divider"></div>
+                <div class="dev-info">
+                    <p><strong>📧 Correo:</strong> crene@example.com</p>
+                    <p><strong>📍 Ubicación:</strong> Sumpango, Sacatepéquez</p>
+                    <p><strong>📱 Teléfono:</strong> +502 1234 5678</p>
+                </div>
+                <div class="dev-divider"></div>
+                <div class="dev-social">
+                    <a href="#" target="_blank" class="dev-social-link">
+                        <span>🐙</span> GitHub
+                    </a>
+                    <a href="#" target="_blank" class="dev-social-link">
+                        <span>🔗</span> LinkedIn
+                    </a>
+                    <a href="#" target="_blank" class="dev-social-link">
+                        <span>📷</span> Instagram
+                    </a>
+                    <a href="#" target="_blank" class="dev-social-link">
+                        <span>🐦</span> Twitter
+                    </a>
+                </div>
+                <div class="dev-divider"></div>
+                <div class="dev-footer">
+                    <p>© 2026 - Pastoral Juvenil</p>
+                    <p class="dev-version">Versión 1.0.0</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="toast" class="toast"></div>
