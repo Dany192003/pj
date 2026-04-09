@@ -364,8 +364,8 @@ async function renderizarRecursos(recursos) {
                         </div>
                     </div>
                     <div class="recurso-actions">
-                        <button class="btn-ver" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-tipo="${tipoArchivo}">👁️ Ver</button>
-                        <button class="btn-descargar" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-extension="${extension}">⬇️ Descargar</button>
+                        <button class="btn-ver" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-tipo="${tipoArchivo}">👀 Ver</button>
+                        <button class="btn-descargar" data-url="${recurso.url}" data-titulo="${recurso.titulo}" data-extension="${extension}">↓ Descargar</button>
                     </div>
                 </div>
             </div>
