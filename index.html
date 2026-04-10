@@ -6,10 +6,8 @@
     <meta name="theme-color" content="#0891b2">
     <title>Pastoral Juvenil | Calendario</title>
     
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- Favicon para todos los dispositivos -->
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="48x48" href="img/favicon-48x48.png">
@@ -18,12 +16,9 @@
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
     <link rel="manifest" href="site.webmanifest">
     
-    <!-- iOS soporte -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Pastoral Juvenil">
-    
-    <!-- Android soporte -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0891b2">
     
@@ -69,7 +64,6 @@
         <div class="calendar-days" id="calendarDays"></div>
     </div>
 
-    <!-- Leyenda de colores -->
     <div class="leyenda-container" id="leyendaContainer" style="display: none;">
         <div class="leyenda-header">
             <span>🎨</span>
@@ -79,7 +73,7 @@
         <div class="leyenda-grid" id="leyendaColores"></div>
     </div>
 
-    <!-- FOOTER: ÍCONOS ARRIBA, TEXTO ABAJO -->
+    <!-- FOOTER -->
     <div class="footer-info">
         <div class="footer-icons">
             <button class="icon-btn admin-icon" id="btnAdminLogin" title="Acceso administrador">🔐</button>
@@ -97,7 +91,7 @@
             <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
             <h3>Acceso Administrador</h3>
             <p style="color: #64748b; font-size: 13px; margin-bottom: 24px;">Ingresa tus credenciales</p>
-            <input type="email" id="adminEmail" placeholder="Correo electrónico" class="modal-input" value="admin@pastoral.com">
+            <input type="text" id="adminUsername" placeholder="Nombre de usuario" class="modal-input">
             <input type="password" id="adminPassword" placeholder="Contraseña" class="modal-input">
             <button id="btnLogin" class="btn-main">Ingresar al Panel</button>
             <p class="error-msg" id="loginError"></p>
@@ -112,31 +106,21 @@
                 <button class="close-desarrollador">&times;</button>
             </div>
             <div class="modal-desarrollador-body">
-                <div class="dev-avatar">
-                    <span>👨‍💻</span>
-                </div>
-                <h2>Edwin Danilo Jeronimo Tomas</h2>
-                <p class="dev-title">Desarrollador </p>
+                <div class="dev-avatar"><span>👨‍💻</span></div>
+                <h2>Carlos René Pérez</h2>
+                <p class="dev-title">Desarrollador Full Stack</p>
                 <div class="dev-divider"></div>
                 <div class="dev-info">
-                    <p><strong>📧 Correo:</strong> danyjeronimo34@gmail.com</p>
+                    <p><strong>📧 Correo:</strong> crene@example.com</p>
                     <p><strong>📍 Ubicación:</strong> Sumpango, Sacatepéquez</p>
-                    <p><strong>📱 Teléfono:</strong> +502 4260230</p>
+                    <p><strong>📱 Teléfono:</strong> +502 1234 5678</p>
                 </div>
                 <div class="dev-divider"></div>
                 <div class="dev-social">
-                    <a href="#" target="_blank" class="dev-social-link">
-                        <span>🐙</span> GitHub
-                    </a>
-                    <a href="#" target="_blank" class="dev-social-link">
-                        <span>🔗</span> LinkedIn
-                    </a>
-                    <a href="#" target="_blank" class="dev-social-link">
-                        <span>📷</span> Instagram
-                    </a>
-                    <a href="#" target="_blank" class="dev-social-link">
-                        <span>🐦</span> Twitter
-                    </a>
+                    <a href="#" target="_blank" class="dev-social-link"><span>🐙</span> GitHub</a>
+                    <a href="#" target="_blank" class="dev-social-link"><span>🔗</span> LinkedIn</a>
+                    <a href="#" target="_blank" class="dev-social-link"><span>📷</span> Instagram</a>
+                    <a href="#" target="_blank" class="dev-social-link"><span>🐦</span> Twitter</a>
                 </div>
                 <div class="dev-divider"></div>
                 <div class="dev-footer">

@@ -6,10 +6,8 @@
     <meta name="theme-color" content="#0891b2">
     <title>Admin | Pastoral Juvenil</title>
     
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- Favicon universal -->
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="48x48" href="img/favicon-48x48.png">
@@ -18,23 +16,21 @@
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
     <link rel="manifest" href="site.webmanifest">
     
-    <!-- iOS soporte -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Pastoral Juvenil">
-    
-    <!-- Android soporte -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0891b2">
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/estilos-globales.css">
     <link rel="stylesheet" href="css/estilos-admin.css">
+    
+
 </head>
 <body>
 
 <div class="app">
-    <!-- HEADER ADMINISTRADOR REORGANIZADO -->
     <div class="admin-header">
         <div class="admin-header-logo">
             <img src="img/logo.jpg" alt="Logo" class="admin-logo-img">
@@ -43,23 +39,12 @@
                 <p>Panel de Administración - Parroquia San Agustín Sumpango</p>
             </div>
         </div>
-    <div class="user-badge-wrapper">
-        <div class="user-badge">Administrador</div>
-    </div>
-        <!-- BOTONES ADMIN (agrupados y con nuevos colores) -->
+        
         <div class="admin-actions">
-            
-            <button class="admin-btn admin-btn-update" id="btnForzarActualizacion">
-                🔄 Forzar actualización
-            </button>
-            
-            <button class="admin-btn admin-btn-reset" id="btnReset">
-                ⚠️ Reiniciar Sistema
-            </button>
-            
-            <button class="admin-btn admin-btn-logout" id="btnLogout">
-                🚪 Cerrar Sesión
-            </button>
+            <span class="user-badge" id="userBadge">Cargando...</span>
+            <button class="admin-btn admin-btn-update" id="btnForzarActualizacion">🔄 Forzar actualización</button>
+            <button class="admin-btn admin-btn-reset" id="btnReset">⚠️ Reiniciar Sistema</button>
+            <button class="admin-btn admin-btn-logout" id="btnLogout">🚪 Cerrar Sesión</button>
         </div>
     </div>
 
@@ -70,6 +55,7 @@
         <button class="tab-btn" data-tab="tab4">🔑 Contraseñas Grupos</button>
         <button class="tab-btn" data-tab="tab5">📚 Biblioteca</button>
         <button class="tab-btn" data-tab="tab6">📜 Historial Recibos</button>
+        <button class="tab-btn" data-tab="tab7">👥 Usuarios</button>
     </div>
 
     <!-- Tab 1: Generar Recibos -->
@@ -114,7 +100,7 @@
                     <label>📱 WhatsApp</label>
                     <input id="whatsapp" type="tel" placeholder="Número de teléfono">
                 </div>
-                <button class="btn-main" id="btnVistaPrevia">👀 Vista Previa</button>
+                <button class="btn-main" id="btnVistaPrevia">👁️ Vista Previa</button>
             </div>
 
             <div class="preview" id="preview" style="display: none;">
@@ -237,34 +223,20 @@
                     </div>
                     <div id="emojiSelector" style="display: none; margin-top: 10px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; max-height: 200px; overflow-y: auto;">
                         <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px;">
-                            <button class="emoji-option" data-emoji="📚">📚</button>
-                            <button class="emoji-option" data-emoji="🙏">🙏</button>
-                            <button class="emoji-option" data-emoji="🎮">🎮</button>
-                            <button class="emoji-option" data-emoji="📄">📄</button>
-                            <button class="emoji-option" data-emoji="📖">📖</button>
-                            <button class="emoji-option" data-emoji="✝️">✝️</button>
-                            <button class="emoji-option" data-emoji="⛪">⛪</button>
-                            <button class="emoji-option" data-emoji="💒">💒</button>
-                            <button class="emoji-option" data-emoji="🎵">🎵</button>
-                            <button class="emoji-option" data-emoji="🎭">🎭</button>
-                            <button class="emoji-option" data-emoji="🎨">🎨</button>
-                            <button class="emoji-option" data-emoji="⚽">⚽</button>
-                            <button class="emoji-option" data-emoji="🏆">🏆</button>
-                            <button class="emoji-option" data-emoji="💡">💡</button>
-                            <button class="emoji-option" data-emoji="❤️">❤️</button>
-                            <button class="emoji-option" data-emoji="💪">💪</button>
-                            <button class="emoji-option" data-emoji="🤝">🤝</button>
-                            <button class="emoji-option" data-emoji="🌟">🌟</button>
-                            <button class="emoji-option" data-emoji="✨">✨</button>
-                            <button class="emoji-option" data-emoji="🎉">🎉</button>
-                            <button class="emoji-option" data-emoji="📢">📢</button>
-                            <button class="emoji-option" data-emoji="🔔">🔔</button>
-                            <button class="emoji-option" data-emoji="📅">📅</button>
-                            <button class="emoji-option" data-emoji="⏰">⏰</button>
-                            <button class="emoji-option" data-emoji="📍">📍</button>
-                            <button class="emoji-option" data-emoji="🗺️">🗺️</button>
-                            <button class="emoji-option" data-emoji="🎁">🎁</button>
-                            <button class="emoji-option" data-emoji="🍕">🍕</button>
+                            <button class="emoji-option" data-emoji="📚">📚</button><button class="emoji-option" data-emoji="🙏">🙏</button>
+                            <button class="emoji-option" data-emoji="🎮">🎮</button><button class="emoji-option" data-emoji="📄">📄</button>
+                            <button class="emoji-option" data-emoji="📖">📖</button><button class="emoji-option" data-emoji="✝️">✝️</button>
+                            <button class="emoji-option" data-emoji="⛪">⛪</button><button class="emoji-option" data-emoji="💒">💒</button>
+                            <button class="emoji-option" data-emoji="🎵">🎵</button><button class="emoji-option" data-emoji="🎭">🎭</button>
+                            <button class="emoji-option" data-emoji="🎨">🎨</button><button class="emoji-option" data-emoji="⚽">⚽</button>
+                            <button class="emoji-option" data-emoji="🏆">🏆</button><button class="emoji-option" data-emoji="💡">💡</button>
+                            <button class="emoji-option" data-emoji="❤️">❤️</button><button class="emoji-option" data-emoji="💪">💪</button>
+                            <button class="emoji-option" data-emoji="🤝">🤝</button><button class="emoji-option" data-emoji="🌟">🌟</button>
+                            <button class="emoji-option" data-emoji="✨">✨</button><button class="emoji-option" data-emoji="🎉">🎉</button>
+                            <button class="emoji-option" data-emoji="📢">📢</button><button class="emoji-option" data-emoji="🔔">🔔</button>
+                            <button class="emoji-option" data-emoji="📅">📅</button><button class="emoji-option" data-emoji="⏰">⏰</button>
+                            <button class="emoji-option" data-emoji="📍">📍</button><button class="emoji-option" data-emoji="🗺️">🗺️</button>
+                            <button class="emoji-option" data-emoji="🎁">🎁</button><button class="emoji-option" data-emoji="🍕">🍕</button>
                             <button class="emoji-option" data-emoji="☕">☕</button>
                         </div>
                     </div>
@@ -342,23 +314,48 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal de gestión de colores -->
-<div id="modalGestionColores" class="modal-gestion-colores">
-    <div class="modal-gestion-colores-content">
-        <div class="modal-gestion-colores-header">
-            <h3>🎨 Gestionar Significados de Colores</h3>
-            <span class="close-modal-colores">&times;</span>
+    <!-- Tab 7: Usuarios -->
+    <div id="tab7" class="tab-content">
+        <div class="card">
+            <div class="section-title">👥 Registrar Nuevo Usuario</div>
+            <div class="row">
+                <div class="field">
+                    <label>👤 Nombre de usuario</label>
+                    <input type="text" id="nuevoUsuarioUsername" placeholder="ej: juan.perez" class="usuario-input">
+                </div>
+                <div class="field">
+                    <label>🔑 Contraseña</label>
+                    <input type="password" id="nuevoUsuarioPassword" placeholder="Mínimo 6 caracteres" class="usuario-input">
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label>👤 Nombre completo</label>
+                    <input type="text" id="nuevoUsuarioNombre" placeholder="Nombre del usuario" class="usuario-input">
+                </div>
+            </div>
+            
+            <div class="field">
+                <label>🔐 Permisos de acceso</label>
+                <button type="button" id="btnAbrirPermisos" class="btn-permisos">📋 Seleccionar permisos</button>
+            </div>
+            
+            <button class="btn-main" id="btnRegistrarUsuario" style="background: linear-gradient(135deg, #10b981, #059669);">➕ Registrar Usuario</button>
         </div>
-        <div class="modal-gestion-colores-body">
-            <p style="color: #64748b; margin-bottom: 20px;">
-                Define el significado de cada color. Solo los colores con significado aparecerán en el selector de actividades.
-            </p>
-            <div class="significado-colores-grid" id="significadoColoresGrid"></div>
-        </div>
-        <div class="modal-gestion-colores-footer">
-            <button class="btn-cerrar-modal-colores" id="btnCerrarModalColores">Cerrar</button>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="section-title">📋 Usuarios Registrados</div>
+            <div style="overflow-x: auto;">
+                <table class="tabla-usuarios">
+                    <thead>
+                        <tr><th>👤 Usuario</th><th>👤 Nombre</th><th>🔐 Permisos</th><th>📅 Creado</th><th>⚙️ Acciones</th></tr>
+                    </thead>
+                    <tbody id="tablaUsuariosBody">
+                        <tr><td colspan="5" style="text-align:center; padding:40px;">Cargando usuarios...<\/td><\/tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -369,43 +366,44 @@
         <h3>⚠️ Reiniciar Sistema</h3>
         <p>Selecciona qué datos deseas reiniciar:</p>
         <div style="text-align: left; margin: 20px 0;">
-            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetPagos" value="pagos">
-                <strong>📊 Pagos y cuotas</strong> - Eliminar todos los registros de pagos
-            </label>
-            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetActividades" value="actividades">
-                <strong>📅 Actividades</strong> - Eliminar todas las actividades del calendario
-            </label>
-            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetPasswords" value="passwords">
-                <strong>🔑 Contraseñas</strong> - Eliminar todas las contraseñas de grupos
-            </label>
-            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetRecibos" value="recibos">
-                <strong>🔢 Contador de recibos</strong> - Reiniciar a REC-0001
-            </label>
-            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetBiblioteca" value="biblioteca">
-                <strong>📚 Biblioteca</strong> - Eliminar todos los recursos de la biblioteca
-            </label>
-            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetCategorias" value="categorias">
-                <strong>🏷️ Categorías</strong> - Eliminar todas las categorías
-            </label>
-            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetHistorial" value="historial">
-                <strong>📜 Historial de recibos</strong> - Eliminar todos los comprobantes del historial
-            </label>
-            <label style="display: block; margin-bottom: 10px; cursor: pointer;">
-                <input type="checkbox" id="resetSignificados" value="significados">
-                <strong>🎨 Significados de colores</strong> - Eliminar todos los significados personalizados
-            </label>
+            <label><input type="checkbox" id="resetPagos"> <strong>📊 Pagos y cuotas</strong></label>
+            <label><input type="checkbox" id="resetActividades"> <strong>📅 Actividades</strong></label>
+            <label><input type="checkbox" id="resetPasswords"> <strong>🔑 Contraseñas</strong></label>
+            <label><input type="checkbox" id="resetRecibos"> <strong>🔢 Contador de recibos</strong></label>
+            <label><input type="checkbox" id="resetBiblioteca"> <strong>📚 Biblioteca</strong></label>
+            <label><input type="checkbox" id="resetCategorias"> <strong>🏷️ Categorías</strong></label>
+            <label><input type="checkbox" id="resetHistorial"> <strong>📜 Historial de recibos</strong></label>
+            <label><input type="checkbox" id="resetSignificados"> <strong>🎨 Significados de colores</strong></label>
         </div>
         <p><strong style="color: #ef4444;">⚠️ Esta acción NO se puede deshacer.</strong></p>
         <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
             <button class="btn-cancel-reset" id="btnCancelReset">Cancelar</button>
             <button class="btn-confirm-reset" id="btnConfirmReset">Sí, reiniciar seleccionados</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de permisos -->
+<div id="modalPermisos" class="modal-permisos">
+    <div class="modal-permisos-content">
+        <div class="modal-permisos-header">
+            <h3>🔐 Seleccionar permisos para el usuario</h3>
+            <button class="close-permisos">&times;</button>
+        </div>
+        <div class="modal-permisos-body">
+            <p>Marque las secciones a las que el usuario tendrá acceso:</p>
+            <div class="permisos-lista">
+                <label><input type="checkbox" class="permiso-checkbox" value="tab1"> 📄 Generar Recibos</label>
+                <label><input type="checkbox" class="permiso-checkbox" value="tab2"> 📊 Control de Cuotas</label>
+                <label><input type="checkbox" class="permiso-checkbox" value="tab3"> 📅 Actividades</label>
+                <label><input type="checkbox" class="permiso-checkbox" value="tab4"> 🔑 Contraseñas Grupos</label>
+                <label><input type="checkbox" class="permiso-checkbox" value="tab5"> 📚 Biblioteca</label>
+                <label><input type="checkbox" class="permiso-checkbox" value="tab6"> 📜 Historial Recibos</label>
+                <label><input type="checkbox" class="permiso-checkbox" value="tab7"> 👥 Usuarios</label>
+            </div>
+        </div>
+        <div class="modal-permisos-footer">
+            <button class="btn-guardar-permisos" id="btnGuardarPermisos">✅ Guardar permisos</button>
         </div>
     </div>
 </div>
@@ -418,7 +416,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>  <!-- ← AGREGAR ESTA LÍNEA -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="js/inicio-firebase.js"></script>
 <script src="js/base-datos-nube.js"></script>
@@ -429,16 +427,9 @@
 <script src="js/autenticacion.js"></script>
 <script src="js/biblioteca-admin.js"></script>
 <script src="js/historial-recibos.js"></script>
+<script src="js/usuarios.js"></script>
 <script src="js/panel-admin.js"></script>
 <script src="js/actualizacion.js"></script>
 
-<script>
-// Evento del botón de forzar actualización (solo para admin)
-document.getElementById('btnForzarActualizacion')?.addEventListener('click', () => {
-    if (typeof forzarActualizacionGlobal === 'function') {
-        forzarActualizacionGlobal();
-    }
-});
-</script>
 </body>
 </html>

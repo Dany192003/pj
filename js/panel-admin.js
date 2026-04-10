@@ -1,12 +1,34 @@
 // js/panel-admin.js - Panel administrativo completo
-// js/panel-admin.js - Panel administrativo completo
-// Primero verificar autenticación
+// Función para actualizar el badge del usuario
+function actualizarUserBadge() {
+    const nombre = sessionStorage.getItem('admin_nombre') || 
+                   sessionStorage.getItem('admin_username') || 
+                   'Administrador';
+    const userBadge = document.getElementById('userBadge');
+    if (userBadge) {
+        userBadge.textContent = nombre;
+    }
+}
+// Función para ocultar botones de administrador (solo admin los ve)
+function configurarBotonesAdmin(permisos) {
+    const esAdmin = permisos.includes('tab7'); // tab7 es Usuarios (solo admin)
+    const btnForzar = document.getElementById('btnForzarActualizacion');
+    const btnReset = document.getElementById('btnReset');
+    
+    if (btnForzar) {
+        btnForzar.style.display = esAdmin ? 'flex' : 'none';
+    }
+    if (btnReset) {
+        btnReset.style.display = esAdmin ? 'flex' : 'none';
+    }
+}
+// Dentro de DOMContentLoaded, después de configurar permisos, llamar:
+
+// Verificar autenticación primero
 if (!requireAuth()) {
-    // No continuar si no está autenticado
     throw new Error('No autorizado');
 }
 
-// El resto del código normal...
 window.showToast = function(message, isError = false) {
     const toast = document.getElementById('toast');
     if (!toast) return;
@@ -31,7 +53,6 @@ function formatearFechaAdmin(fechaISO) {
     });
 }
 
-// ========== TOASTS MEJORADOS ==========
 function mostrarToastExito(mensaje) {
     const toast = document.createElement("div");
     toast.className = "toast-exito";
@@ -56,7 +77,6 @@ function mostrarToastError(mensaje) {
     }, 3000);
 }
 
-// ========== MODAL DE CONFIRMACIÓN MEJORADO ==========
 function mostrarConfirmacion(opciones) {
     return new Promise((resolve) => {
         let modal = document.getElementById("modalConfirmacion");
@@ -73,12 +93,8 @@ function mostrarConfirmacion(opciones) {
                             <p id="confirmacionMensaje">¿Estás seguro de realizar esta acción?</p>
                         </div>
                         <div class="modal-confirmacion-footer">
-                            <button class="btn-confirmar-cancelar" id="btnConfirmarNo">
-                                <span>✗</span> Cancelar
-                            </button>
-                            <button class="btn-confirmar-aceptar" id="btnConfirmarSi">
-                                <span>✓</span> Confirmar
-                            </button>
+                            <button class="btn-confirmar-cancelar" id="btnConfirmarNo"><span>✗</span> Cancelar</button>
+                            <button class="btn-confirmar-aceptar" id="btnConfirmarSi"><span>✓</span> Confirmar</button>
                         </div>
                     </div>
                 </div>
@@ -101,16 +117,13 @@ function mostrarConfirmacion(opciones) {
         extras.forEach(el => el.remove());
         
         let mensajeHTML = `<p>${opciones.mensaje}</p>`;
-        
         if (opciones.nombre) {
             const claseNombre = opciones.tipo === "recurso" ? "recurso-nombre" : "comprobante-nombre";
             mensajeHTML += `<div class="${claseNombre}">"${escapeHtml(opciones.nombre)}"</div>`;
         }
-        
         if (opciones.advertencia) {
             mensajeHTML += `<p style="color: #f97316; font-size: 13px; margin-top: 12px;">⚠️ ${opciones.advertencia}</p>`;
         }
-        
         mensajeElem.innerHTML = mensajeHTML;
         
         const cerrar = (resultado) => {
@@ -120,11 +133,7 @@ function mostrarConfirmacion(opciones) {
         
         btnSi.onclick = () => cerrar(true);
         btnNo.onclick = () => cerrar(false);
-        
-        modal.onclick = (e) => {
-            if (e.target === modal) cerrar(false);
-        };
-        
+        modal.onclick = (e) => { if (e.target === modal) cerrar(false); };
         modal.style.display = "flex";
     });
 }
@@ -133,14 +142,11 @@ function mostrarConfirmacion(opciones) {
 async function cargarEventosAdmin() {
     const eventosList = document.getElementById('eventosList');
     if (!eventosList) return;
-
     const eventos = await cargarEventos();
-
     if (eventos.length === 0) {
         eventosList.innerHTML = '<p style="color:#64748b;text-align:center;padding:20px;">No hay actividades registradas</p>';
         return;
     }
-
     eventosList.innerHTML = eventos.map(evento => `
         <div class="evento-item" style="border-left: 4px solid ${evento.color || '#0891b2'};">
             <div style="flex:1;">
@@ -153,12 +159,10 @@ async function cargarEventosAdmin() {
             <button class="delete-btn" data-id="${evento.id}">🗑️</button>
         </div>
     `).join('');
-
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.onclick = async () => {
             const confirmado = await mostrarConfirmacion({
-                titulo: "🗑️ Eliminar actividad",
-                icono: "⚠️",
+                titulo: "🗑️ Eliminar actividad", icono: "⚠️",
                 mensaje: "¿Estás seguro de eliminar esta actividad?",
                 advertencia: "Esta acción no se puede deshacer."
             });
@@ -175,9 +179,7 @@ async function cargarEventosAdmin() {
 async function cargarContraseñasAdmin() {
     const gruposPassList = document.getElementById('gruposPassList');
     if (!gruposPassList) return;
-
     const passwords = await cargarContraseñasGrupos();
-
     gruposPassList.innerHTML = GRUPOS.map(grupo => `
         <div class="grupo-pass-item">
             <span><strong>👥 ${escapeHtml(grupo)}</strong></span>
@@ -187,15 +189,11 @@ async function cargarContraseñasAdmin() {
             </div>
         </div>
     `).join('');
-
     document.querySelectorAll('.save-pass-btn').forEach(btn => {
         btn.onclick = async () => {
             const grupo = btn.dataset.grupo;
             const password = document.getElementById(`pass-${grupo}`).value.trim();
-            if (!password) { 
-                mostrarToastError("❌ Ingresa una contraseña"); 
-                return; 
-            }
+            if (!password) { mostrarToastError("❌ Ingresa una contraseña"); return; }
             await guardarContraseñaGrupo(grupo, password);
             mostrarToastExito(`✓ Contraseña guardada para ${grupo}`);
         };
@@ -206,7 +204,6 @@ async function cargarContraseñasAdmin() {
 async function cargarSelectCategorias() {
     const select = document.getElementById('recursoCategoria');
     if (!select) return;
-
     try {
         const categorias = await cargarCategorias();
         if (categorias.length === 0) {
@@ -223,15 +220,12 @@ async function cargarSelectCategorias() {
 async function cargarListaCategoriasAdmin() {
     const container = document.getElementById('categoriasListAdmin');
     if (!container) return;
-
     try {
         const categorias = await cargarCategorias();
-
         if (categorias.length === 0) {
             container.innerHTML = '<p style="color:#64748b;text-align:center;padding:20px;">No hay categorías. Agrega la primera.</p>';
             return;
         }
-
         container.innerHTML = `
             <div style="margin-top:10px;">
                 <h4 style="margin-bottom:10px;color:#0f172a;">📋 Categorías existentes:</h4>
@@ -247,7 +241,6 @@ async function cargarListaCategoriasAdmin() {
                 </div>
             </div>
         `;
-
         document.querySelectorAll('.btn-editar-categoria-mini').forEach(btn => {
             btn.onclick = async () => {
                 const nuevoNombre = prompt('Editar nombre de categoría:', btn.dataset.nombre);
@@ -260,15 +253,12 @@ async function cargarListaCategoriasAdmin() {
                 }
             };
         });
-
         document.querySelectorAll('.btn-eliminar-categoria-mini').forEach(btn => {
             btn.onclick = async () => {
                 const confirmado = await mostrarConfirmacion({
-                    titulo: "🗑️ Eliminar categoría",
-                    icono: "⚠️",
+                    titulo: "🗑️ Eliminar categoría", icono: "⚠️",
                     mensaje: `¿Estás seguro de eliminar la categoría "${btn.dataset.nombre}"?`,
-                    nombre: btn.dataset.nombre,
-                    tipo: "categoria",
+                    nombre: btn.dataset.nombre, tipo: "categoria",
                     advertencia: "Esta acción no se puede deshacer."
                 });
                 if (confirmado) {
@@ -291,80 +281,52 @@ async function cargarListaCategoriasAdmin() {
 async function cargarRecursosAdmin() {
     const recursosTableBody = document.getElementById('recursosTableBody');
     if (!recursosTableBody) return;
-
     try {
-        const [recursos, categoriasSnapshot] = await Promise.all([
-            coleccionRecursos.get(),
-            coleccionCategorias.get()
-        ]);
-
+        const [recursos, categoriasSnapshot] = await Promise.all([coleccionRecursos.get(), coleccionCategorias.get()]);
         const categoriasMap = {};
-        categoriasSnapshot.forEach(doc => {
-            categoriasMap[doc.id] = { nombre: doc.data().nombre, icono: doc.data().icono || '📁' };
-        });
-
+        categoriasSnapshot.forEach(doc => { categoriasMap[doc.id] = { nombre: doc.data().nombre, icono: doc.data().icono || '📁' }; });
         const lista = [];
         recursos.forEach(doc => lista.push({ id: doc.id, ...doc.data() }));
         lista.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
         if (lista.length === 0) {
-            recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">📭 No hay recursos disponibles</td></tr>';
+            recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">📭 No hay recursos disponibles<\/td><\/tr>';
             return;
         }
-
         recursosTableBody.innerHTML = lista.map(recurso => {
             const cat = categoriasMap[recurso.categoria];
             const catDisplay = cat ? `${cat.icono} ${cat.nombre}` : '📁 Sin categoría';
-            const desc = recurso.descripcion
-                ? escapeHtml(recurso.descripcion.substring(0, 60)) + (recurso.descripcion.length > 60 ? '...' : '')
-                : '-';
+            const desc = recurso.descripcion ? escapeHtml(recurso.descripcion.substring(0, 60)) + (recurso.descripcion.length > 60 ? '...' : '') : '-';
             return `
                 <tr>
-                    <td><strong>${escapeHtml(recurso.titulo)}</strong></td>
-                    <td><span class="categoria-badge">${catDisplay}</span></td>
-                    <td>${desc}</td>
-                    <td><span style="font-size:12px;color:#64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}</span></td>
+                    <td><strong>${escapeHtml(recurso.titulo)}<\/strong><\/td>
+                    <td><span class="categoria-badge">${catDisplay}<\/span><\/td>
+                    <td>${desc}<\/td>
+                    <td><span style="font-size:12px;color:#64748b;">📅 ${formatearFechaAdmin(recurso.fecha)}<\/span><\/td>
                     <td>
-                        <a href="${recurso.url}" target="_blank" class="btn-ver" style="display:inline-block; background: #0891b2; color:white; border:none; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:11px; margin-right:5px;">👀 Ver</a>
-                        <button class="btn-editar-recurso" data-id="${recurso.id}" style="background: #ff9100; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; margin-right:5px;">✏️ Editar</button>
-                        <button class="btn-eliminar-recurso" data-id="${recurso.id}" data-titulo="${escapeHtml(recurso.titulo)}" style="background: #f50000; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px;">🗑️ Eliminar</button>
-                    </td>
-                </tr>
+                        <a href="${recurso.url}" target="_blank" class="btn-ver" style="display:inline-block; background: #0891b2; color:white; border:none; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:11px; margin-right:5px;">👀 Ver<\/a>
+                        <button class="btn-editar-recurso" data-id="${recurso.id}" style="background: #ff9100; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; margin-right:5px;">✏️ Editar<\/button>
+                        <button class="btn-eliminar-recurso" data-id="${recurso.id}" data-titulo="${escapeHtml(recurso.titulo)}" style="background: #f50000; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px;">🗑️ Eliminar<\/button>
+                    <\/td>
+                <\/tr>
             `;
         }).join('');
-
-        // Eventos editar
-        document.querySelectorAll('.btn-editar-recurso').forEach(btn => {
-            btn.onclick = () => {
-                abrirModalEditarRecursoAdmin(btn.dataset.id);
-            };
-        });
-
-        // Eventos eliminar
+        document.querySelectorAll('.btn-editar-recurso').forEach(btn => { btn.onclick = () => { abrirModalEditarRecursoAdmin(btn.dataset.id); }; });
         document.querySelectorAll('.btn-eliminar-recurso').forEach(btn => {
             btn.onclick = async () => {
                 const id = btn.dataset.id;
                 const titulo = btn.dataset.titulo;
-                
                 const confirmado = await mostrarConfirmacion({
-                    titulo: "🗑️ Eliminar recurso",
-                    icono: "⚠️",
+                    titulo: "🗑️ Eliminar recurso", icono: "⚠️",
                     mensaje: "¿Estás seguro de eliminar este recurso permanentemente?",
-                    nombre: titulo,
-                    tipo: "recurso",
-                    advertencia: "Esta acción no se puede deshacer."
+                    nombre: titulo, tipo: "recurso", advertencia: "Esta acción no se puede deshacer."
                 });
-                
                 if (confirmado) {
                     try {
                         const docSnap = await coleccionRecursos.doc(id).get();
                         if (docSnap.exists) {
                             const recursoData = docSnap.data();
                             if (recursoData.public_id && typeof window.eliminarDeCloudinary === 'function') {
-                                await window.eliminarDeCloudinary(
-                                    recursoData.public_id,
-                                    recursoData.resource_type || 'image'
-                                );
+                                await window.eliminarDeCloudinary(recursoData.public_id, recursoData.resource_type || 'image');
                             }
                         }
                         await eliminarRecursoCloud(id);
@@ -379,39 +341,24 @@ async function cargarRecursosAdmin() {
         });
     } catch (error) {
         console.error('Error cargando recursos:', error);
-        recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos</td></tr>';
+        recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos<\/td><\/tr>';
     }
 }
 
-// ========== EDITAR RECURSO MODAL ==========
 async function abrirModalEditarRecursoAdmin(recursoId) {
-    // Cargar datos del recurso
     let recursoData;
     try {
         const docSnap = await coleccionRecursos.doc(recursoId).get();
-        if (!docSnap.exists) {
-            mostrarToastError("❌ Recurso no encontrado");
-            return;
-        }
+        if (!docSnap.exists) { mostrarToastError("❌ Recurso no encontrado"); return; }
         recursoData = { id: docSnap.id, ...docSnap.data() };
-    } catch (e) {
-        mostrarToastError("❌ Error al cargar el recurso");
-        return;
-    }
-
-    // Cargar categorías
+    } catch (e) { mostrarToastError("❌ Error al cargar el recurso"); return; }
     let categorias = [];
     try {
         const snap = await coleccionCategorias.get();
         snap.forEach(doc => categorias.push({ id: doc.id, ...doc.data() }));
         categorias.sort((a, b) => a.nombre.localeCompare(b.nombre));
     } catch (e) { }
-
-    const opcionesCategoria = categorias.map(cat =>
-        `<option value="${cat.id}" ${recursoData.categoria === cat.id ? 'selected' : ''}>${escapeHtml(cat.icono || '📁')} ${escapeHtml(cat.nombre)}</option>`
-    ).join('');
-
-    // Crear modal si no existe
+    const opcionesCategoria = categorias.map(cat => `<option value="${cat.id}" ${recursoData.categoria === cat.id ? 'selected' : ''}>${escapeHtml(cat.icono || '📁')} ${escapeHtml(cat.nombre)}</option>`).join('');
     let modal = document.getElementById('modalEditarRecursoAdmin');
     if (!modal) {
         document.body.insertAdjacentHTML('beforeend', `
@@ -424,20 +371,9 @@ async function abrirModalEditarRecursoAdmin(recursoId) {
                     </div>
                     <div class="modal-editar-recurso-body">
                         <input type="hidden" id="editarRecursoAdminId" />
-                        <div class="form-editar-grupo">
-                            <label class="form-editar-label" for="editarRecursoAdminTitulo">📝 Título</label>
-                            <input type="text" id="editarRecursoAdminTitulo" class="form-editar-input" placeholder="Título del recurso" maxlength="200" />
-                        </div>
-                        <div class="form-editar-grupo">
-                            <label class="form-editar-label" for="editarRecursoAdminCategoria">🗂️ Categoría</label>
-                            <select id="editarRecursoAdminCategoria" class="form-editar-input form-editar-select">
-                                <option value="">— Sin categoría —</option>
-                            </select>
-                        </div>
-                        <div class="form-editar-grupo">
-                            <label class="form-editar-label" for="editarRecursoAdminDescripcion">📄 Descripción</label>
-                            <textarea id="editarRecursoAdminDescripcion" class="form-editar-input form-editar-textarea" placeholder="Descripción del recurso (opcional)" maxlength="500" rows="3"></textarea>
-                        </div>
+                        <div class="form-editar-grupo"><label class="form-editar-label">📝 Título</label><input type="text" id="editarRecursoAdminTitulo" class="form-editar-input" placeholder="Título del recurso" maxlength="200" /></div>
+                        <div class="form-editar-grupo"><label class="form-editar-label">🗂️ Categoría</label><select id="editarRecursoAdminCategoria" class="form-editar-input form-editar-select"><option value="">— Sin categoría —</option></select></div>
+                        <div class="form-editar-grupo"><label class="form-editar-label">📄 Descripción</label><textarea id="editarRecursoAdminDescripcion" class="form-editar-input form-editar-textarea" placeholder="Descripción del recurso (opcional)" maxlength="500" rows="3"></textarea></div>
                     </div>
                     <div class="modal-editar-recurso-footer">
                         <button class="btn-editar-cancelar" id="btnEditarRecursoAdminCancelar">✗ Cancelar</button>
@@ -447,50 +383,33 @@ async function abrirModalEditarRecursoAdmin(recursoId) {
             </div>
         `);
         modal = document.getElementById('modalEditarRecursoAdmin');
-
         document.getElementById('btnCerrarEditarRecursoAdmin').onclick = () => modal.style.display = 'none';
         document.getElementById('btnEditarRecursoAdminCancelar').onclick = () => modal.style.display = 'none';
         modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-
         document.getElementById('btnEditarRecursoAdminGuardar').onclick = async () => {
             const id = document.getElementById('editarRecursoAdminId').value;
             const titulo = document.getElementById('editarRecursoAdminTitulo').value.trim();
             const catId = document.getElementById('editarRecursoAdminCategoria').value;
             const desc = document.getElementById('editarRecursoAdminDescripcion').value.trim();
-
             if (!titulo) { mostrarToastError("❌ El título es obligatorio"); return; }
-
             const btnGuardar = document.getElementById('btnEditarRecursoAdminGuardar');
             btnGuardar.disabled = true;
             btnGuardar.textContent = '⏳ Guardando...';
-
             try {
-                await coleccionRecursos.doc(id).update({
-                    titulo,
-                    categoria: catId || null,
-                    descripcion: desc
-                });
+                await coleccionRecursos.doc(id).update({ titulo, categoria: catId || null, descripcion: desc });
                 modal.style.display = 'none';
                 mostrarToastExito('✓ Recurso actualizado correctamente');
                 await cargarRecursosAdmin();
-            } catch (err) {
-                mostrarToastError('❌ Error al guardar los cambios');
-            } finally {
-                btnGuardar.disabled = false;
-                btnGuardar.textContent = '💾 Guardar cambios';
-            }
+            } catch (err) { mostrarToastError('❌ Error al guardar los cambios'); }
+            finally { btnGuardar.disabled = false; btnGuardar.textContent = '💾 Guardar cambios'; }
         };
     }
-
-    // Rellenar datos actuales
     document.getElementById('editarRecursoAdminId').value = recursoData.id;
     document.getElementById('editarRecursoAdminTitulo').value = recursoData.titulo || '';
     document.getElementById('editarRecursoAdminDescripcion').value = recursoData.descripcion || '';
-
     const selectCat = document.getElementById('editarRecursoAdminCategoria');
     selectCat.innerHTML = `<option value="">— Sin categoría —</option>${opcionesCategoria}`;
     selectCat.value = recursoData.categoria || '';
-
     modal.style.display = 'flex';
 }
 
@@ -498,27 +417,18 @@ async function abrirModalEditarRecursoAdmin(recursoId) {
 async function cargarSignificadosAdmin() {
     const significadosGrid = document.getElementById('significadoColoresGrid');
     if (!significadosGrid) return;
-    
     const significados = await cargarSignificadosColores();
-    
     const colores = [
-        { codigo: '#0891b2', nombre: 'Azul', default: '' },
-        { codigo: '#ef4444', nombre: 'Rojo',  default: '' },
-        { codigo: '#f97316', nombre: 'Naranja', default: '' },
-        { codigo: '#eab308', nombre: 'Amarillo', default: '' },
-        { codigo: '#10b981', nombre: 'Verde', default: '' },
-        { codigo: '#8b5cf6', nombre: 'Morado', default: '' },
-        { codigo: '#ec4899', nombre: 'Rosa', default: '' },
-        { codigo: '#06b6d4', nombre: 'Cian', default: '' },
-        { codigo: '#f59e0b', nombre: 'Ámbar', default: '' },
-        { codigo: '#6366f1', nombre: 'Índigo', default: '' },
-        { codigo: '#616163', nombre: 'Gris', default: '' }
+        { codigo: '#0891b2', nombre: 'Azul' }, { codigo: '#ef4444', nombre: 'Rojo' },
+        { codigo: '#f97316', nombre: 'Naranja' }, { codigo: '#eab308', nombre: 'Amarillo' },
+        { codigo: '#10b981', nombre: 'Verde' }, { codigo: '#8b5cf6', nombre: 'Morado' },
+        { codigo: '#ec4899', nombre: 'Rosa' }, { codigo: '#06b6d4', nombre: 'Cian' },
+        { codigo: '#f59e0b', nombre: 'Ámbar' }, { codigo: '#6366f1', nombre: 'Índigo' },
+        { codigo: '#616163', nombre: 'Gris' }
     ];
-    
     significadosGrid.innerHTML = colores.map(color => {
         const significadoActual = significados[color.codigo] || '';
         const tieneSignificado = significadoActual.trim() !== '';
-        
         return `
             <div class="significado-item ${tieneSignificado ? 'tiene-significado' : ''}" data-color="${color.codigo}">
                 <div class="significado-info">
@@ -527,43 +437,30 @@ async function cargarSignificadosAdmin() {
                     ${tieneSignificado ? '<span class="significado-badge">✓ Activo</span>' : '<span class="significado-badge inactivo">⚡ Sin significado</span>'}
                 </div>
                 <div class="significado-input-group">
-                    <input type="text" id="significado_${color.codigo.replace('#', '')}" 
-                           class="significado-input" 
-                           placeholder="Ej: Actividades de formación, Eventos importantes..."
-                           value="${significadoActual.replace(/"/g, '&quot;')}">
+                    <input type="text" id="significado_${color.codigo.replace('#', '')}" class="significado-input" placeholder="Ej: Actividades de formación..." value="${significadoActual.replace(/"/g, '&quot;')}">
                     <button class="btn-guardar-significado" data-color="${color.codigo}">💾 Guardar</button>
                 </div>
             </div>
         `;
     }).join('');
-    
     document.querySelectorAll('.btn-guardar-significado').forEach(btn => {
         btn.onclick = async () => {
             const color = btn.dataset.color;
             const input = document.getElementById(`significado_${color.replace('#', '')}`);
             const significado = input.value.trim();
-            
             await guardarSignificadoColor(color, significado);
-            
             const parent = btn.closest('.significado-item');
             if (significado) {
                 parent.classList.add('tiene-significado');
                 const badge = parent.querySelector('.significado-badge');
-                if (badge) {
-                    badge.textContent = '✓ Activo';
-                    badge.classList.remove('inactivo');
-                }
+                if (badge) { badge.textContent = '✓ Activo'; badge.classList.remove('inactivo'); }
                 mostrarToastExito(`✓ Significado guardado para ${color}`);
             } else {
                 parent.classList.remove('tiene-significado');
                 const badge = parent.querySelector('.significado-badge');
-                if (badge) {
-                    badge.textContent = '⚡ Sin significado';
-                    badge.classList.add('inactivo');
-                }
+                if (badge) { badge.textContent = '⚡ Sin significado'; badge.classList.add('inactivo'); }
                 mostrarToastExito(`✓ Significado eliminado para ${color}`);
             }
-            
             await cargarSelectColoresActividades();
         };
     });
@@ -572,46 +469,29 @@ async function cargarSignificadosAdmin() {
 async function cargarSelectColoresActividades() {
     const select = document.getElementById('eventoColor');
     if (!select) return;
-    
     const significados = await cargarSignificadosColores();
-    
     const coloresPredeterminados = [
-        { codigo: '#0891b2', nombre: 'Azul', icono: '🔵' },
-        { codigo: '#ef4444', nombre: 'Rojo', icono: '🔴' },
-        { codigo: '#f97316', nombre: 'Naranja', icono: '🟠' },
-        { codigo: '#eab308', nombre: 'Amarillo', icono: '🟡' },
-        { codigo: '#10b981', nombre: 'Verde', icono: '🟢' },
-        { codigo: '#8b5cf6', nombre: 'Morado', icono: '🟣' },
-        { codigo: '#ec4899', nombre: 'Rosa', icono: '🩷' },
-        { codigo: '#06b6d4', nombre: 'Cian', icono: '💙' },
-        { codigo: '#f59e0b', nombre: 'Ámbar', icono: '🟧' },
-        { codigo: '#6366f1', nombre: 'Índigo', icono: '🔮' }
+        { codigo: '#0891b2', nombre: 'Azul', icono: '🔵' }, { codigo: '#ef4444', nombre: 'Rojo', icono: '🔴' },
+        { codigo: '#f97316', nombre: 'Naranja', icono: '🟠' }, { codigo: '#eab308', nombre: 'Amarillo', icono: '🟡' },
+        { codigo: '#10b981', nombre: 'Verde', icono: '🟢' }, { codigo: '#8b5cf6', nombre: 'Morado', icono: '🟣' },
+        { codigo: '#ec4899', nombre: 'Rosa', icono: '🩷' }, { codigo: '#06b6d4', nombre: 'Cian', icono: '💙' },
+        { codigo: '#f59e0b', nombre: 'Ámbar', icono: '🟧' }, { codigo: '#6366f1', nombre: 'Índigo', icono: '🔮' }
     ];
-    
-    // Filtrar solo colores que tienen significado
     const coloresConSignificado = coloresPredeterminados.filter(color => {
         const significado = significados[color.codigo];
         return significado && significado.trim() !== '';
     });
-    
     if (coloresConSignificado.length === 0) {
         select.innerHTML = '<option value="" disabled selected>⚠️ No hay colores disponibles - Ve a "Gestionar significados"</option>';
         select.disabled = true;
         return;
     }
-    
     select.disabled = false;
-    
-    // Generar opciones con significado
     select.innerHTML = '<option value="" disabled selected>-- Seleccione un color --</option>' +
         coloresConSignificado.map(color => {
             const significado = significados[color.codigo] || '';
-            // Limitar el significado a 50 caracteres para no alargar demasiado el select
             const significadoCorto = significado.length > 50 ? significado.substring(0, 47) + '...' : significado;
-            
-            return `<option value="${color.codigo}" style="background-color: ${color.codigo}; color: white; padding: 5px;">
-                        ${color.icono} ${color.nombre} - ${significadoCorto}
-                    </option>`;
+            return `<option value="${color.codigo}" style="background-color: ${color.codigo}; color: white; padding: 5px;">${color.icono} ${color.nombre} - ${significadoCorto}</option>`;
         }).join('');
 }
 
@@ -620,122 +500,57 @@ function initModalColores() {
     const modalGestionColores = document.getElementById('modalGestionColores');
     const closeModalColores = document.querySelector('.close-modal-colores');
     const btnCerrarModalColores = document.getElementById('btnCerrarModalColores');
-    
-    if (btnGestionarColores) {
-        btnGestionarColores.onclick = async () => {
-            await cargarSignificadosAdmin();
-            if (modalGestionColores) modalGestionColores.style.display = 'flex';
-        };
-    }
-    
-    if (closeModalColores) {
-        closeModalColores.onclick = () => {
-            if (modalGestionColores) modalGestionColores.style.display = 'none';
-        };
-    }
-    
-    if (btnCerrarModalColores) {
-        btnCerrarModalColores.onclick = () => {
-            if (modalGestionColores) modalGestionColores.style.display = 'none';
-        };
-    }
-    
-    window.addEventListener('click', (e) => {
-        if (e.target === modalGestionColores) {
-            modalGestionColores.style.display = 'none';
-        }
-    });
+    if (btnGestionarColores) { btnGestionarColores.onclick = async () => { await cargarSignificadosAdmin(); if (modalGestionColores) modalGestionColores.style.display = 'flex'; }; }
+    if (closeModalColores) { closeModalColores.onclick = () => { if (modalGestionColores) modalGestionColores.style.display = 'none'; }; }
+    if (btnCerrarModalColores) { btnCerrarModalColores.onclick = () => { if (modalGestionColores) modalGestionColores.style.display = 'none'; }; }
+    window.addEventListener('click', (e) => { if (e.target === modalGestionColores) modalGestionColores.style.display = 'none'; });
 }
 
-// ========== SUBIR RECURSO ==========
 function initSubirRecurso() {
     const btnSubirRecurso = document.getElementById('btnSubirRecurso');
     if (!btnSubirRecurso) return;
-    
     const nuevoBtn = btnSubirRecurso.cloneNode(true);
     btnSubirRecurso.parentNode.replaceChild(nuevoBtn, btnSubirRecurso);
-    
     nuevoBtn.addEventListener('click', async function subirRecursoHandler(e) {
         e.preventDefault();
         e.stopPropagation();
-        
-        if (nuevoBtn.disabled) {
-            return;
-        }
-        
+        if (nuevoBtn.disabled) return;
         const titulo = document.getElementById('recursoTitulo').value.trim();
         const categoria = document.getElementById('recursoCategoria').value;
         const descripcion = document.getElementById('recursoDescripcion').value.trim();
         const archivo = document.getElementById('recursoArchivo').files[0];
-
         if (!titulo) { mostrarToastError('❌ Ingresa un título'); return; }
         if (!archivo) { mostrarToastError('❌ Selecciona un archivo'); return; }
         if (!categoria) { mostrarToastError('❌ Selecciona una categoría'); return; }
-        if (archivo.size > 10 * 1024 * 1024) {
-            mostrarToastError('❌ El archivo es demasiado grande (máx 10MB)');
-            return;
-        }
-
+        if (archivo.size > 10 * 1024 * 1024) { mostrarToastError('❌ El archivo es demasiado grande (máx 10MB)'); return; }
         nuevoBtn.disabled = true;
         const textoOriginal = nuevoBtn.innerHTML;
         nuevoBtn.innerHTML = '<span class="spinner"></span> Subiendo...';
-        
         mostrarToastExito('📤 Subiendo archivo...');
-
         try {
-            let nombreLimpio = titulo
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-z0-9]/gi, '_')
-                .replace(/_+/g, '_')
-                .toLowerCase()
-                .substring(0, 40);
-            
+            let nombreLimpio = titulo.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/gi, '_').replace(/_+/g, '_').toLowerCase().substring(0, 40);
             if (!nombreLimpio) nombreLimpio = 'recurso';
-            
             const formData = new FormData();
             formData.append("file", archivo);
             formData.append("upload_preset", "comprobantes");
             formData.append("folder", "biblioteca");
             formData.append("public_id", nombreLimpio);
-            
-            const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/upload", {
-                method: "POST",
-                body: formData
-            });
-            
+            const res = await fetch("https://api.cloudinary.com/v1_1/dyzpdl9tg/upload", { method: "POST", body: formData });
             if (!res.ok) throw new Error(`Error: ${res.status}`);
             const data = await res.json();
-            
             const tipo = archivo.type.startsWith('image/') ? 'image' : 'pdf';
-            
-            const recurso = {
-                titulo: titulo,
-                categoria: categoria,
-                descripcion: descripcion || "",
-                url: data.secure_url,
-                public_id: data.public_id,
-                resource_type: data.resource_type,
-                tipo: tipo,
-                fecha: new Date().toISOString()
-            };
-            
+            const recurso = { titulo: titulo, categoria: categoria, descripcion: descripcion || "", url: data.secure_url, public_id: data.public_id, resource_type: data.resource_type, tipo: tipo, fecha: new Date().toISOString() };
             await coleccionRecursos.add(recurso);
-            
             document.getElementById('recursoTitulo').value = '';
             document.getElementById('recursoDescripcion').value = '';
             document.getElementById('recursoArchivo').value = '';
             document.getElementById('previewArchivo').innerHTML = '';
-            
             await cargarRecursosAdmin();
             mostrarToastExito('✓ Recurso subido exitosamente');
-            
         } catch (error) {
             console.error('Error:', error);
             mostrarToastError('❌ Error al subir el recurso: ' + (error.message || 'Error desconocido'));
-        } finally {
-            nuevoBtn.disabled = false;
-            nuevoBtn.innerHTML = textoOriginal;
-        }
+        } finally { nuevoBtn.disabled = false; nuevoBtn.innerHTML = textoOriginal; }
     });
 }
 
@@ -744,12 +559,9 @@ function initPreviewArchivo() {
         const previewDiv = document.getElementById('previewArchivo');
         const file = e.target.files[0];
         if (!file) { previewDiv.innerHTML = ''; return; }
-
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
-            reader.onload = (ev) => {
-                previewDiv.innerHTML = `<img src="${ev.target.result}" style="max-width:100px;max-height:100px;border-radius:8px;">`;
-            };
+            reader.onload = (ev) => { previewDiv.innerHTML = `<img src="${ev.target.result}" style="max-width:100px;max-height:100px;border-radius:8px;">`; };
             reader.readAsDataURL(file);
         } else {
             const icon = file.type === 'application/pdf' ? '📄' : '📎';
@@ -758,12 +570,32 @@ function initPreviewArchivo() {
     });
 }
 
-// ========== INICIALIZACIÓN PRINCIPAL ==========
+function initTabUsuarios() {
+    if (typeof initUsuarios === 'function') initUsuarios();
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (!requireAuth()) return;
 
     await loadDatabase();
 
+    // ========== 1. PRIMERO: Configurar permisos (antes de mostrar cualquier tab) ==========
+    const permisos = getPermisosUsuario();
+    console.log('📌 Permisos del usuario:', permisos);
+    
+    // Ocultar/Mostrar tabs según permisos
+    const tabsIds = ['tab1', 'tab2', 'tab3', 'tab4', 'tab5', 'tab6', 'tab7'];
+    for (const tabId of tabsIds) {
+        const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+        if (tabBtn) {
+            tabBtn.style.display = permisos.includes(tabId) ? 'flex' : 'none';
+        }
+    }
+    configurarBotonesAdmin(permisos);
+    // ========== ACTUALIZAR BADGE DEL USUARIO ==========
+    actualizarUserBadge();
+
+    // ========== 2. Inicializar el resto ==========
     const anioActual = new Date().getFullYear();
     window.anioSeleccionado = anioActual;
     await asegurarDBCloud(anioActual);
@@ -778,23 +610,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     initSubirRecurso();
     initPreviewArchivo();
 
-    document.getElementById('btnVistaPrevia').onclick    = generarVistaPrevia;
+    document.getElementById('btnVistaPrevia').onclick = generarVistaPrevia;
     document.getElementById('btnConfirmarEnviar').onclick = subirYEnviar;
-    document.getElementById('btnLogout').onclick          = logout;
-    document.getElementById('grupo').onchange             = checkOtroGrupo;
+    document.getElementById('btnLogout').onclick = logout;
+    document.getElementById('grupo').onchange = checkOtroGrupo;
     document.getElementById('selectAnioControl').onchange = cambiarAnioControl;
 
-    // ========== TABS ==========
-    const tabs        = document.querySelectorAll('.tab-btn');
+    // ========== 3. Configurar TABS ==========
+    const tabs = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
     async function activateTab(tabId) {
         tabs.forEach(t => t.classList.remove('active'));
         tabContents.forEach(c => c.classList.remove('active'));
-
         document.querySelector(`.tab-btn[data-tab="${tabId}"]`)?.classList.add('active');
         document.getElementById(tabId)?.classList.add('active');
-
         if (tabId === 'tab2') renderTabla();
         if (tabId === 'tab3') await cargarEventosAdmin();
         if (tabId === 'tab4') await cargarContraseñasAdmin();
@@ -803,10 +633,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             await cargarListaCategoriasAdmin();
         }
         if (tabId === 'tab6') {
-            if (typeof cargarHistorialRecibos === 'function') {
-                await cargarHistorialRecibos();
-            }
+            if (typeof cargarHistorialRecibos === 'function') await cargarHistorialRecibos();
         }
+        if (tabId === 'tab7') initTabUsuarios();
     }
 
     tabs.forEach(tab => {
@@ -816,141 +645,88 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    await activateTab('tab1');
+    // Activar el primer tab permitido
+    let firstAllowedTab = tabsIds.find(tabId => permisos.includes(tabId));
+    if (!firstAllowedTab) firstAllowedTab = 'tab1';
+    await activateTab(firstAllowedTab);
 
-    // ========== SELECTOR DE EMOJIS ==========
-    const btnAbrirEmojis    = document.getElementById('btnAbrirEmojis');
-    const emojiSelector     = document.getElementById('emojiSelector');
+    // ========== 4. Selector de emojis ==========
+    const btnAbrirEmojis = document.getElementById('btnAbrirEmojis');
+    const emojiSelector = document.getElementById('emojiSelector');
     const categoriaIconoInput = document.getElementById('categoriaIcono');
-
     if (btnAbrirEmojis && emojiSelector) {
-        btnAbrirEmojis.onclick = (e) => {
-            e.stopPropagation();
-            emojiSelector.style.display = emojiSelector.style.display === 'none' ? 'block' : 'none';
-        };
-
-        document.addEventListener('click', (e) => {
-            if (!btnAbrirEmojis.contains(e.target) && !emojiSelector.contains(e.target)) {
-                emojiSelector.style.display = 'none';
-            }
-        });
-
-        document.querySelectorAll('.emoji-option').forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                if (categoriaIconoInput) categoriaIconoInput.value = btn.dataset.emoji;
-                emojiSelector.style.display = 'none';
-            };
-        });
+        btnAbrirEmojis.onclick = (e) => { e.stopPropagation(); emojiSelector.style.display = emojiSelector.style.display === 'none' ? 'block' : 'none'; };
+        document.addEventListener('click', (e) => { if (!btnAbrirEmojis.contains(e.target) && !emojiSelector.contains(e.target)) emojiSelector.style.display = 'none'; });
+        document.querySelectorAll('.emoji-option').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); if (categoriaIconoInput) categoriaIconoInput.value = btn.dataset.emoji; emojiSelector.style.display = 'none'; }; });
     }
 
-    // ========== AGREGAR EVENTO ==========
-// ========== AGREGAR EVENTO ==========
-document.getElementById('btnAgregarEvento')?.addEventListener('click', async () => {
-    const fecha       = document.getElementById('eventoFecha').value;
-    const titulo      = document.getElementById('eventoTitulo').value.trim();
-    const lugar       = document.getElementById('eventoLugar').value.trim();
-    const descripcion = document.getElementById('eventoDescripcion').value.trim();
-    const color       = document.getElementById('eventoColor').value;
+    // ========== 5. Agregar Evento ==========
+    document.getElementById('btnAgregarEvento')?.addEventListener('click', async () => {
+        const fecha = document.getElementById('eventoFecha').value;
+        const titulo = document.getElementById('eventoTitulo').value.trim();
+        const lugar = document.getElementById('eventoLugar').value.trim();
+        const descripcion = document.getElementById('eventoDescripcion').value.trim();
+        const color = document.getElementById('eventoColor').value;
+        if (!fecha) { mostrarToastError('❌ Selecciona una fecha'); return; }
+        if (!color) { mostrarToastError('❌ Selecciona un color para la actividad'); return; }
+        const tituloFinal = titulo || '📅 Actividad sin título';
+        await agregarEvento(fecha, tituloFinal, lugar, descripcion, color);
+        ['eventoFecha', 'eventoTitulo', 'eventoLugar', 'eventoDescripcion'].forEach(id => { document.getElementById(id).value = ''; });
+        document.getElementById('eventoColor').value = '';
+        await cargarEventosAdmin();
+        mostrarToastExito('✓ Actividad agregada');
+    });
 
-    if (!fecha)  { mostrarToastError('❌ Selecciona una fecha'); return; }
-    // ❌ ELIMINADA la validación del título
-    if (!color)  { mostrarToastError('❌ Selecciona un color para la actividad'); return; }
-
-    // Si el título está vacío, usar un valor por defecto
-    const tituloFinal = titulo || ' ';
-
-    await agregarEvento(fecha, tituloFinal, lugar, descripcion, color);
-
-    ['eventoFecha', 'eventoTitulo', 'eventoLugar', 'eventoDescripcion']
-        .forEach(id => { document.getElementById(id).value = ''; });
-    document.getElementById('eventoColor').value = '';
-
-    await cargarEventosAdmin();
-    mostrarToastExito('✓ Actividad agregada');
-});
-
-    // ========== AGREGAR CATEGORÍA ==========
+    // ========== 6. Agregar Categoría ==========
     document.getElementById('btnAgregarCategoria')?.addEventListener('click', async () => {
         const nombre = document.getElementById('categoriaNombre').value.trim();
-        const icono  = document.getElementById('categoriaIcono').value.trim() || '📁';
-
+        const icono = document.getElementById('categoriaIcono').value.trim() || '📁';
         if (!nombre) { mostrarToastError('❌ Ingresa un nombre para la categoría'); return; }
-
         await agregarCategoria(nombre, icono);
         document.getElementById('categoriaNombre').value = '';
-        document.getElementById('categoriaIcono').value  = '';
+        document.getElementById('categoriaIcono').value = '';
         await cargarListaCategoriasAdmin();
         await cargarSelectCategorias();
         mostrarToastExito('✓ Categoría agregada');
     });
 
-    // ========== MODAL RESET ==========
-    const modalReset     = document.getElementById('modalReset');
-    const btnReset       = document.getElementById('btnReset');
+    // ========== 7. Modal Reset ==========
+    const modalReset = document.getElementById('modalReset');
+    const btnReset = document.getElementById('btnReset');
     const btnCancelReset = document.getElementById('btnCancelReset');
     const btnConfirmReset = document.getElementById('btnConfirmReset');
-
-    if (btnReset) {
-        btnReset.onclick = () => {
-            if (modalReset) {
-                modalReset.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
-        };
-    }
-
-    if (btnCancelReset) {
-        btnCancelReset.onclick = () => {
-            if (modalReset) {
-                modalReset.style.display = 'none';
-                document.body.style.overflow = '';
-            }
-        };
-    }
-
+    if (btnReset) { btnReset.onclick = () => { if (modalReset) { modalReset.style.display = 'flex'; document.body.style.overflow = 'hidden'; } }; }
+    if (btnCancelReset) { btnCancelReset.onclick = () => { if (modalReset) { modalReset.style.display = 'none'; document.body.style.overflow = ''; } }; }
     if (btnConfirmReset) {
         btnConfirmReset.onclick = async () => {
             const getId = (id) => document.getElementById(id)?.checked || false;
             const opciones = {
-                pagos:       getId('resetPagos'),
-                actividades: getId('resetActividades'),
-                passwords:   getId('resetPasswords'),
-                recibos:     getId('resetRecibos'),
-                biblioteca:  getId('resetBiblioteca'),
-                categorias:  getId('resetCategorias'),
-                historial:   getId('resetHistorial'),
-                significados: getId('resetSignificados')
+                pagos: getId('resetPagos'), actividades: getId('resetActividades'), passwords: getId('resetPasswords'),
+                recibos: getId('resetRecibos'), biblioteca: getId('resetBiblioteca'), categorias: getId('resetCategorias'),
+                historial: getId('resetHistorial'), significados: getId('resetSignificados')
             };
-
-            if (!Object.values(opciones).some(Boolean)) {
-                mostrarToastError('❌ Selecciona al menos un elemento para reiniciar');
-                return;
-            }
-
-            const confirmado = await mostrarConfirmacion({
-                titulo: "⚠️ Reiniciar Sistema",
-                icono: "⚠️",
-                mensaje: "¿Estás seguro de reiniciar los elementos seleccionados?",
-                advertencia: "Esta acción NO se puede deshacer."
-            });
-
+            if (!Object.values(opciones).some(Boolean)) { mostrarToastError('❌ Selecciona al menos un elemento para reiniciar'); return; }
+            const confirmado = await mostrarConfirmacion({ titulo: "⚠️ Reiniciar Sistema", icono: "⚠️", mensaje: "¿Estás seguro de reiniciar los elementos seleccionados?", advertencia: "Esta acción NO se puede deshacer." });
             if (confirmado) {
-                if (modalReset) {
-                    modalReset.style.display = 'none';
-                    document.body.style.overflow = '';
-                }
+                if (modalReset) { modalReset.style.display = 'none'; document.body.style.overflow = ''; }
                 await resetSistema(opciones);
             }
         };
     }
-
-    window.addEventListener('click', (e) => {
-        if (e.target === modalReset) {
-            modalReset.style.display = 'none';
-            document.body.style.overflow = '';
-        }
-    });
-
+    window.addEventListener('click', (e) => { if (e.target === modalReset) { modalReset.style.display = 'none'; document.body.style.overflow = ''; } });
     mostrarToastExito('✓ Panel administrativo listo');
 });
+
+// Función para actualizar el badge del usuario
+function actualizarUserBadge() {
+    const nombre = sessionStorage.getItem('admin_nombre') || 
+                   sessionStorage.getItem('admin_username') || 
+                   'Administrador';
+    const userBadge = document.getElementById('userBadge');
+    if (userBadge) {
+        userBadge.textContent = nombre;
+        console.log('✅ Badge actualizado a:', nombre);
+    } else {
+        console.log('⚠️ No se encontró el elemento userBadge');
+    }
+}

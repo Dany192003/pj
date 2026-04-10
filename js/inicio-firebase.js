@@ -20,3 +20,4 @@ const coleccionRecursos    = dbFirestore.collection('recursos');
 const coleccionCategorias  = dbFirestore.collection('categorias');
 const coleccionHistorialRecibos = dbFirestore.collection('historial_recibos');
 const coleccionSignificadosColores = dbFirestore.collection('significados_colores');
+const coleccionUsuarios = dbFirestore.collection('usuarios');
