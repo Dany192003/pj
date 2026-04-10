@@ -9,6 +9,9 @@ window.showToast = function(message, isError = false) {
     setTimeout(() => { toast.className = 'toast'; }, 2000);
 };
 
+function mostrarToastExito(mensaje) { window.showToast(mensaje, false); }
+function mostrarToastError(mensaje) { window.showToast(mensaje, true); }
+
 document.addEventListener('DOMContentLoaded', async () => {
     await loadDatabase();
     await initCalendar();
@@ -81,4 +84,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (closeDesarrollador) closeDesarrollador.addEventListener('click', () => { modalDesarrollador.style.display = 'none'; });
         window.addEventListener('click', (e) => { if (e.target === modalDesarrollador) modalDesarrollador.style.display = 'none'; });
     }
+
+    // Restablecer contraseña
+    const btnRestablecer = document.getElementById('btnRestablecerPassword');
+    if (btnRestablecer) {
+        btnRestablecer.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await restablecerMiPassword();
+        });
+    }
 });
+
+async function restablecerMiPassword() {
+    const username = document.getElementById('adminUsername').value.trim();
+    
+    if (!username) {
+        mostrarToastError('❌ Ingresa tu nombre de usuario primero');
+        return;
+    }
+    
+    try {
+        const snapshot = await coleccionUsuarios.where('username', '==', username).get();
+        
+        if (snapshot.empty) {
+            mostrarToastError('❌ Usuario no encontrado');
+            return;
+        }
+        
+        const userDoc = snapshot.docs[0];
+        const email = userDoc.data().email;
+        
+        if (!email) {
+            mostrarToastError('❌ Este usuario no tiene correo asociado');
+            return;
+        }
+        
+        await firebase.auth().sendPasswordResetEmail(email);
+        mostrarToastExito(`✓ Se ha enviado un enlace de restablecimiento a ${email}`);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarToastError('❌ Error al enviar el enlace');
+    }
+}

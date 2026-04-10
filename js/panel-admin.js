@@ -730,3 +730,43 @@ function actualizarUserBadge() {
         console.log('⚠️ No se encontró el elemento userBadge');
     }
 }
+
+// Función para cambiar contraseña del usuario actual
+async function cambiarMiContraseña() {
+    const nuevaPassword = prompt('🔑 Ingresa tu nueva contraseña (mínimo 6 caracteres):');
+    
+    if (!nuevaPassword) return;
+    
+    if (nuevaPassword.length < 6) {
+        mostrarToastError('❌ La contraseña debe tener al menos 6 caracteres');
+        return;
+    }
+    
+    const confirmar = prompt('🔑 Confirma tu nueva contraseña:');
+    
+    if (nuevaPassword !== confirmar) {
+        mostrarToastError('❌ Las contraseñas no coinciden');
+        return;
+    }
+    
+    try {
+        const user = firebase.auth().currentUser;
+        if (user) {
+            await user.updatePassword(nuevaPassword);
+            mostrarToastExito('✓ Contraseña actualizada correctamente');
+            console.log('✅ Contraseña actualizada para:', user.email);
+        } else {
+            mostrarToastError('❌ No hay usuario autenticado');
+        }
+    } catch (error) {
+        console.error('Error al cambiar contraseña:', error);
+        let mensaje = 'Error al cambiar contraseña';
+        if (error.code === 'auth/requires-recent-login') {
+            mensaje = '⚠️ Por seguridad, cierra sesión y vuelve a iniciar para cambiar la contraseña';
+        }
+        mostrarToastError(mensaje);
+    }
+}
+
+// Agregar el evento al botón (dentro del DOMContentLoaded)
+document.getElementById('btnCambiarPassword')?.addEventListener('click', cambiarMiContraseña);

@@ -6,6 +6,7 @@ function obtenerEmailPorUsername(username) {
     }
     return `${username}@pastoral.local`;
 }
+// js/autenticacion.js - Autenticación con username
 
 async function login(username, password) {
     console.log('🔐 Intentando login con usuario:', username);
@@ -14,41 +15,38 @@ async function login(username, password) {
         return { success: false, message: 'Ingresa usuario y contraseña' };
     }
     
-    const email = obtenerEmailPorUsername(username);
-    console.log('📧 Email correspondiente:', email);
-    
     try {
-        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-        const user = userCredential.user;
+        // Buscar el usuario por username en Firestore
+        const snapshot = await coleccionUsuarios.where('username', '==', username).get();
         
-        let permisos = ['tab1', 'tab2', 'tab3', 'tab4', 'tab5', 'tab6', 'tab7'];
-        let nombre = username;
-        
-        try {
-            const doc = await coleccionUsuarios.doc(user.uid).get();
-            if (doc.exists) {
-                permisos = doc.data().permisos || permisos;
-                nombre = doc.data().nombre || username;
-                console.log('✅ Permisos cargados:', permisos);
-                console.log('✅ Nombre del usuario:', nombre);
-            }
-        } catch (e) {
-            console.log('Error al cargar datos del usuario:', e);
+        if (snapshot.empty) {
+            return { success: false, message: 'Usuario no encontrado' };
         }
+        
+        const userDoc = snapshot.docs[0];
+        const userData = userDoc.data();
+        const email = userData.email;
+        
+        if (!email) {
+            return { success: false, message: 'Usuario sin correo asociado' };
+        }
+        
+        // Autenticar con Firebase usando el correo real
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
         
         sessionStorage.setItem('admin_auth', 'true');
         sessionStorage.setItem('admin_username', username);
-        sessionStorage.setItem('admin_nombre', nombre);
-        sessionStorage.setItem('admin_permisos', JSON.stringify(permisos));
+        sessionStorage.setItem('admin_nombre', userData.nombre || username);
+        sessionStorage.setItem('admin_permisos', JSON.stringify(userData.permisos || []));
         sessionStorage.setItem('admin_last_activity', Date.now().toString());
         
-        return { success: true, message: 'Login exitoso', permisos: permisos, nombre: nombre };
+        return { success: true, message: 'Login exitoso', permisos: userData.permisos || [] };
         
     } catch (error) {
         console.error('Error:', error);
         let mensaje = 'Credenciales incorrectas';
-        if (error.code === 'auth/user-not-found') mensaje = 'Usuario no encontrado';
-        else if (error.code === 'auth/wrong-password') mensaje = 'Contraseña incorrecta';
+        if (error.code === 'auth/wrong-password') mensaje = 'Contraseña incorrecta';
+        else if (error.code === 'auth/user-not-found') mensaje = 'Usuario no encontrado';
         return { success: false, message: mensaje };
     }
 }
@@ -97,4 +95,3 @@ window.logout = logout;
 window.isAuthenticated = isAuthenticated;
 window.requireAuth = requireAuth;
 window.redirectIfAuthenticated = redirectIfAuthenticated;
-window.obtenerEmailPorUsername = obtenerEmailPorUsername;
