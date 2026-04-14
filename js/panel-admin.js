@@ -176,8 +176,22 @@ async function cargarEventosAdmin() {
     });
 }
 
-
-// ========== CONTRASEÑAS ==========
+// Función para cargar CSS exclusivo del administrador
+function cargarCSSAdministrador() {
+    const username = sessionStorage.getItem('admin_username');
+    
+    // Si es el administrador dany, cargar CSS personalizado
+    if (username === 'dany') {
+        if (!document.getElementById('admin-dany-css')) {
+            const link = document.createElement('link');
+            link.id = 'admin-dany-css';
+            link.rel = 'stylesheet';
+            link.href = 'css/estilos-admin-dany.css';
+            document.head.appendChild(link);
+            console.log('🎨 Estilos exclusivos para administrador cargados');
+        }
+    }
+}
 // ========== CONTRASEÑAS ==========
 async function cargarContraseñasAdmin() {
     const gruposPassList = document.getElementById('gruposPassList');
@@ -842,6 +856,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     configurarBotonesAdmin(permisos);
     // ========== ACTUALIZAR BADGE DEL USUARIO ==========
     actualizarUserBadge();
+    cargarCSSAdministrador();
 
     // ========== 2. Inicializar el resto ==========
     const anioActual = new Date().getFullYear();
