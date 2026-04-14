@@ -1969,3 +1969,44 @@
         justify-content: center;
     }
 }
+
+/* ========== INDICADOR PERMANENTE DE CONTRASEÑA GUARDADA ========== */
+.pass-status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    padding: 4px 10px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #15803d;
+    border: 1px solid #86efac;
+    animation: fadeInScale 0.3s ease;
+}
+
+.pass-status-check {
+    font-size: 12px;
+}
+
+.pass-status-text {
+    font-size: 11px;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Efecto hover en el indicador */
+.pass-status-indicator:hover {
+    background: linear-gradient(135deg, #bbf7d0, #86efac);
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}

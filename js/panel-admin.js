@@ -176,6 +176,7 @@ async function cargarEventosAdmin() {
     });
 }
 
+
 // ========== CONTRASEÑAS ==========
 // ========== CONTRASEÑAS ==========
 async function cargarContraseñasAdmin() {
@@ -184,22 +185,28 @@ async function cargarContraseñasAdmin() {
 
     const passwords = await cargarContraseñasGrupos();
 
-    gruposPassList.innerHTML = GRUPOS.map(grupo => `
-        <div class="grupo-pass-item" data-grupo="${escapeHtml(grupo)}">
-            <span><strong>👥 ${escapeHtml(grupo)}</strong></span>
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                <input type="text" id="pass-${escapeHtml(grupo)}" placeholder="Contraseña" value="${passwords[grupo] || ''}" class="pass-input">
-                <button class="save-pass-btn" data-grupo="${escapeHtml(grupo)}">💾 Guardar</button>
-                <span class="pass-status" id="status-${escapeHtml(grupo)}" style="font-size: 12px; display: none;"></span>
+    gruposPassList.innerHTML = GRUPOS.map(grupo => {
+        const tienePassword = passwords[grupo] && passwords[grupo].trim() !== '';
+        return `
+            <div class="grupo-pass-item" data-grupo="${escapeHtml(grupo)}">
+                <span><strong>👥 ${escapeHtml(grupo)}</strong></span>
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <input type="text" id="pass-${escapeHtml(grupo)}" placeholder="Contraseña" value="${passwords[grupo] || ''}" class="pass-input">
+                    <button class="save-pass-btn" data-grupo="${escapeHtml(grupo)}">💾 Guardar</button>
+                    <span class="pass-status-indicator" id="status-indicator-${escapeHtml(grupo)}" style="display: ${tienePassword ? 'inline-flex' : 'none'};">
+                        <span class="pass-status-check">✅</span>
+                        <span class="pass-status-text">Guardada</span>
+                    </span>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     document.querySelectorAll('.save-pass-btn').forEach(btn => {
         btn.onclick = async () => {
             const grupo = btn.dataset.grupo;
             const password = document.getElementById(`pass-${grupo}`).value.trim();
-            const statusSpan = document.getElementById(`status-${grupo}`);
+            const indicator = document.getElementById(`status-indicator-${grupo}`);
             
             if (!password) { 
                 mostrarToastError("❌ Ingresa una contraseña"); 
@@ -210,31 +217,16 @@ async function cargarContraseñasAdmin() {
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-small"></span> Guardando...';
             
-            if (statusSpan) {
-                statusSpan.style.display = 'inline-flex';
-                statusSpan.style.alignItems = 'center';
-                statusSpan.style.gap = '4px';
-                statusSpan.innerHTML = '⏳ Guardando...';
-                statusSpan.style.color = '#f59e0b';
-            }
-            
             await guardarContraseñaGrupo(grupo, password);
             
-            // Mostrar mensaje de éxito
-            if (statusSpan) {
-                statusSpan.innerHTML = '✅ Guardado';
-                statusSpan.style.color = '#10b981';
+            // Mostrar indicador permanente
+            if (indicator) {
+                indicator.style.display = 'inline-flex';
+                indicator.style.animation = 'fadeInScale 0.3s ease';
             }
             
             btn.innerHTML = '💾 Guardar';
             btn.disabled = false;
-            
-            // Ocultar mensaje después de 3 segundos
-            setTimeout(() => {
-                if (statusSpan) {
-                    statusSpan.style.display = 'none';
-                }
-            }, 3000);
             
             mostrarToastExito(`✓ Contraseña guardada para ${grupo}`);
         };
@@ -641,7 +633,7 @@ function renderizarTablaGrupos() {
     if (!tbody) return;
     
     if (listaGrupos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">📭 No hay grupos configurados. Usa "Agregar Grupo" para empezar.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">📭 No hay coordinadores agregados. Usa "Agregar coordinador" para empezar.</td></tr>';
         return;
     }
     
