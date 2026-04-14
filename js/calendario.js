@@ -5,8 +5,19 @@ let currentYear = currentDate.getFullYear();
 let currentMonth = currentDate.getMonth();
 let eventosGlobal = [];
 
-async function initCalendar() {
-    eventosGlobal = await cargarEventos();
+// ========== CARGA RÁPIDA CON CACHÉ LOCAL ==========
+async function initCalendarLocal() {
+    // Intentar cargar datos del localStorage
+    const eventosLocal = localStorage.getItem('eventos_cache');
+    
+    if (eventosLocal) {
+        eventosGlobal = JSON.parse(eventosLocal);
+        console.log('📦 Calendario cargado desde caché local');
+    } else {
+        eventosGlobal = [];
+        console.log('📦 No hay caché, mostrando calendario vacío');
+    }
+    
     renderCalendar();
     generarLeyendaColores();
     crearModalActividad();
@@ -27,6 +38,48 @@ async function initCalendar() {
     
     if (nextBtn) {
         nextBtn.addEventListener("click", () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+    }
+}
+
+// ========== CARGA COMPLETA DESDE FIREBASE ==========
+async function initCalendar() {
+    eventosGlobal = await cargarEventos();
+    
+    // Guardar en localStorage para próxima vez
+    localStorage.setItem('eventos_cache', JSON.stringify(eventosGlobal));
+    
+    renderCalendar();
+    generarLeyendaColores();
+    crearModalActividad();
+    
+    const prevBtn = document.getElementById("prevMonth");
+    const nextBtn = document.getElementById("nextMonth");
+    
+    if (prevBtn) {
+        // Remover eventos anteriores para evitar duplicados
+        const newPrevBtn = prevBtn.cloneNode(true);
+        prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
+        newPrevBtn.addEventListener("click", () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+    }
+    
+    if (nextBtn) {
+        const newNextBtn = nextBtn.cloneNode(true);
+        nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+        newNextBtn.addEventListener("click", () => {
             currentMonth++;
             if (currentMonth > 11) {
                 currentMonth = 0;
@@ -202,7 +255,6 @@ function crearModalActividad() {
     if (closeBtn) closeBtn.onclick = () => modal.style.display = "none";
     if (cerrarBtn) cerrarBtn.onclick = () => modal.style.display = "none";
     
-    // Cerrar al hacer clic fuera del contenido
     window.onclick = (event) => { 
         if (event.target === modal) modal.style.display = "none"; 
     };
@@ -258,7 +310,6 @@ function mostrarDetalleActividad(eventos, dia) {
         body.innerHTML = `<div class="actividades-lista">${actividadesHtml}</div>`;
     }
     
-    // Forzar centrado - eliminar cualquier estilo inline
     modal.style.display = "flex";
     modal.style.alignItems = "center";
     modal.style.justifyContent = "center";
@@ -287,7 +338,6 @@ function mostrarSinActividades(dia) {
         </div>
     `;
     
-    // Forzar centrado
     modal.style.display = "flex";
     modal.style.alignItems = "center";
     modal.style.justifyContent = "center";

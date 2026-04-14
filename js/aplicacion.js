@@ -13,8 +13,16 @@ function mostrarToastExito(mensaje) { window.showToast(mensaje, false); }
 function mostrarToastError(mensaje) { window.showToast(mensaje, true); }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadDatabase();
-    await initCalendar();
+    // ========== CARGA RÁPIDA: Mostrar calendario con caché local ==========
+    await initCalendarLocal();
+    
+    // ========== CARGA EN SEGUNDO PLANO: Actualizar desde Firebase ==========
+    loadDatabase().then(async () => {
+        await initCalendar();
+        console.log('✅ Datos actualizados desde la nube');
+    }).catch(error => {
+        console.error('Error al cargar datos desde la nube:', error);
+    });
 
     const modal         = document.getElementById('loginModal');
     const btnAdminLogin = document.getElementById('btnAdminLogin');
@@ -43,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     btnLogin?.addEventListener('click', async () => {
         const username = adminUsername?.value.trim();
-        const password = adminPassword.value;
+        const password = adminPassword?.value;
         
         if (!username) {
             loginError.textContent = 'Ingresa tu nombre de usuario';
