@@ -23,7 +23,7 @@ function renderizarTablaUsuarios() {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 No hay usuarios registrados<\/td><\/tr>';
         return;
     }
-    const permisosMap = { 'tab1': '📄', 'tab2': '📊', 'tab3': '📅', 'tab4': '🔑', 'tab5': '📚', 'tab6': '📜', 'tab7': '👥' };
+    const permisosMap = { 'tab1': '📄', 'tab2': '📊', 'tab3': '📅', 'tab4': '🔑', 'tab5': '📚', 'tab6': '📜', 'tab7': '👥' , 'tab8': '👨‍💼'};
     
     tbody.innerHTML = listaUsuarios.map(usuario => {
         const permisosLista = usuario.permisos || [];
