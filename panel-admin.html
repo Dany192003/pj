@@ -56,6 +56,7 @@
         <button class="tab-btn" data-tab="tab5">📚 Biblioteca</button>
         <button class="tab-btn" data-tab="tab6">📜 Historial Recibos</button>
         <button class="tab-btn" data-tab="tab7">👥 Usuarios</button>
+        <button class="tab-btn" data-tab="tab8">📋 Grupos</button>
     </div>
 
     <!-- Tab 1: Generar Recibos -->
@@ -357,6 +358,51 @@
                 </thead>
                 <tbody id="tablaUsuariosBody">
                     <tr><td colspan="6" style="text-align:center; padding:40px;">Cargando usuarios...<\/td><\/tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- Tab 8: Grupos -->
+<!-- Tab 8: Grupos -->
+<div id="tab8" class="tab-content">
+    <div class="card">
+        <div class="section-title">📋 Gestionar Información de Grupos</div>
+        
+        <!-- Formulario para agregar nuevo grupo -->
+        <div class="form-agregar-grupo">
+            <div class="section-title">
+                <span>➕</span> Agregar Nuevo Grupo
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label>👥 Nombre del grupo</label>
+                    <input type="text" id="nuevoGrupoNombre" placeholder="Ej: Juventud Misionera" class="grupo-input">
+                </div>
+                <div class="field">
+                    <label>👤 Coordinador</label>
+                    <input type="text" id="nuevoGrupoCoordinador" placeholder="Nombre del coordinador" class="grupo-input">
+                </div>
+                <div class="field">
+                    <label>📱 Teléfono</label>
+                    <input type="tel" id="nuevoGrupoTelefono" placeholder="Ej: 50212345678" class="grupo-input">
+                </div>
+            </div>
+            <button id="btnAgregarGrupoForm" class="btn-agregar-grupo">
+                <span>➕</span> Agregar Grupo
+            </button>
+        </div>
+        
+        <!-- Tabla de grupos existentes -->
+        <div style="overflow-x: auto; margin-top: 20px;">
+            <table class="tabla-grupos">
+                <thead>
+                    <tr><th>👥 Grupo</th><th>👤 Coordinador</th><th>📱 Teléfono</th><th>⚙️ Acciones</th></tr>
+                </thead>
+                <tbody id="tablaGruposBody">
+                    <tr><td colspan="4" style="text-align:center; padding:40px;">📜 Cargando grupos...<\/td><\/tr>
                 </tbody>
             </table>
         </div>

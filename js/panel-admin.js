@@ -1,4 +1,5 @@
 // js/panel-admin.js - Panel administrativo completo
+
 // Función para actualizar el badge del usuario
 function actualizarUserBadge() {
     const nombre = sessionStorage.getItem('admin_nombre') || 
@@ -9,6 +10,7 @@ function actualizarUserBadge() {
         userBadge.textContent = nombre;
     }
 }
+
 // Función para ocultar botones de administrador (solo admin los ve)
 function configurarBotonesAdmin(permisos) {
     const esAdmin = permisos.includes('tab7'); // tab7 es Usuarios (solo admin)
@@ -22,7 +24,6 @@ function configurarBotonesAdmin(permisos) {
         btnReset.style.display = esAdmin ? 'flex' : 'none';
     }
 }
-// Dentro de DOMContentLoaded, después de configurar permisos, llamar:
 
 // Verificar autenticación primero
 if (!requireAuth()) {
@@ -574,6 +575,222 @@ function initTabUsuarios() {
     if (typeof initUsuarios === 'function') initUsuarios();
 }
 
+// ========== GESTIÓN DE GRUPOS (NUEVO TAB8) ==========
+let listaGrupos = [];
+
+async function cargarGrupos() {
+    const tbody = document.getElementById('tablaGruposBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">📜 Cargando grupos...<\/td><\/tr>';
+    
+    try {
+        const snapshot = await coleccionGruposInfo.get();
+        listaGrupos = [];
+        snapshot.forEach(doc => {
+            listaGrupos.push({ id: doc.id, ...doc.data() });
+        });
+        renderizarTablaGrupos();
+    } catch (error) {
+        console.error('Error cargando grupos:', error);
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">❌ Error al cargar grupos<\/td><\/tr>';
+    }
+}
+
+function renderizarTablaGrupos() {
+    const tbody = document.getElementById('tablaGruposBody');
+    if (!tbody) return;
+    
+    if (listaGrupos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">📭 No hay grupos configurados. Usa "Agregar Grupo" para empezar.</td></tr>';
+        return;
+    }
+    
+    let html = '';
+    for (const grupo of listaGrupos) {
+        html += `
+            <tr>
+                <td><strong>${escapeHtml(grupo.grupo)}</strong></td>
+                <td>${escapeHtml(grupo.coordinador || '-')}</td>
+                <td>${escapeHtml(grupo.telefono || '-')}</td>
+                <td>
+                    <button class="btn-editar-grupo" data-id="${grupo.id}" data-grupo="${grupo.grupo}" data-coordinador="${grupo.coordinador || ''}" data-telefono="${grupo.telefono || ''}">✏️ Editar</button>
+                    <button class="btn-eliminar-grupo" data-id="${grupo.id}" data-grupo="${grupo.grupo}">🗑️ Eliminar</button>
+                </td>
+            </tr>
+        `;
+    }
+    tbody.innerHTML = html;
+    
+    document.querySelectorAll('.btn-editar-grupo').forEach(btn => {
+        btn.onclick = () => editarGrupo(btn.dataset.id, btn.dataset.grupo, btn.dataset.coordinador, btn.dataset.telefono);
+    });
+    
+    document.querySelectorAll('.btn-eliminar-grupo').forEach(btn => {
+        btn.onclick = async () => {
+            if (confirm(`¿Eliminar la información del grupo "${btn.dataset.grupo}"?`)) {
+                await coleccionGruposInfo.doc(btn.dataset.id).delete();
+                await cargarGrupos();
+                mostrarToastExito('✓ Información del grupo eliminada');
+            }
+        };
+    });
+}
+
+// Modal de edición de grupo (con estilos)
+function editarGrupo(id, grupoActual, coordinadorActual, telefonoActual) {
+    // Crear modal si no existe
+    let modal = document.getElementById('modalEditarGrupo');
+    if (!modal) {
+        const modalHTML = `
+            <div id="modalEditarGrupo" class="modal-editar-grupo">
+                <div class="modal-editar-grupo-content">
+                    <div class="modal-editar-grupo-header">
+                        <h3>✏️ Editar Grupo</h3>
+                        <button class="modal-editar-grupo-close">&times;</button>
+                    </div>
+                    <div class="modal-editar-grupo-body">
+                        <div class="form-editar-grupo">
+                            <div class="form-grupo-field">
+                                <label>🏷️ Nombre del grupo</label>
+                                <input type="text" id="editGrupoNombre" class="form-editar-input" placeholder="Nombre del grupo">
+                            </div>
+                            <div class="form-grupo-field">
+                                <label>👤 Coordinador</label>
+                                <input type="text" id="editGrupoCoordinador" class="form-editar-input" placeholder="Nombre del coordinador">
+                            </div>
+                            <div class="form-grupo-field">
+                                <label>📱 Teléfono</label>
+                                <input type="tel" id="editGrupoTelefono" class="form-editar-input" placeholder="Ej: 50212345678">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-editar-grupo-footer">
+                        <button class="btn-editar-grupo-cancelar">Cancelar</button>
+                        <button class="btn-editar-grupo-guardar">💾 Guardar cambios</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        modal = document.getElementById('modalEditarGrupo');
+        
+        // Eventos del modal
+        const closeBtn = modal.querySelector('.modal-editar-grupo-close');
+        const cancelBtn = modal.querySelector('.btn-editar-grupo-cancelar');
+        
+        closeBtn.onclick = () => modal.style.display = 'none';
+        cancelBtn.onclick = () => modal.style.display = 'none';
+        
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    }
+    
+    // Rellenar datos actuales
+    document.getElementById('editGrupoNombre').value = grupoActual;
+    document.getElementById('editGrupoCoordinador').value = coordinadorActual || '';
+    document.getElementById('editGrupoTelefono').value = telefonoActual || '';
+    
+    // Guardar ID del grupo para usarlo al guardar
+    modal.dataset.id = id;
+    modal.dataset.grupoActual = grupoActual;
+    
+    // Evento guardar (remover anterior para evitar duplicados)
+    const guardarBtn = modal.querySelector('.btn-editar-grupo-guardar');
+    const nuevoGuardarBtn = guardarBtn.cloneNode(true);
+    guardarBtn.parentNode.replaceChild(nuevoGuardarBtn, guardarBtn);
+    
+    nuevoGuardarBtn.onclick = async () => {
+        const nuevoNombre = document.getElementById('editGrupoNombre').value.trim();
+        const nuevoCoordinador = document.getElementById('editGrupoCoordinador').value.trim();
+        const nuevoTelefono = document.getElementById('editGrupoTelefono').value.trim();
+        
+        const updates = {};
+        if (nuevoNombre && nuevoNombre !== modal.dataset.grupoActual) updates.grupo = nuevoNombre;
+        if (nuevoCoordinador) updates.coordinador = nuevoCoordinador;
+        if (nuevoTelefono) updates.telefono = nuevoTelefono;
+        
+        if (Object.keys(updates).length === 0) {
+            modal.style.display = 'none';
+            return;
+        }
+        
+        nuevoGuardarBtn.disabled = true;
+        nuevoGuardarBtn.innerHTML = '<span class="spinner-small"></span> Guardando...';
+        
+        try {
+            await coleccionGruposInfo.doc(modal.dataset.id).update(updates);
+            await cargarGrupos();
+            mostrarToastExito('✓ Grupo actualizado correctamente');
+            modal.style.display = 'none';
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarToastError('❌ Error al actualizar el grupo');
+        } finally {
+            nuevoGuardarBtn.disabled = false;
+            nuevoGuardarBtn.innerHTML = '💾 Guardar cambios';
+        }
+    };
+    
+    modal.style.display = 'flex';
+}
+
+function agregarGrupoInicial(grupo) {
+    const existe = listaGrupos.find(g => g.grupo === grupo);
+    if (!existe) {
+        coleccionGruposInfo.add({
+            grupo: grupo,
+            coordinador: '',
+            telefono: ''
+        }).then(() => {
+            cargarGrupos();
+        }).catch(error => {
+            console.error('Error al agregar grupo:', error);
+        });
+    }
+}
+
+function initTabGrupos() {
+    cargarGrupos();
+    
+    // Botón del formulario para agregar grupo
+    const btnAgregarGrupoForm = document.getElementById('btnAgregarGrupoForm');
+    if (btnAgregarGrupoForm) {
+        btnAgregarGrupoForm.onclick = () => {
+            const nombre = document.getElementById('nuevoGrupoNombre')?.value.trim();
+            const coordinador = document.getElementById('nuevoGrupoCoordinador')?.value.trim();
+            const telefono = document.getElementById('nuevoGrupoTelefono')?.value.trim();
+            
+            if (!nombre) {
+                mostrarToastError('❌ Ingresa el nombre del grupo');
+                return;
+            }
+            
+            // Verificar si ya existe
+            const existe = listaGrupos.find(g => g.grupo === nombre);
+            if (existe) {
+                mostrarToastError('❌ El grupo ya existe');
+                return;
+            }
+            
+            coleccionGruposInfo.add({
+                grupo: nombre,
+                coordinador: coordinador || '',
+                telefono: telefono || ''
+            }).then(() => {
+                cargarGrupos();
+                // Limpiar formulario
+                document.getElementById('nuevoGrupoNombre').value = '';
+                document.getElementById('nuevoGrupoCoordinador').value = '';
+                document.getElementById('nuevoGrupoTelefono').value = '';
+                mostrarToastExito('✓ Grupo agregado exitosamente');
+            }).catch(error => {
+                console.error('Error:', error);
+                mostrarToastError('❌ Error al agregar grupo');
+            });
+        };
+    }
+}
+// ========== INICIALIZACIÓN PRINCIPAL ==========
 document.addEventListener('DOMContentLoaded', async () => {
     if (!requireAuth()) return;
 
@@ -584,7 +801,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('📌 Permisos del usuario:', permisos);
     
     // Ocultar/Mostrar tabs según permisos
-    const tabsIds = ['tab1', 'tab2', 'tab3', 'tab4', 'tab5', 'tab6', 'tab7'];
+    const tabsIds = ['tab1', 'tab2', 'tab3', 'tab4', 'tab5', 'tab6', 'tab7', 'tab8'];
     for (const tabId of tabsIds) {
         const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
         if (tabBtn) {
@@ -636,6 +853,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (typeof cargarHistorialRecibos === 'function') await cargarHistorialRecibos();
         }
         if (tabId === 'tab7') initTabUsuarios();
+        if (tabId === 'tab8') initTabGrupos();
     }
 
     tabs.forEach(tab => {
@@ -717,20 +935,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     mostrarToastExito('✓ Panel administrativo listo');
 });
 
-// Función para actualizar el badge del usuario
-function actualizarUserBadge() {
-    const nombre = sessionStorage.getItem('admin_nombre') || 
-                   sessionStorage.getItem('admin_username') || 
-                   'Administrador';
-    const userBadge = document.getElementById('userBadge');
-    if (userBadge) {
-        userBadge.textContent = nombre;
-        console.log('✅ Badge actualizado a:', nombre);
-    } else {
-        console.log('⚠️ No se encontró el elemento userBadge');
-    }
-}
-
 // Función para cambiar contraseña del usuario actual
 async function cambiarMiContraseña() {
     const nuevaPassword = prompt('🔑 Ingresa tu nueva contraseña (mínimo 6 caracteres):');
@@ -768,5 +972,5 @@ async function cambiarMiContraseña() {
     }
 }
 
-// Agregar el evento al botón (dentro del DOMContentLoaded)
+// Agregar el evento al botón (si existe)
 document.getElementById('btnCambiarPassword')?.addEventListener('click', cambiarMiContraseña);
