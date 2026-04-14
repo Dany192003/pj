@@ -25,6 +25,20 @@ function configurarBotonesAdmin(permisos) {
     }
 }
 
+// Función para aplicar tema según el usuario
+function aplicarTemaPorUsuario() {
+    const username = sessionStorage.getItem('admin_username');
+    const body = document.body;
+    
+    // Si es el administrador general, agregar clase naranja
+    if (username === 'dany') {
+        body.classList.add('tema-administrador');
+        console.log('🎨 Tema naranja para administrador activado');
+    } else {
+        body.classList.remove('tema-administrador');
+    }
+}
+
 // Verificar autenticación primero
 if (!requireAuth()) {
     throw new Error('No autorizado');
@@ -176,22 +190,6 @@ async function cargarEventosAdmin() {
     });
 }
 
-// Función para cargar CSS exclusivo del administrador
-function cargarCSSAdministrador() {
-    const username = sessionStorage.getItem('admin_username');
-    
-    // Si es el administrador dany, cargar CSS personalizado
-    if (username === 'dany') {
-        if (!document.getElementById('admin-dany-css')) {
-            const link = document.createElement('link');
-            link.id = 'admin-dany-css';
-            link.rel = 'stylesheet';
-            link.href = 'css/estilos-admin-dany.css';
-            document.head.appendChild(link);
-            console.log('🎨 Estilos exclusivos para administrador cargados');
-        }
-    }
-}
 // ========== CONTRASEÑAS ==========
 async function cargarContraseñasAdmin() {
     const gruposPassList = document.getElementById('gruposPassList');
@@ -855,8 +853,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     configurarBotonesAdmin(permisos);
     // ========== ACTUALIZAR BADGE DEL USUARIO ==========
-    actualizarUserBadge();
-    cargarCSSAdministrador();
+// En el DOMContentLoaded, después de actualizarUserBadge()
+actualizarUserBadge();
+aplicarTemaPorUsuario();  // ← Agregar esta línea
 
     // ========== 2. Inicializar el resto ==========
     const anioActual = new Date().getFullYear();
