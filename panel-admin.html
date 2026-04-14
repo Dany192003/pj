@@ -196,16 +196,16 @@
         </div>
     </div>
 
-    <!-- Tab 4: Contraseñas -->
-    <div id="tab4" class="tab-content">
-        <div class="card">
-            <div class="section-title">🔑 Contraseñas por Grupo</div>
-            <div id="gruposPassList"></div>
-            <p style="font-size: 12px; color: #64748b; margin-top: 15px;">
-                Cada coordinador usará esta contraseña para consultar los pagos de su grupo.
-            </p>
-        </div>
+<!-- Tab 4: Contraseñas -->
+<div id="tab4" class="tab-content">
+    <div class="card">
+        <div class="section-title">🔑 Contraseñas por Grupo</div>
+        <div id="gruposPassList"></div>
+        <p style="font-size: 12px; color: #64748b; margin-top: 15px;">
+            Cada coordinador usará esta contraseña para consultar los pagos de su grupo.
+        </p>
     </div>
+</div>
 
     <!-- Tab 5: Biblioteca -->
     <div id="tab5" class="tab-content">
@@ -410,25 +410,98 @@
 </div>
 </div>
 
-<!-- Modal Reset -->
+<!-- Modal Reset (mejorado) -->
 <div id="modalReset" class="modal-reset">
     <div class="modal-reset-content">
-        <h3>⚠️ Reiniciar Sistema</h3>
-        <p>Selecciona qué datos deseas reiniciar:</p>
-        <div style="text-align: left; margin: 20px 0;">
-            <label><input type="checkbox" id="resetPagos"> <strong>📊 Pagos y cuotas</strong></label>
-            <label><input type="checkbox" id="resetActividades"> <strong>📅 Actividades</strong></label>
-            <label><input type="checkbox" id="resetPasswords"> <strong>🔑 Contraseñas</strong></label>
-            <label><input type="checkbox" id="resetRecibos"> <strong>🔢 Contador de recibos</strong></label>
-            <label><input type="checkbox" id="resetBiblioteca"> <strong>📚 Biblioteca</strong></label>
-            <label><input type="checkbox" id="resetCategorias"> <strong>🏷️ Categorías</strong></label>
-            <label><input type="checkbox" id="resetHistorial"> <strong>📜 Historial de recibos</strong></label>
-            <label><input type="checkbox" id="resetSignificados"> <strong>🎨 Significados de colores</strong></label>
+        <div class="modal-reset-header">
+            <div class="modal-reset-icon">⚠️</div>
+            <h3>Reiniciar Sistema</h3>
+            <button class="modal-reset-close" id="btnCloseReset">&times;</button>
         </div>
-        <p><strong style="color: #ef4444;">⚠️ Esta acción NO se puede deshacer.</strong></p>
-        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
-            <button class="btn-cancel-reset" id="btnCancelReset">Cancelar</button>
-            <button class="btn-confirm-reset" id="btnConfirmReset">Sí, reiniciar seleccionados</button>
+        <div class="modal-reset-body">
+            <p class="reset-warning">Selecciona qué datos deseas reiniciar:</p>
+            <div class="reset-opciones">
+                <label class="reset-option">
+                    <input type="checkbox" id="resetPagos" value="pagos">
+                    <span class="reset-option-icon">📊</span>
+                    <div class="reset-option-text">
+                        <strong>Pagos y cuotas</strong>
+                        <small>Eliminar todos los registros de pagos</small>
+                    </div>
+                </label>
+                <label class="reset-option">
+                    <input type="checkbox" id="resetActividades" value="actividades">
+                    <span class="reset-option-icon">📅</span>
+                    <div class="reset-option-text">
+                        <strong>Actividades</strong>
+                        <small>Eliminar todas las actividades del calendario</small>
+                    </div>
+                </label>
+                <label class="reset-option">
+                    <input type="checkbox" id="resetPasswords" value="passwords">
+                    <span class="reset-option-icon">🔑</span>
+                    <div class="reset-option-text">
+                        <strong>Contraseñas de grupos</strong>
+                        <small>Eliminar todas las contraseñas de grupos</small>
+                    </div>
+                </label>
+                <label class="reset-option">
+                    <input type="checkbox" id="resetRecibos" value="recibos">
+                    <span class="reset-option-icon">🔢</span>
+                    <div class="reset-option-text">
+                        <strong>Contador de recibos</strong>
+                        <small>Reiniciar a REC-0001</small>
+                    </div>
+                </label>
+                <label class="reset-option">
+                    <input type="checkbox" id="resetBiblioteca" value="biblioteca">
+                    <span class="reset-option-icon">📚</span>
+                    <div class="reset-option-text">
+                        <strong>Biblioteca</strong>
+                        <small>Eliminar todos los recursos de la biblioteca</small>
+                    </div>
+                </label>
+                <label class="reset-option">
+                    <input type="checkbox" id="resetCategorias" value="categorias">
+                    <span class="reset-option-icon">🏷️</span>
+                    <div class="reset-option-text">
+                        <strong>Categorías</strong>
+                        <small>Eliminar todas las categorías</small>
+                    </div>
+                </label>
+                <label class="reset-option">
+                    <input type="checkbox" id="resetHistorial" value="historial">
+                    <span class="reset-option-icon">📜</span>
+                    <div class="reset-option-text">
+                        <strong>Historial de recibos</strong>
+                        <small>Eliminar todos los comprobantes del historial</small>
+                    </div>
+                </label>
+                <label class="reset-option">
+                    <input type="checkbox" id="resetSignificados" value="significados">
+                    <span class="reset-option-icon">🎨</span>
+                    <div class="reset-option-text">
+                        <strong>Significados de colores</strong>
+                        <small>Eliminar todos los significados personalizados</small>
+                    </div>
+                </label>
+                <label class="reset-option">
+    <input type="checkbox" id="resetGrupos" value="grupos">
+    <span class="reset-option-icon">📋</span>
+    <div class="reset-option-text">
+        <strong>Directorio de Grupos</strong>
+        <small>Eliminar todos los grupos y coordinadores del directorio</small>
+    </div>
+</label>
+            </div>
+            <div class="reset-advertencia">
+                <span>⚠️</span>
+                <p>Esta acción NO se puede deshacer. Los datos seleccionados se eliminarán permanentemente.</p>
+            </div>
+        </div>
+        <div class="modal-reset-footer">
+            <button class="btn-reset-cancelar" id="btnCancelReset">Cancelar</button>
+            <button class="btn-reset-confirmar" id="btnConfirmReset">Sí, reiniciar seleccionados</button>
         </div>
     </div>
 </div>

@@ -177,30 +177,69 @@ async function cargarEventosAdmin() {
 }
 
 // ========== CONTRASEÑAS ==========
+// ========== CONTRASEÑAS ==========
 async function cargarContraseñasAdmin() {
     const gruposPassList = document.getElementById('gruposPassList');
     if (!gruposPassList) return;
+
     const passwords = await cargarContraseñasGrupos();
+
     gruposPassList.innerHTML = GRUPOS.map(grupo => `
-        <div class="grupo-pass-item">
+        <div class="grupo-pass-item" data-grupo="${escapeHtml(grupo)}">
             <span><strong>👥 ${escapeHtml(grupo)}</strong></span>
-            <div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <input type="text" id="pass-${escapeHtml(grupo)}" placeholder="Contraseña" value="${passwords[grupo] || ''}" class="pass-input">
                 <button class="save-pass-btn" data-grupo="${escapeHtml(grupo)}">💾 Guardar</button>
+                <span class="pass-status" id="status-${escapeHtml(grupo)}" style="font-size: 12px; display: none;"></span>
             </div>
         </div>
     `).join('');
+
     document.querySelectorAll('.save-pass-btn').forEach(btn => {
         btn.onclick = async () => {
             const grupo = btn.dataset.grupo;
             const password = document.getElementById(`pass-${grupo}`).value.trim();
-            if (!password) { mostrarToastError("❌ Ingresa una contraseña"); return; }
+            const statusSpan = document.getElementById(`status-${grupo}`);
+            
+            if (!password) { 
+                mostrarToastError("❌ Ingresa una contraseña"); 
+                return; 
+            }
+            
+            // Deshabilitar botón y mostrar estado de guardado
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-small"></span> Guardando...';
+            
+            if (statusSpan) {
+                statusSpan.style.display = 'inline-flex';
+                statusSpan.style.alignItems = 'center';
+                statusSpan.style.gap = '4px';
+                statusSpan.innerHTML = '⏳ Guardando...';
+                statusSpan.style.color = '#f59e0b';
+            }
+            
             await guardarContraseñaGrupo(grupo, password);
+            
+            // Mostrar mensaje de éxito
+            if (statusSpan) {
+                statusSpan.innerHTML = '✅ Guardado';
+                statusSpan.style.color = '#10b981';
+            }
+            
+            btn.innerHTML = '💾 Guardar';
+            btn.disabled = false;
+            
+            // Ocultar mensaje después de 3 segundos
+            setTimeout(() => {
+                if (statusSpan) {
+                    statusSpan.style.display = 'none';
+                }
+            }, 3000);
+            
             mostrarToastExito(`✓ Contraseña guardada para ${grupo}`);
         };
     });
 }
-
 // ========== CATEGORÍAS ==========
 async function cargarSelectCategorias() {
     const select = document.getElementById('recursoCategoria');
@@ -916,20 +955,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnReset) { btnReset.onclick = () => { if (modalReset) { modalReset.style.display = 'flex'; document.body.style.overflow = 'hidden'; } }; }
     if (btnCancelReset) { btnCancelReset.onclick = () => { if (modalReset) { modalReset.style.display = 'none'; document.body.style.overflow = ''; } }; }
     if (btnConfirmReset) {
-        btnConfirmReset.onclick = async () => {
-            const getId = (id) => document.getElementById(id)?.checked || false;
-            const opciones = {
-                pagos: getId('resetPagos'), actividades: getId('resetActividades'), passwords: getId('resetPasswords'),
-                recibos: getId('resetRecibos'), biblioteca: getId('resetBiblioteca'), categorias: getId('resetCategorias'),
-                historial: getId('resetHistorial'), significados: getId('resetSignificados')
-            };
-            if (!Object.values(opciones).some(Boolean)) { mostrarToastError('❌ Selecciona al menos un elemento para reiniciar'); return; }
-            const confirmado = await mostrarConfirmacion({ titulo: "⚠️ Reiniciar Sistema", icono: "⚠️", mensaje: "¿Estás seguro de reiniciar los elementos seleccionados?", advertencia: "Esta acción NO se puede deshacer." });
-            if (confirmado) {
-                if (modalReset) { modalReset.style.display = 'none'; document.body.style.overflow = ''; }
-                await resetSistema(opciones);
-            }
-        };
+btnConfirmReset.onclick = async () => {
+    const getId = (id) => document.getElementById(id)?.checked || false;
+    const opciones = {
+        pagos: getId('resetPagos'),
+        actividades: getId('resetActividades'),
+        passwords: getId('resetPasswords'),
+        recibos: getId('resetRecibos'),
+        biblioteca: getId('resetBiblioteca'),
+        categorias: getId('resetCategorias'),
+        historial: getId('resetHistorial'),
+        significados: getId('resetSignificados'),
+        grupos: getId('resetGrupos')  // ← NUEVO
+    };
+    
+    if (!Object.values(opciones).some(Boolean)) {
+        mostrarToastError('❌ Selecciona al menos un elemento para reiniciar');
+        return;
+    }
+    
+    const confirmado = await mostrarConfirmacion({
+        titulo: "⚠️ Reiniciar Sistema",
+        icono: "⚠️",
+        mensaje: "¿Estás seguro de reiniciar los elementos seleccionados?",
+        advertencia: "Esta acción NO se puede deshacer."
+    });
+    
+    if (confirmado) {
+        if (modalReset) {
+            modalReset.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        await resetSistema(opciones);
+    }
+};
     }
     window.addEventListener('click', (e) => { if (e.target === modalReset) { modalReset.style.display = 'none'; document.body.style.overflow = ''; } });
     mostrarToastExito('✓ Panel administrativo listo');

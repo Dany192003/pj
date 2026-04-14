@@ -308,7 +308,6 @@ async function actualizarCategoria(categoriaId, nombre, icono) {
 }
 
 // ── Reset sistema ─────────────────────────────────────────────────────────────
-
 async function resetSistema(opciones) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -332,7 +331,6 @@ async function resetSistema(opciones) {
                 }
             }
 
-            // Eliminar comprobantes de Cloudinary antes de borrar de Firestore
             if (opciones?.historial && typeof window.eliminarDeCloudinary === 'function') {
                 const snapHistorial = await coleccionHistorialRecibos.get();
                 for (const doc of snapHistorial.docs) {
@@ -343,13 +341,14 @@ async function resetSistema(opciones) {
                 }
             }
 
-            if (opciones?.pagos)        await deleteCollection(coleccionPagos);
-            if (opciones?.actividades)  await deleteCollection(coleccionEventos);
-            if (opciones?.passwords)    await deleteCollection(coleccionPasswords);
-            if (opciones?.biblioteca)   await deleteCollection(coleccionRecursos);
-            if (opciones?.categorias)   await deleteCollection(coleccionCategorias);
-            if (opciones?.historial)    await deleteCollection(coleccionHistorialRecibos);
+            if (opciones?.pagos) await deleteCollection(coleccionPagos);
+            if (opciones?.actividades) await deleteCollection(coleccionEventos);
+            if (opciones?.passwords) await deleteCollection(coleccionPasswords);
+            if (opciones?.biblioteca) await deleteCollection(coleccionRecursos);
+            if (opciones?.categorias) await deleteCollection(coleccionCategorias);
+            if (opciones?.historial) await deleteCollection(coleccionHistorialRecibos);
             if (opciones?.significados) await deleteCollection(coleccionSignificadosColores);
+            if (opciones?.grupos) await deleteCollection(coleccionGruposInfo);  // ← NUEVO
 
             if (opciones?.recibos) {
                 ultimoNum = 0;
