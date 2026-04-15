@@ -2,6 +2,8 @@
 
 let listaUsuarios = [];
 let permisosSeleccionados = [];
+let usuarioEditandoId = null;
+let usuarioEditandoUsername = null;
 
 async function cargarUsuarios() {
     const tbody = document.getElementById('tablaUsuariosBody');
@@ -16,6 +18,7 @@ async function cargarUsuarios() {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">❌ Error al cargar usuarios<\/td><\/tr>';
     }
 }
+
 function renderizarTablaUsuarios() {
     const tbody = document.getElementById('tablaUsuariosBody');
     if (!tbody) return;
@@ -23,16 +26,14 @@ function renderizarTablaUsuarios() {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 No hay usuarios registrados<\/td><\/tr>';
         return;
     }
-    const permisosMap = { 'tab1': '📄', 'tab2': '📊', 'tab3': '📅', 'tab4': '🔑', 'tab5': '📚', 'tab6': '📜', 'tab7': '👥' , 'tab8': '👨‍💼'};
+    const permisosMap = { 'tab1': '📄', 'tab2': '📊', 'tab3': '📅', 'tab4': '🔑', 'tab5': '📚', 'tab6': '📜', 'tab7': '👥', 'tab8': '👨‍💼' };
     
     tbody.innerHTML = listaUsuarios.map(usuario => {
         const permisosLista = usuario.permisos || [];
         const permisosBadges = permisosLista.map(p => `<span class="permiso-badge">${permisosMap[p] || p}</span>`).join('');
         
-        // Verificar si es el administrador (username 'dany')
         const esAdmin = usuario.username === 'dany';
         
-        // Botones: solo mostrar si NO es administrador
         const botones = esAdmin ? 
             '<span style="color:#94a3b8; font-size:12px;">🔒 Bloqueado</span>' :
             `
@@ -52,11 +53,10 @@ function renderizarTablaUsuarios() {
         `;
     }).join('');
     
-    // Eventos solo para usuarios no administradores
     document.querySelectorAll('.btn-editar-usuario').forEach(btn => {
         btn.onclick = () => {
             const permisos = JSON.parse(btn.dataset.permisos || '[]');
-            editarUsuario(btn.dataset.id, btn.dataset.username, btn.dataset.email, btn.dataset.nombre, permisos);
+            abrirModalEditarUsuario(btn.dataset.id, btn.dataset.username, btn.dataset.email, btn.dataset.nombre, permisos);
         };
     });
     
@@ -70,6 +70,7 @@ function renderizarTablaUsuarios() {
         };
     });
 }
+
 async function registrarUsuario(username, email, password, nombre, permisos) {
     try {
         if (!username) return { success: false, message: 'Ingresa un nombre de usuario' };
@@ -101,27 +102,109 @@ async function registrarUsuario(username, email, password, nombre, permisos) {
     }
 }
 
-async function editarUsuario(id, usernameActual, emailActual, nombreActual, permisosActuales) {
-    const nuevoNombre = prompt('Editar nombre:', nombreActual || '');
-    permisosSeleccionados = [...permisosActuales];
-    abrirModalPermisos();
+// ========== MODAL EDITAR USUARIO (CON ESTILOS) ==========
+
+function abrirModalEditarUsuario(id, username, email, nombreActual, permisosActuales) {
+    usuarioEditandoId = id;
+    usuarioEditandoUsername = username;
     
-    const btnGuardar = document.getElementById('btnGuardarPermisos');
-    const guardarHandler = async () => {
-        const updates = {};
-        if (nuevoNombre !== null && nuevoNombre.trim() !== '') updates.nombre = nuevoNombre.trim();
-        updates.permisos = permisosSeleccionados;
-        if (Object.keys(updates).length > 0) {
-            await coleccionUsuarios.doc(id).update(updates);
-            await cargarUsuarios();
-            mostrarToastExito('✓ Usuario actualizado');
-        }
-        cerrarModalPermisos();
-        btnGuardar.removeEventListener('click', guardarHandler);
-    };
-    btnGuardar.addEventListener('click', guardarHandler);
-    abrirModalPermisos();
+    // Verificar que los elementos existan
+    const nombreInput = document.getElementById('editUsuarioNombre');
+    const emailInput = document.getElementById('editUsuarioEmail');
+    
+    if (nombreInput) nombreInput.value = nombreActual || '';
+    if (emailInput) {
+        emailInput.value = email || '';
+        emailInput.readOnly = true;
+    }
+    
+    const permisosContainer = document.getElementById('editUsuarioPermisos');
+    if (!permisosContainer) return;
+    
+    const listaPermisos = [
+        { id: 'tab1', nombre: '📄 Generar Recibos' },
+        { id: 'tab2', nombre: '📊 Control de Cuotas' },
+        { id: 'tab3', nombre: '📅 Actividades' },
+        { id: 'tab4', nombre: '🔑 Contraseñas Grupos' },
+        { id: 'tab5', nombre: '📚 Biblioteca' },
+        { id: 'tab6', nombre: '📜 Historial Recibos' },
+        { id: 'tab7', nombre: '👥 Usuarios' },
+        { id: 'tab8', nombre: '📋 Grupos' }
+    ];
+    
+    permisosContainer.innerHTML = listaPermisos.map(permiso => `
+        <label class="permiso-checkbox-item">
+            <input type="checkbox" value="${permiso.id}" ${permisosActuales.includes(permiso.id) ? 'checked' : ''}>
+            <span>${permiso.nombre}</span>
+        </label>
+    `).join('');
+    
+    const modal = document.getElementById('modalEditarUsuario');
+    if (modal) modal.style.display = 'flex';
 }
+
+function cerrarModalEditarUsuario() {
+    const modal = document.getElementById('modalEditarUsuario');
+    if (modal) modal.style.display = 'none';
+}
+
+async function guardarEdicionUsuario() {
+    const nuevoNombre = document.getElementById('editUsuarioNombre')?.value.trim() || '';
+    const permisosSeleccionadosEdit = [];
+    
+    document.querySelectorAll('#editUsuarioPermisos input[type="checkbox"]:checked').forEach(cb => {
+        permisosSeleccionadosEdit.push(cb.value);
+    });
+    
+    if (!nuevoNombre) {
+        mostrarToastError('❌ El nombre es obligatorio');
+        return;
+    }
+    
+    const btnGuardar = document.querySelector('#modalEditarUsuario .btn-editar-usuario-guardar');
+    if (btnGuardar) {
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<span class="spinner-small"></span> Guardando...';
+    }
+    
+    try {
+        await coleccionUsuarios.doc(usuarioEditandoId).update({
+            nombre: nuevoNombre,
+            permisos: permisosSeleccionadosEdit
+        });
+        
+        await cargarUsuarios();
+        mostrarToastExito('✓ Usuario actualizado correctamente');
+        cerrarModalEditarUsuario();
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarToastError('❌ Error al actualizar el usuario');
+    } finally {
+        if (btnGuardar) {
+            btnGuardar.disabled = false;
+            btnGuardar.innerHTML = '💾 Guardar cambios';
+        }
+    }
+}
+
+function initModalEditarUsuario() {
+    const modal = document.getElementById('modalEditarUsuario');
+    if (!modal) return;
+    
+    const closeBtn = document.querySelector('#modalEditarUsuario .modal-editar-usuario-close');
+    const cancelBtn = document.querySelector('#modalEditarUsuario .btn-editar-usuario-cancelar');
+    const guardarBtn = document.querySelector('#modalEditarUsuario .btn-editar-usuario-guardar');
+    
+    if (closeBtn) closeBtn.onclick = cerrarModalEditarUsuario;
+    if (cancelBtn) cancelBtn.onclick = cerrarModalEditarUsuario;
+    if (guardarBtn) guardarBtn.onclick = guardarEdicionUsuario;
+    
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) cerrarModalEditarUsuario();
+    });
+}
+
+// ========== ELIMINAR USUARIO ==========
 
 async function eliminarUsuario(id) {
     try {
@@ -130,7 +213,8 @@ async function eliminarUsuario(id) {
     } catch (error) { return false; }
 }
 
-// Restablecer contraseña de un usuario (envía email)
+// ========== RESTABLECER CONTRASEÑA ==========
+
 async function restablecerPasswordUsuario(email, username) {
     if (!email) {
         mostrarToastError('❌ Este usuario no tiene correo registrado');
@@ -149,13 +233,15 @@ async function restablecerPasswordUsuario(email, username) {
     }
 }
 
+// ========== PERMISOS Y ROLES ==========
+
 function getPermisosUsuario() {
     const permisos = sessionStorage.getItem('admin_permisos');
     return permisos ? JSON.parse(permisos) : [];
 }
 
 function configurarPermisosPorRol(permisos) {
-    const tabs = ['tab1', 'tab2', 'tab3', 'tab4', 'tab5', 'tab6', 'tab7'];
+    const tabs = ['tab1', 'tab2', 'tab3', 'tab4', 'tab5', 'tab6', 'tab7', 'tab8'];
     for (const tabId of tabs) {
         const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
         if (tabBtn) tabBtn.style.display = permisos.includes(tabId) ? 'flex' : 'none';
@@ -165,6 +251,8 @@ function configurarPermisosPorRol(permisos) {
         setTimeout(() => logout(), 2000);
     }
 }
+
+// ========== MODAL DE PERMISOS ==========
 
 function abrirModalPermisos() {
     const modal = document.getElementById('modalPermisos');
@@ -179,7 +267,12 @@ function cerrarModalPermisos() {
     if (modal) modal.style.display = 'none';
 }
 
+// ========== INICIALIZACIÓN ==========
+
 function initUsuarios() {
+    // Inicializar modal de edición de usuario
+    initModalEditarUsuario();
+    
     const btnRegistrar = document.getElementById('btnRegistrarUsuario');
     const btnAbrirPermisos = document.getElementById('btnAbrirPermisos');
     const btnGuardarPermisos = document.getElementById('btnGuardarPermisos');
@@ -237,6 +330,7 @@ function initUsuarios() {
     cargarUsuarios();
 }
 
+// ========== EXPORTAR ==========
 window.initUsuarios = initUsuarios;
 window.getPermisosUsuario = getPermisosUsuario;
 window.configurarPermisosPorRol = configurarPermisosPorRol;

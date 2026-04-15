@@ -504,7 +504,33 @@
         </div>
     </div>
 </div>
-
+<!-- Modal Editar Usuario -->
+<div id="modalEditarUsuario" class="modal-editar-usuario">
+    <div class="modal-editar-usuario-content">
+        <div class="modal-editar-usuario-header">
+            <h3>✏️ Editar Usuario</h3>
+            <button class="modal-editar-usuario-close">&times;</button>
+        </div>
+        <div class="modal-editar-usuario-body">
+            <div class="form-editar-usuario">
+                <div class="form-usuario-field">
+                    <label>👤 Nombre completo</label>
+                    <input type="text" id="editUsuarioNombre" class="form-usuario-input" placeholder="Nombre del usuario">
+                </div>
+                <div class="form-usuario-field">
+                    <label>🎭 Permisos</label>
+                    <div id="editUsuarioPermisos" class="permisos-checkboxes">
+                        <!-- Los checkboxes se generarán dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-editar-usuario-footer">
+            <button class="btn-editar-usuario-cancelar">Cancelar</button>
+            <button class="btn-editar-usuario-guardar">💾 Guardar cambios</button>
+        </div>
+    </div>
+</div>
 <!-- Modal de permisos -->
 <div id="modalPermisos" class="modal-permisos">
     <div class="modal-permisos-content">
@@ -522,6 +548,7 @@
                 <label><input type="checkbox" class="permiso-checkbox" value="tab5"> 📚 Biblioteca</label>
                 <label><input type="checkbox" class="permiso-checkbox" value="tab6"> 📜 Historial Recibos</label>
                 <label><input type="checkbox" class="permiso-checkbox" value="tab7"> 👥 Usuarios</label>
+                <label><input type="checkbox" class="permiso-checkbox" value="tab8"> ✅ Coordinadores</label>
             </div>
         </div>
         <div class="modal-permisos-footer">
