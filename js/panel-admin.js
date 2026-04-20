@@ -30,7 +30,6 @@ function aplicarTemaPorUsuario() {
     const username = sessionStorage.getItem('admin_username');
     const body = document.body;
     
-    // Si es el administrador general, agregar clase naranja
     if (username === 'dany') {
         body.classList.add('tema-administrador');
         console.log('🎨 Tema naranja para administrador activado');
@@ -153,7 +152,128 @@ function mostrarConfirmacion(opciones) {
     });
 }
 
-// ========== EVENTOS ADMIN ==========
+// ========== EVENTOS ADMIN (con edición y hora) ==========
+let eventoEditandoId = null;
+
+function abrirModalEditarActividad(evento) {
+    eventoEditandoId = evento.id;
+    
+    let modal = document.getElementById('modalEditarActividad');
+    if (!modal) {
+        const modalHTML = `
+            <div id="modalEditarActividad" class="modal-editar-actividad">
+                <div class="modal-editar-actividad-content">
+                    <div class="modal-editar-actividad-header">
+                        <h3>✏️ Editar Actividad</h3>
+                        <button class="modal-editar-actividad-close">&times;</button>
+                    </div>
+                    <div class="modal-editar-actividad-body">
+                        <div class="form-editar-actividad">
+                            <div class="form-actividad-field">
+                                <label>📆 Fecha</label>
+                                <input type="date" id="editActividadFecha" class="form-actividad-input">
+                            </div>
+                            <div class="form-actividad-field">
+                                <label>⏰ Hora</label>
+                                <input type="time" id="editActividadHora" class="form-actividad-input" step="60">
+                            </div>
+                            <div class="form-actividad-field">
+                                <label>📌 Título</label>
+                                <input type="text" id="editActividadTitulo" class="form-actividad-input" placeholder="Título de la actividad">
+                            </div>
+                            <div class="form-actividad-field">
+                                <label>📍 Lugar</label>
+                                <input type="text" id="editActividadLugar" class="form-actividad-input" placeholder="Lugar">
+                            </div>
+                            <div class="form-actividad-field">
+                                <label>🎨 Color</label>
+                                <select id="editActividadColor" class="form-actividad-select"></select>
+                            </div>
+                            <div class="form-actividad-field">
+                                <label>📝 Descripción</label>
+                                <textarea id="editActividadDescripcion" class="form-actividad-textarea" rows="3" placeholder="Descripción detallada..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-editar-actividad-footer">
+                        <button class="btn-editar-actividad-cancelar">Cancelar</button>
+                        <button class="btn-editar-actividad-guardar">💾 Guardar cambios</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        modal = document.getElementById('modalEditarActividad');
+        
+        const closeBtn = modal.querySelector('.modal-editar-actividad-close');
+        const cancelBtn = modal.querySelector('.btn-editar-actividad-cancelar');
+        
+        closeBtn.onclick = () => modal.style.display = 'none';
+        cancelBtn.onclick = () => modal.style.display = 'none';
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+        
+        const guardarBtn = modal.querySelector('.btn-editar-actividad-guardar');
+        guardarBtn.onclick = guardarEdicionActividad;
+    }
+    
+    // Cargar colores en el select
+    const selectColor = document.getElementById('editActividadColor');
+    const colores = [
+        { codigo: '#0891b2', nombre: 'Azul', icono: '🔵' },
+        { codigo: '#ef4444', nombre: 'Rojo', icono: '🔴' },
+        { codigo: '#f97316', nombre: 'Naranja', icono: '🟠' },
+        { codigo: '#eab308', nombre: 'Amarillo', icono: '🟡' },
+        { codigo: '#10b981', nombre: 'Verde', icono: '🟢' },
+        { codigo: '#8b5cf6', nombre: 'Morado', icono: '🟣' },
+        { codigo: '#ec4899', nombre: 'Rosa', icono: '🩷' },
+        { codigo: '#06b6d4', nombre: 'Cian', icono: '💙' },
+        { codigo: '#f59e0b', nombre: 'Ámbar', icono: '🟧' },
+        { codigo: '#6366f1', nombre: 'Índigo', icono: '🔮' }
+    ];
+    selectColor.innerHTML = colores.map(c => 
+        `<option value="${c.codigo}" ${evento.color === c.codigo ? 'selected' : ''}>${c.icono} ${c.nombre}</option>`
+    ).join('');
+    
+    document.getElementById('editActividadFecha').value = evento.fecha;
+    document.getElementById('editActividadHora').value = evento.hora || '';
+    document.getElementById('editActividadTitulo').value = evento.titulo;
+    document.getElementById('editActividadLugar').value = evento.lugar || '';
+    document.getElementById('editActividadDescripcion').value = evento.descripcion || '';
+    
+    modal.style.display = 'flex';
+}
+
+async function guardarEdicionActividad() {
+    const fecha = document.getElementById('editActividadFecha').value;
+    const hora = document.getElementById('editActividadHora').value;
+    const titulo = document.getElementById('editActividadTitulo').value.trim();
+    const lugar = document.getElementById('editActividadLugar').value.trim();
+    const descripcion = document.getElementById('editActividadDescripcion').value.trim();
+    const color = document.getElementById('editActividadColor').value;
+    
+    if (!fecha) { mostrarToastError('❌ La fecha es obligatoria'); return; }
+    if (!titulo) { mostrarToastError('❌ El título es obligatorio'); return; }
+    
+    const btnGuardar = document.querySelector('#modalEditarActividad .btn-editar-actividad-guardar');
+    btnGuardar.disabled = true;
+    btnGuardar.innerHTML = '<span class="spinner-small"></span> Guardando...';
+    
+    try {
+        await coleccionEventos.doc(eventoEditandoId).update({
+            fecha, hora, titulo, lugar, descripcion, color
+        });
+        await cargarEventosAdmin();
+        mostrarToastExito('✓ Actividad actualizada correctamente');
+        document.getElementById('modalEditarActividad').style.display = 'none';
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarToastError('❌ Error al actualizar la actividad');
+    } finally {
+        btnGuardar.disabled = false;
+        btnGuardar.innerHTML = '💾 Guardar cambios';
+    }
+}
+
 async function cargarEventosAdmin() {
     const eventosList = document.getElementById('eventosList');
     if (!eventosList) return;
@@ -165,15 +285,26 @@ async function cargarEventosAdmin() {
     eventosList.innerHTML = eventos.map(evento => `
         <div class="evento-item" style="border-left: 4px solid ${evento.color || '#0891b2'};">
             <div style="flex:1;">
-                <div class="evento-fecha">📅 ${evento.fecha}</div>
+                <div class="evento-fecha">📅 ${evento.fecha} ${evento.hora ? `⏰ ${evento.hora}` : ''}</div>
                 <div class="evento-titulo"><strong>${escapeHtml(evento.titulo)}</strong></div>
                 ${evento.lugar ? `<div class="evento-lugar">📍 ${escapeHtml(evento.lugar)}</div>` : ''}
                 ${evento.descripcion ? `<div class="evento-descripcion">📝 ${escapeHtml(evento.descripcion.substring(0, 100))}${evento.descripcion.length > 100 ? '...' : ''}</div>` : ''}
                 <div class="evento-color" style="display: inline-block; background: ${evento.color || '#0891b2'}; width: 16px; height: 16px; border-radius: 4px; margin-top: 5px;"></div>
             </div>
-            <button class="delete-btn" data-id="${evento.id}">🗑️</button>
+            <div style="display: flex; gap: 8px;">
+                <button class="edit-btn" data-id="${evento.id}" data-evento='${JSON.stringify(evento)}'>✏️ Editar</button>
+                <button class="delete-btn" data-id="${evento.id}">🗑️ Eliminar</button>
+            </div>
         </div>
     `).join('');
+    
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.onclick = () => {
+            const evento = JSON.parse(btn.dataset.evento);
+            abrirModalEditarActividad(evento);
+        };
+    });
+    
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.onclick = async () => {
             const confirmado = await mostrarConfirmacion({
@@ -225,13 +356,11 @@ async function cargarContraseñasAdmin() {
                 return; 
             }
             
-            // Deshabilitar botón y mostrar estado de guardado
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-small"></span> Guardando...';
             
             await guardarContraseñaGrupo(grupo, password);
             
-            // Mostrar indicador permanente
             if (indicator) {
                 indicator.style.display = 'inline-flex';
                 indicator.style.animation = 'fadeInScale 0.3s ease';
@@ -244,6 +373,7 @@ async function cargarContraseñasAdmin() {
         };
     });
 }
+
 // ========== CATEGORÍAS ==========
 async function cargarSelectCategorias() {
     const select = document.getElementById('recursoCategoria');
@@ -385,7 +515,7 @@ async function cargarRecursosAdmin() {
         });
     } catch (error) {
         console.error('Error cargando recursos:', error);
-        recursosTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos<\/td><\/tr>';
+        recursosTableBody.innerHTML = '<td><td colspan="5" style="text-align:center;padding:40px;">❌ Error al cargar recursos<\/td><\/tr>';
     }
 }
 
@@ -618,24 +748,19 @@ function initTabUsuarios() {
     if (typeof initUsuarios === 'function') initUsuarios();
 }
 
-// ========== GESTIÓN DE GRUPOS (NUEVO TAB8) ==========
+// ========== GESTIÓN DE GRUPOS (TAB8) ==========
 let listaGrupos = [];
 
 async function cargarGrupos() {
     const tbody = document.getElementById('tablaGruposBody');
     if (!tbody) return;
-    
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">📜 Cargando grupos...<\/td><\/tr>';
-    
     try {
         const snapshot = await coleccionGruposInfo.get();
         listaGrupos = [];
-        snapshot.forEach(doc => {
-            listaGrupos.push({ id: doc.id, ...doc.data() });
-        });
+        snapshot.forEach(doc => { listaGrupos.push({ id: doc.id, ...doc.data() }); });
         renderizarTablaGrupos();
     } catch (error) {
-        console.error('Error cargando grupos:', error);
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">❌ Error al cargar grupos<\/td><\/tr>';
     }
 }
@@ -643,12 +768,10 @@ async function cargarGrupos() {
 function renderizarTablaGrupos() {
     const tbody = document.getElementById('tablaGruposBody');
     if (!tbody) return;
-    
     if (listaGrupos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">📭 No hay coordinadores agregados. Usa "Agregar coordinador" para empezar.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">📭 No hay coordinadores agregados. Usa "Agregar coordinador" para empezar.解决</td>';
         return;
     }
-    
     let html = '';
     for (const grupo of listaGrupos) {
         html += `
@@ -664,11 +787,9 @@ function renderizarTablaGrupos() {
         `;
     }
     tbody.innerHTML = html;
-    
     document.querySelectorAll('.btn-editar-grupo').forEach(btn => {
         btn.onclick = () => editarGrupo(btn.dataset.id, btn.dataset.grupo, btn.dataset.coordinador, btn.dataset.telefono);
     });
-    
     document.querySelectorAll('.btn-eliminar-grupo').forEach(btn => {
         btn.onclick = async () => {
             if (confirm(`¿Eliminar la información del grupo "${btn.dataset.grupo}"?`)) {
@@ -680,9 +801,7 @@ function renderizarTablaGrupos() {
     });
 }
 
-// Modal de edición de grupo (con estilos)
 function editarGrupo(id, grupoActual, coordinadorActual, telefonoActual) {
-    // Crear modal si no existe
     let modal = document.getElementById('modalEditarGrupo');
     if (!modal) {
         const modalHTML = `
@@ -694,18 +813,9 @@ function editarGrupo(id, grupoActual, coordinadorActual, telefonoActual) {
                     </div>
                     <div class="modal-editar-grupo-body">
                         <div class="form-editar-grupo">
-                            <div class="form-grupo-field">
-                                <label>🏷️ Nombre del grupo</label>
-                                <input type="text" id="editGrupoNombre" class="form-editar-input" placeholder="Nombre del grupo">
-                            </div>
-                            <div class="form-grupo-field">
-                                <label>👤 Coordinador</label>
-                                <input type="text" id="editGrupoCoordinador" class="form-editar-input" placeholder="Nombre del coordinador">
-                            </div>
-                            <div class="form-grupo-field">
-                                <label>📱 Teléfono</label>
-                                <input type="tel" id="editGrupoTelefono" class="form-editar-input" placeholder="Ej: 50212345678">
-                            </div>
+                            <div class="form-grupo-field"><label>🏷️ Nombre del grupo</label><input type="text" id="editGrupoNombre" class="form-editar-input" placeholder="Nombre del grupo"></div>
+                            <div class="form-grupo-field"><label>👤 Coordinador</label><input type="text" id="editGrupoCoordinador" class="form-editar-input" placeholder="Nombre del coordinador"></div>
+                            <div class="form-grupo-field"><label>📱 Teléfono</label><input type="tel" id="editGrupoTelefono" class="form-editar-input" placeholder="Ej: 50212345678"></div>
                         </div>
                     </div>
                     <div class="modal-editar-grupo-footer">
@@ -717,147 +827,82 @@ function editarGrupo(id, grupoActual, coordinadorActual, telefonoActual) {
         `;
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         modal = document.getElementById('modalEditarGrupo');
-        
-        // Eventos del modal
-        const closeBtn = modal.querySelector('.modal-editar-grupo-close');
-        const cancelBtn = modal.querySelector('.btn-editar-grupo-cancelar');
-        
-        closeBtn.onclick = () => modal.style.display = 'none';
-        cancelBtn.onclick = () => modal.style.display = 'none';
-        
+        modal.querySelector('.modal-editar-grupo-close').onclick = () => modal.style.display = 'none';
+        modal.querySelector('.btn-editar-grupo-cancelar').onclick = () => modal.style.display = 'none';
         modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
     }
-    
-    // Rellenar datos actuales
     document.getElementById('editGrupoNombre').value = grupoActual;
     document.getElementById('editGrupoCoordinador').value = coordinadorActual || '';
     document.getElementById('editGrupoTelefono').value = telefonoActual || '';
-    
-    // Guardar ID del grupo para usarlo al guardar
     modal.dataset.id = id;
     modal.dataset.grupoActual = grupoActual;
-    
-    // Evento guardar (remover anterior para evitar duplicados)
     const guardarBtn = modal.querySelector('.btn-editar-grupo-guardar');
     const nuevoGuardarBtn = guardarBtn.cloneNode(true);
     guardarBtn.parentNode.replaceChild(nuevoGuardarBtn, guardarBtn);
-    
     nuevoGuardarBtn.onclick = async () => {
         const nuevoNombre = document.getElementById('editGrupoNombre').value.trim();
         const nuevoCoordinador = document.getElementById('editGrupoCoordinador').value.trim();
         const nuevoTelefono = document.getElementById('editGrupoTelefono').value.trim();
-        
         const updates = {};
         if (nuevoNombre && nuevoNombre !== modal.dataset.grupoActual) updates.grupo = nuevoNombre;
         if (nuevoCoordinador) updates.coordinador = nuevoCoordinador;
         if (nuevoTelefono) updates.telefono = nuevoTelefono;
-        
-        if (Object.keys(updates).length === 0) {
-            modal.style.display = 'none';
-            return;
-        }
-        
+        if (Object.keys(updates).length === 0) { modal.style.display = 'none'; return; }
         nuevoGuardarBtn.disabled = true;
         nuevoGuardarBtn.innerHTML = '<span class="spinner-small"></span> Guardando...';
-        
         try {
             await coleccionGruposInfo.doc(modal.dataset.id).update(updates);
             await cargarGrupos();
             mostrarToastExito('✓ Grupo actualizado correctamente');
             modal.style.display = 'none';
         } catch (error) {
-            console.error('Error:', error);
             mostrarToastError('❌ Error al actualizar el grupo');
         } finally {
             nuevoGuardarBtn.disabled = false;
             nuevoGuardarBtn.innerHTML = '💾 Guardar cambios';
         }
     };
-    
     modal.style.display = 'flex';
-}
-
-function agregarGrupoInicial(grupo) {
-    const existe = listaGrupos.find(g => g.grupo === grupo);
-    if (!existe) {
-        coleccionGruposInfo.add({
-            grupo: grupo,
-            coordinador: '',
-            telefono: ''
-        }).then(() => {
-            cargarGrupos();
-        }).catch(error => {
-            console.error('Error al agregar grupo:', error);
-        });
-    }
 }
 
 function initTabGrupos() {
     cargarGrupos();
-    
-    // Botón del formulario para agregar grupo
     const btnAgregarGrupoForm = document.getElementById('btnAgregarGrupoForm');
     if (btnAgregarGrupoForm) {
         btnAgregarGrupoForm.onclick = () => {
             const nombre = document.getElementById('nuevoGrupoNombre')?.value.trim();
             const coordinador = document.getElementById('nuevoGrupoCoordinador')?.value.trim();
             const telefono = document.getElementById('nuevoGrupoTelefono')?.value.trim();
-            
-            if (!nombre) {
-                mostrarToastError('❌ Ingresa el nombre del grupo');
-                return;
-            }
-            
-            // Verificar si ya existe
-            const existe = listaGrupos.find(g => g.grupo === nombre);
-            if (existe) {
-                mostrarToastError('❌ El grupo ya existe');
-                return;
-            }
-            
-            coleccionGruposInfo.add({
-                grupo: nombre,
-                coordinador: coordinador || '',
-                telefono: telefono || ''
-            }).then(() => {
+            if (!nombre) { mostrarToastError('❌ Ingresa el nombre del grupo'); return; }
+            if (listaGrupos.find(g => g.grupo === nombre)) { mostrarToastError('❌ El grupo ya existe'); return; }
+            coleccionGruposInfo.add({ grupo: nombre, coordinador: coordinador || '', telefono: telefono || '' }).then(() => {
                 cargarGrupos();
-                // Limpiar formulario
                 document.getElementById('nuevoGrupoNombre').value = '';
                 document.getElementById('nuevoGrupoCoordinador').value = '';
                 document.getElementById('nuevoGrupoTelefono').value = '';
                 mostrarToastExito('✓ Grupo agregado exitosamente');
-            }).catch(error => {
-                console.error('Error:', error);
-                mostrarToastError('❌ Error al agregar grupo');
-            });
+            }).catch(() => mostrarToastError('❌ Error al agregar grupo'));
         };
     }
 }
+
 // ========== INICIALIZACIÓN PRINCIPAL ==========
 document.addEventListener('DOMContentLoaded', async () => {
     if (!requireAuth()) return;
-
     await loadDatabase();
 
-    // ========== 1. PRIMERO: Configurar permisos (antes de mostrar cualquier tab) ==========
     const permisos = getPermisosUsuario();
     console.log('📌 Permisos del usuario:', permisos);
     
-    // Ocultar/Mostrar tabs según permisos
     const tabsIds = ['tab1', 'tab2', 'tab3', 'tab4', 'tab5', 'tab6', 'tab7', 'tab8'];
     for (const tabId of tabsIds) {
         const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-        if (tabBtn) {
-            tabBtn.style.display = permisos.includes(tabId) ? 'flex' : 'none';
-        }
+        if (tabBtn) tabBtn.style.display = permisos.includes(tabId) ? 'flex' : 'none';
     }
     configurarBotonesAdmin(permisos);
-    // ========== ACTUALIZAR BADGE DEL USUARIO ==========
-// En el DOMContentLoaded, después de actualizarUserBadge()
-actualizarUserBadge();
-aplicarTemaPorUsuario();  // ← Agregar esta línea
+    actualizarUserBadge();
+    aplicarTemaPorUsuario();
 
-    // ========== 2. Inicializar el resto ==========
     const anioActual = new Date().getFullYear();
     window.anioSeleccionado = anioActual;
     await asegurarDBCloud(anioActual);
@@ -878,7 +923,6 @@ aplicarTemaPorUsuario();  // ← Agregar esta línea
     document.getElementById('grupo').onchange = checkOtroGrupo;
     document.getElementById('selectAnioControl').onchange = cambiarAnioControl;
 
-    // ========== 3. Configurar TABS ==========
     const tabs = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -908,12 +952,10 @@ aplicarTemaPorUsuario();  // ← Agregar esta línea
         });
     });
 
-    // Activar el primer tab permitido
     let firstAllowedTab = tabsIds.find(tabId => permisos.includes(tabId));
     if (!firstAllowedTab) firstAllowedTab = 'tab1';
     await activateTab(firstAllowedTab);
 
-    // ========== 4. Selector de emojis ==========
     const btnAbrirEmojis = document.getElementById('btnAbrirEmojis');
     const emojiSelector = document.getElementById('emojiSelector');
     const categoriaIconoInput = document.getElementById('categoriaIcono');
@@ -923,28 +965,30 @@ aplicarTemaPorUsuario();  // ← Agregar esta línea
         document.querySelectorAll('.emoji-option').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); if (categoriaIconoInput) categoriaIconoInput.value = btn.dataset.emoji; emojiSelector.style.display = 'none'; }; });
     }
 
-    // ========== 5. Agregar Evento ==========
     document.getElementById('btnAgregarEvento')?.addEventListener('click', async () => {
         const fecha = document.getElementById('eventoFecha').value;
+        const hora = document.getElementById('eventoHora').value;
         const titulo = document.getElementById('eventoTitulo').value.trim();
         const lugar = document.getElementById('eventoLugar').value.trim();
         const descripcion = document.getElementById('eventoDescripcion').value.trim();
         const color = document.getElementById('eventoColor').value;
         if (!fecha) { mostrarToastError('❌ Selecciona una fecha'); return; }
-        if (!color) { mostrarToastError('❌ Selecciona un color para la actividad'); return; }
+        if (!color) { mostrarToastError('❌ Selecciona un color'); return; }
         const tituloFinal = titulo || '📅 Actividad sin título';
-        await agregarEvento(fecha, tituloFinal, lugar, descripcion, color);
-        ['eventoFecha', 'eventoTitulo', 'eventoLugar', 'eventoDescripcion'].forEach(id => { document.getElementById(id).value = ''; });
-        document.getElementById('eventoColor').value = '';
+        await agregarEvento(fecha, tituloFinal, lugar, descripcion, color, hora);
+        document.getElementById('eventoFecha').value = '';
+        document.getElementById('eventoHora').value = '';
+        document.getElementById('eventoTitulo').value = '';
+        document.getElementById('eventoLugar').value = '';
+        document.getElementById('eventoDescripcion').value = '';
         await cargarEventosAdmin();
         mostrarToastExito('✓ Actividad agregada');
     });
 
-    // ========== 6. Agregar Categoría ==========
     document.getElementById('btnAgregarCategoria')?.addEventListener('click', async () => {
         const nombre = document.getElementById('categoriaNombre').value.trim();
         const icono = document.getElementById('categoriaIcono').value.trim() || '📁';
-        if (!nombre) { mostrarToastError('❌ Ingresa un nombre para la categoría'); return; }
+        if (!nombre) { mostrarToastError('❌ Ingresa un nombre'); return; }
         await agregarCategoria(nombre, icono);
         document.getElementById('categoriaNombre').value = '';
         document.getElementById('categoriaIcono').value = '';
@@ -953,7 +997,6 @@ aplicarTemaPorUsuario();  // ← Agregar esta línea
         mostrarToastExito('✓ Categoría agregada');
     });
 
-    // ========== 7. Modal Reset ==========
     const modalReset = document.getElementById('modalReset');
     const btnReset = document.getElementById('btnReset');
     const btnCancelReset = document.getElementById('btnCancelReset');
@@ -961,81 +1004,41 @@ aplicarTemaPorUsuario();  // ← Agregar esta línea
     if (btnReset) { btnReset.onclick = () => { if (modalReset) { modalReset.style.display = 'flex'; document.body.style.overflow = 'hidden'; } }; }
     if (btnCancelReset) { btnCancelReset.onclick = () => { if (modalReset) { modalReset.style.display = 'none'; document.body.style.overflow = ''; } }; }
     if (btnConfirmReset) {
-btnConfirmReset.onclick = async () => {
-    const getId = (id) => document.getElementById(id)?.checked || false;
-    const opciones = {
-        pagos: getId('resetPagos'),
-        actividades: getId('resetActividades'),
-        passwords: getId('resetPasswords'),
-        recibos: getId('resetRecibos'),
-        biblioteca: getId('resetBiblioteca'),
-        categorias: getId('resetCategorias'),
-        historial: getId('resetHistorial'),
-        significados: getId('resetSignificados'),
-        grupos: getId('resetGrupos')  // ← NUEVO
-    };
-    
-    if (!Object.values(opciones).some(Boolean)) {
-        mostrarToastError('❌ Selecciona al menos un elemento para reiniciar');
-        return;
-    }
-    
-    const confirmado = await mostrarConfirmacion({
-        titulo: "⚠️ Reiniciar Sistema",
-        icono: "⚠️",
-        mensaje: "¿Estás seguro de reiniciar los elementos seleccionados?",
-        advertencia: "Esta acción NO se puede deshacer."
-    });
-    
-    if (confirmado) {
-        if (modalReset) {
-            modalReset.style.display = 'none';
-            document.body.style.overflow = '';
-        }
-        await resetSistema(opciones);
-    }
-};
+        btnConfirmReset.onclick = async () => {
+            const getId = (id) => document.getElementById(id)?.checked || false;
+            const opciones = {
+                pagos: getId('resetPagos'), actividades: getId('resetActividades'), passwords: getId('resetPasswords'),
+                recibos: getId('resetRecibos'), biblioteca: getId('resetBiblioteca'), categorias: getId('resetCategorias'),
+                historial: getId('resetHistorial'), significados: getId('resetSignificados'), grupos: getId('resetGrupos')
+            };
+            if (!Object.values(opciones).some(Boolean)) { mostrarToastError('❌ Selecciona al menos un elemento'); return; }
+            const confirmado = await mostrarConfirmacion({ titulo: "⚠️ Reiniciar Sistema", icono: "⚠️", mensaje: "¿Estás seguro de reiniciar los elementos seleccionados?", advertencia: "Esta acción NO se puede deshacer." });
+            if (confirmado) {
+                if (modalReset) { modalReset.style.display = 'none'; document.body.style.overflow = ''; }
+                await resetSistema(opciones);
+            }
+        };
     }
     window.addEventListener('click', (e) => { if (e.target === modalReset) { modalReset.style.display = 'none'; document.body.style.overflow = ''; } });
     mostrarToastExito('✓ Panel administrativo listo');
 });
 
-// Función para cambiar contraseña del usuario actual
+// Función para cambiar contraseña
 async function cambiarMiContraseña() {
     const nuevaPassword = prompt('🔑 Ingresa tu nueva contraseña (mínimo 6 caracteres):');
-    
     if (!nuevaPassword) return;
-    
-    if (nuevaPassword.length < 6) {
-        mostrarToastError('❌ La contraseña debe tener al menos 6 caracteres');
-        return;
-    }
-    
+    if (nuevaPassword.length < 6) { mostrarToastError('❌ La contraseña debe tener al menos 6 caracteres'); return; }
     const confirmar = prompt('🔑 Confirma tu nueva contraseña:');
-    
-    if (nuevaPassword !== confirmar) {
-        mostrarToastError('❌ Las contraseñas no coinciden');
-        return;
-    }
-    
+    if (nuevaPassword !== confirmar) { mostrarToastError('❌ Las contraseñas no coinciden'); return; }
     try {
         const user = firebase.auth().currentUser;
-        if (user) {
-            await user.updatePassword(nuevaPassword);
-            mostrarToastExito('✓ Contraseña actualizada correctamente');
-            console.log('✅ Contraseña actualizada para:', user.email);
-        } else {
-            mostrarToastError('❌ No hay usuario autenticado');
-        }
+        if (user) { await user.updatePassword(nuevaPassword); mostrarToastExito('✓ Contraseña actualizada correctamente'); }
+        else { mostrarToastError('❌ No hay usuario autenticado'); }
     } catch (error) {
-        console.error('Error al cambiar contraseña:', error);
         let mensaje = 'Error al cambiar contraseña';
-        if (error.code === 'auth/requires-recent-login') {
-            mensaje = '⚠️ Por seguridad, cierra sesión y vuelve a iniciar para cambiar la contraseña';
-        }
+        if (error.code === 'auth/requires-recent-login') mensaje = '⚠️ Por seguridad, cierra sesión y vuelve a iniciar para cambiar la contraseña';
         mostrarToastError(mensaje);
     }
 }
 
-// Agregar el evento al botón (si existe)
 document.getElementById('btnCambiarPassword')?.addEventListener('click', cambiarMiContraseña);

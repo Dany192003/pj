@@ -132,13 +132,15 @@ function renderCalendar() {
             dayElement.style.backgroundColor = colorPrincipal;
             dayElement.style.borderLeftColor = colorPrincipal;
             
-            eventosDia.forEach(evento => {
-                const tituloCorto = evento.titulo.length > 15 ? evento.titulo.substring(0, 15) + '...' : evento.titulo;
-                const eventBadge = document.createElement("div");
-                eventBadge.className = "day-event";
-                eventBadge.textContent = `📌 ${tituloCorto}`;
-                dayElement.appendChild(eventBadge);
-            });
+// Dentro de renderCalendar, donde se crean los eventBadge
+eventosDia.forEach(evento => {
+    const tituloCorto = evento.titulo.length > 15 ? evento.titulo.substring(0, 15) + '...' : evento.titulo;
+    const horaTexto = evento.hora ? ` ⏰${evento.hora}` : '';
+    const eventBadge = document.createElement("div");
+    eventBadge.className = "day-event";
+    eventBadge.textContent = `📌 ${tituloCorto}${horaTexto}`;
+    dayElement.appendChild(eventBadge);
+});
         }
         
         const dayNumber = document.createElement("div");
@@ -277,6 +279,12 @@ function mostrarDetalleActividad(eventos, dia) {
         body.innerHTML = `
             <div class="actividad-item" style="border-left: 4px solid ${evento.color || '#0891b2'}">
                 <div class="actividad-titulo" style="color: ${evento.color || '#0891b2'}">📌 ${evento.titulo}</div>
+                ${evento.hora ? `
+                <div class="actividad-hora">
+                    <span class="actividad-icono">⏰</span>
+                    <strong>Hora:</strong> ${evento.hora}
+                </div>
+                ` : ''}
                 ${evento.lugar ? `
                 <div class="actividad-lugar">
                     <span class="actividad-icono">📍</span>
@@ -293,6 +301,12 @@ function mostrarDetalleActividad(eventos, dia) {
         const actividadesHtml = eventos.map((evento, index) => `
             <div class="actividad-item" style="${index < eventos.length - 1 ? 'border-bottom: 1px solid #e2e8f0; margin-bottom: 15px; padding-bottom: 15px;' : ''} border-left: 4px solid ${evento.color || '#0891b2'}">
                 <div class="actividad-titulo" style="color: ${evento.color || '#0891b2'}">📌 ${evento.titulo}</div>
+                ${evento.hora ? `
+                <div class="actividad-hora">
+                    <span class="actividad-icono">⏰</span>
+                    <strong>Hora:</strong> ${evento.hora}
+                </div>
+                ` : ''}
                 ${evento.lugar ? `
                 <div class="actividad-lugar">
                     <span class="actividad-icono">📍</span>

@@ -211,14 +211,16 @@ async function cargarEventos() {
     return eventos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 }
 
-async function agregarEvento(fecha, titulo, lugar, descripcion, color) {
+async function agregarEvento(fecha, titulo, lugar, descripcion, color, hora) {
     const evento = {
-        fecha,
-        titulo,
-        lugar: lugar || '',
+        fecha, 
+        titulo, 
+        lugar: lugar || '', 
         descripcion: descripcion || '',
         color: color || '#0891b2',
+        hora: hora || '',  // ← NUEVO: campo hora
         creado: new Date().toISOString()
+        
     };
     const docRef = await coleccionEventos.add(evento);
     return { id: docRef.id, ...evento };
