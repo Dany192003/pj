@@ -218,18 +218,18 @@ function abrirModalEditarActividad(evento) {
     
     // Cargar colores en el select
     const selectColor = document.getElementById('editActividadColor');
-    const colores = [
-        { codigo: '#0891b2', nombre: 'Azul', icono: '🔵' },
-        { codigo: '#ef4444', nombre: 'Rojo', icono: '🔴' },
-        { codigo: '#f97316', nombre: 'Naranja', icono: '🟠' },
-        { codigo: '#eab308', nombre: 'Amarillo', icono: '🟡' },
-        { codigo: '#10b981', nombre: 'Verde', icono: '🟢' },
-        { codigo: '#8b5cf6', nombre: 'Morado', icono: '🟣' },
-        { codigo: '#ec4899', nombre: 'Rosa', icono: '🩷' },
-        { codigo: '#06b6d4', nombre: 'Cian', icono: '💙' },
-        { codigo: '#f59e0b', nombre: 'Ámbar', icono: '🟧' },
-        { codigo: '#6366f1', nombre: 'Índigo', icono: '🔮' }
-    ];
+const colores = [
+    { codigo: '#0891b2', nombre: 'Azul', icono: '🔵' },
+    { codigo: '#ef4444', nombre: 'Rojo', icono: '🔴' },
+    { codigo: '#f97316', nombre: 'Naranja', icono: '🟠' },
+    { codigo: '#eab308', nombre: 'Amarillo', icono: '🟡' },
+    { codigo: '#10b981', nombre: 'Verde', icono: '🟢' },
+    { codigo: '#8b5cf6', nombre: 'Morado', icono: '🟣' },
+    { codigo: '#ec4899', nombre: 'Rosa', icono: '🩷' },
+    { codigo: '#6b4226', nombre: 'Café', icono: '🟤' },      // Café
+    { codigo: '#4ade80', nombre: 'Menta', icono: '🌿' },      // Menta
+    { codigo: '#000000', nombre: 'Negro', icono: '⚫' }       // Negro
+];
     selectColor.innerHTML = colores.map(c => 
         `<option value="${c.codigo}" ${evento.color === c.codigo ? 'selected' : ''}>${c.icono} ${c.nombre}</option>`
     ).join('');
@@ -592,14 +592,19 @@ async function cargarSignificadosAdmin() {
     const significadosGrid = document.getElementById('significadoColoresGrid');
     if (!significadosGrid) return;
     const significados = await cargarSignificadosColores();
-    const colores = [
-        { codigo: '#0891b2', nombre: 'Azul' }, { codigo: '#ef4444', nombre: 'Rojo' },
-        { codigo: '#f97316', nombre: 'Naranja' }, { codigo: '#eab308', nombre: 'Amarillo' },
-        { codigo: '#10b981', nombre: 'Verde' }, { codigo: '#8b5cf6', nombre: 'Morado' },
-        { codigo: '#ec4899', nombre: 'Rosa' }, { codigo: '#06b6d4', nombre: 'Cian' },
-        { codigo: '#f59e0b', nombre: 'Ámbar' }, { codigo: '#6366f1', nombre: 'Índigo' },
-        { codigo: '#616163', nombre: 'Gris' }
-    ];
+const colores = [
+    { codigo: '#0891b2', nombre: 'Azul' }, 
+    { codigo: '#ef4444', nombre: 'Rojo' },
+    { codigo: '#f97316', nombre: 'Naranja' }, 
+    { codigo: '#eab308', nombre: 'Amarillo' },
+    { codigo: '#10b981', nombre: 'Verde' }, 
+    { codigo: '#8b5cf6', nombre: 'Morado' },
+    { codigo: '#ec4899', nombre: 'Rosa' }, 
+    { codigo: '#6b4226', nombre: 'Café' },    // antes Cian
+    { codigo: '#4ade80', nombre: 'Menta' },   // antes Ámbar
+    { codigo: '#000000', nombre: 'Negro' },   // antes Índigo
+    { codigo: '#616163', nombre: 'Gris' }
+];
     significadosGrid.innerHTML = colores.map(color => {
         const significadoActual = significados[color.codigo] || '';
         const tieneSignificado = significadoActual.trim() !== '';
@@ -644,13 +649,18 @@ async function cargarSelectColoresActividades() {
     const select = document.getElementById('eventoColor');
     if (!select) return;
     const significados = await cargarSignificadosColores();
-    const coloresPredeterminados = [
-        { codigo: '#0891b2', nombre: 'Azul', icono: '🔵' }, { codigo: '#ef4444', nombre: 'Rojo', icono: '🔴' },
-        { codigo: '#f97316', nombre: 'Naranja', icono: '🟠' }, { codigo: '#eab308', nombre: 'Amarillo', icono: '🟡' },
-        { codigo: '#10b981', nombre: 'Verde', icono: '🟢' }, { codigo: '#8b5cf6', nombre: 'Morado', icono: '🟣' },
-        { codigo: '#ec4899', nombre: 'Rosa', icono: '🩷' }, { codigo: '#06b6d4', nombre: 'Cian', icono: '💙' },
-        { codigo: '#f59e0b', nombre: 'Ámbar', icono: '🟧' }, { codigo: '#6366f1', nombre: 'Índigo', icono: '🔮' }
-    ];
+const coloresPredeterminados = [
+    { codigo: '#0891b2', nombre: 'Azul', icono: '🔵' }, 
+    { codigo: '#ef4444', nombre: 'Rojo', icono: '🔴' },
+    { codigo: '#f97316', nombre: 'Naranja', icono: '🟠' }, 
+    { codigo: '#eab308', nombre: 'Amarillo', icono: '🟡' },
+    { codigo: '#10b981', nombre: 'Verde', icono: '🟢' }, 
+    { codigo: '#8b5cf6', nombre: 'Morado', icono: '🟣' },
+    { codigo: '#ec4899', nombre: 'Rosa', icono: '🩷' }, 
+    { codigo: '#6b4226', nombre: 'Café', icono: '🟤' },    // antes Cian
+    { codigo: '#4ade80', nombre: 'Menta', icono: '🌿' },    // antes Ámbar
+    { codigo: '#000000', nombre: 'Negro', icono: '⚫' }     // antes Índigo
+];
     const coloresConSignificado = coloresPredeterminados.filter(color => {
         const significado = significados[color.codigo];
         return significado && significado.trim() !== '';
